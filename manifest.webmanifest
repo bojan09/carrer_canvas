@@ -1,0 +1,30 @@
+{
+  "id": "./",
+  "name": "CareerCanvas",
+  "short_name": "CareerCanvas",
+  "description": "Free, private resume and cover-letter builder that works offline.",
+  "lang": "en",
+  "dir": "ltr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "any",
+  "background_color": "#091226",
+  "theme_color": "#091226",
+  "categories": ["productivity", "business", "utilities"],
+  "icons": [
+    { "src": "assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "assets/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "assets/icons/icon-maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "assets/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "screenshots": [
+    { "src": "assets/screenshots/desktop.png", "sizes": "1280x800", "type": "image/png", "form_factor": "wide", "label": "CareerCanvas home on desktop" },
+    { "src": "assets/screenshots/mobile.png", "sizes": "390x844", "type": "image/png", "form_factor": "narrow", "label": "CareerCanvas home on mobile" }
+  ],
+  "shortcuts": [
+    { "name": "Create resume", "short_name": "Resume", "url": "./#/resume", "icons": [{ "src": "assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png" }] },
+    { "name": "Browse templates", "short_name": "Templates", "url": "./#/templates", "icons": [{ "src": "assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png" }] }
+  ]
+}

@@ -1,0 +1,24 @@
+/* Phase 1: make sure no app chrome or dark theme ever reaches paper.
+   Document-specific print rules arrive with the template phases. */
+
+@media print {
+  html,
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  .site-header,
+  .bottom-nav,
+  .site-footer,
+  .toasts,
+  .skip-link,
+  dialog {
+    display: none !important;
+  }
+
+  main {
+    padding: 0 !important;
+    min-height: 0 !important;
+  }
+}

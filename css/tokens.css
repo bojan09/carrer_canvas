@@ -1,0 +1,151 @@
+/* Design tokens. Product chrome is dark indigo/navy; the interface theme
+   (light/dark) is independent from any resume template colours. */
+
+:root {
+  /* Brand palette */
+  --ink-950: #060d1d;
+  --ink-900: #091226;
+  --ink-800: #101b36;
+  --ink-700: #182347;
+  --ink-600: #243060;
+  --indigo: #536bff;
+  --violet: #9747ff;
+  --cyan: #37c8f7;
+  --positive: #12856a;
+  --danger: #cf3f5c;
+  --warning: #d9a21b;
+
+  --grad-brand: linear-gradient(135deg, #536bff 0%, #9747ff 100%);
+  --grad-text: linear-gradient(90deg, #37c8f7 0%, #7c8cff 45%, #b06bff 100%);
+
+  /* Typography: robust system stacks, no remote fonts */
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  --font-display: ui-sans-serif, system-ui, -apple-system, "Segoe UI Variable Display",
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  /* 4px rhythm */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --space-9: 96px;
+
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --radius-pill: 999px;
+
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --dur-fast: 150ms;
+  --dur: 240ms;
+  --dur-slow: 380ms;
+
+  --header-h: 64px;
+  --bottom-nav-h: 64px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+
+  --container: 1200px;
+  --gutter: 16px;
+
+  /* Always-dark app chrome (header) */
+  --chrome-bg: rgba(9, 18, 38, 0.82);
+  --chrome-border: rgba(140, 158, 255, 0.16);
+  --chrome-text: #e8ecfb;
+  --chrome-text-2: #a9b4d6;
+}
+
+/* Dark theme (default) */
+:root,
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #091226;
+  --bg-2: #0c1730;
+  --surface: #101b36;
+  --surface-2: #182347;
+  --surface-3: #202d5a;
+  --border: rgba(140, 158, 255, 0.16);
+  --border-strong: rgba(140, 158, 255, 0.34);
+  --text: #f1f4ff;
+  --text-2: #a9b4d6;
+  --text-3: #7f8bb0;
+  --accent: #536bff;
+  --accent-text: #9db0ff;
+  --accent-soft: rgba(83, 107, 255, 0.18);
+  --focus: #7fd9ff;
+  --shadow-sm: 0 1px 2px rgba(2, 6, 18, 0.5);
+  --shadow-md: 0 10px 30px rgba(2, 6, 18, 0.45);
+  --shadow-lg: 0 30px 80px rgba(2, 6, 18, 0.6);
+  --glass: rgba(24, 35, 71, 0.6);
+  --overlay: rgba(4, 8, 20, 0.72);
+  --ok-text: #4fd1ad;
+  --danger-text: #ff8da4;
+}
+
+/* Light theme */
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f5f7fb;
+  --bg-2: #eef1f8;
+  --surface: #ffffff;
+  --surface-2: #f0f3fa;
+  --surface-3: #e5e9f4;
+  --border: rgba(16, 27, 54, 0.12);
+  --border-strong: rgba(16, 27, 54, 0.28);
+  --text: #0e1730;
+  --text-2: #4b5a74;
+  --text-3: #64748b;
+  --accent: #3f55e6;
+  --accent-text: #3447cf;
+  --accent-soft: rgba(83, 107, 255, 0.12);
+  --focus: #3f55e6;
+  --shadow-sm: 0 1px 2px rgba(16, 27, 54, 0.08);
+  --shadow-md: 0 10px 30px rgba(16, 27, 54, 0.1);
+  --shadow-lg: 0 30px 80px rgba(16, 27, 54, 0.16);
+  --glass: rgba(255, 255, 255, 0.7);
+  --overlay: rgba(9, 18, 38, 0.55);
+  --ok-text: #0b6b55;
+  --danger-text: #b3294a;
+}
+
+/* No-JS fallback: follow the OS when the boot script has not set a theme */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme]) {
+    color-scheme: light;
+    --bg: #f5f7fb;
+    --bg-2: #eef1f8;
+    --surface: #ffffff;
+    --surface-2: #f0f3fa;
+    --surface-3: #e5e9f4;
+    --border: rgba(16, 27, 54, 0.12);
+    --border-strong: rgba(16, 27, 54, 0.28);
+    --text: #0e1730;
+    --text-2: #4b5a74;
+    --text-3: #64748b;
+    --accent: #3f55e6;
+    --accent-text: #3447cf;
+    --accent-soft: rgba(83, 107, 255, 0.12);
+    --focus: #3f55e6;
+  }
+}
+
+@media (min-width: 720px) {
+  :root {
+    --gutter: 24px;
+  }
+}
+
+@media (min-width: 1100px) {
+  :root {
+    --gutter: 32px;
+  }
+}

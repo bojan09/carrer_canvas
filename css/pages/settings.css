@@ -1,0 +1,132 @@
+.settings-grid {
+  display: grid;
+  gap: var(--space-5);
+  max-width: 820px;
+}
+
+.setting-card {
+  padding: var(--space-5);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+}
+
+.setting-card > h2 {
+  font-size: 1.1875rem;
+  margin-bottom: var(--space-1);
+}
+
+.setting-card > .setting-card__lead {
+  color: var(--text-2);
+  font-size: 0.9375rem;
+  margin-bottom: var(--space-4);
+}
+
+.setting-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3) var(--space-5);
+  padding-block: var(--space-4);
+  border-top: 1px solid var(--border);
+}
+
+.setting-row:first-of-type {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.setting-row__label {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.setting-row__label strong {
+  font-weight: 600;
+}
+
+.setting-row__label span {
+  font-size: 0.875rem;
+  color: var(--text-2);
+}
+
+.setting-row fieldset {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.setting-row legend {
+  padding: 0;
+}
+
+.kv {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--space-2) var(--space-5);
+  font-size: 0.9375rem;
+}
+
+.kv dt {
+  color: var(--text-2);
+}
+
+.kv dd {
+  margin: 0;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.prose-list {
+  display: grid;
+  gap: var(--space-2);
+  padding-left: var(--space-5);
+  list-style: disc;
+  color: var(--text-2);
+  font-size: 0.9375rem;
+}
+
+.prose-list strong {
+  color: var(--text);
+}
+
+.install-card {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.install-card__status {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--text-2);
+  font-size: 0.9375rem;
+}
+
+.install-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.install-band {
+  display: grid;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.install-band h3 {
+  font-size: 1.125rem;
+}
+
+.install-band p {
+  color: var(--text-2);
+  font-size: 0.9375rem;
+}

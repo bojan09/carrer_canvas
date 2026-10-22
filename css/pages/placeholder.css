@@ -1,0 +1,72 @@
+/* Phase placeholder pages (Resume, Cover Letter, Saved) */
+
+.ph-studio {
+  display: grid;
+  gap: var(--space-3);
+  margin-top: var(--space-6);
+  padding: var(--space-4);
+  border-radius: var(--radius-xl);
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.ph-studio__caption {
+  font-size: 0.8125rem;
+  color: var(--text-3);
+  text-align: center;
+}
+
+.ph-studio__frame {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-3);
+}
+
+.ph-pane {
+  min-height: 140px;
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+  border: 1px dashed var(--border-strong);
+}
+
+.ph-pane i {
+  display: block;
+  height: 8px;
+  margin-bottom: 10px;
+  border-radius: 99px;
+  background: var(--border-strong);
+}
+
+.ph-pane i:nth-child(1) {
+  width: 40%;
+  height: 10px;
+}
+.ph-pane i:nth-child(2) {
+  width: 90%;
+}
+.ph-pane i:nth-child(3) {
+  width: 76%;
+}
+.ph-pane i:nth-child(4) {
+  width: 84%;
+}
+
+.ph-pane--paper {
+  background: #fff;
+  border-style: solid;
+}
+
+.ph-pane--paper i {
+  background: #dfe3ee;
+}
+
+@media (min-width: 840px) {
+  .ph-studio__frame {
+    grid-template-columns: 0.6fr 1.2fr 1fr;
+  }
+
+  .ph-pane {
+    min-height: 260px;
+  }
+}
