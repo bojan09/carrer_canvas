@@ -41,10 +41,27 @@ function showLoadError(path) {
   return path;
 }
 
+/** Matches "/resume/:id" style patterns. Returns {route, params} or null. */
+function match(path) {
+  for (const route of routes) {
+    if (!route.path.includes(":")) {
+      if (route.path === path) return { route, params: {} };
+      continue;
+    }
+    const names = [];
+    const re = new RegExp("^" + route.path.replace(/:([a-z]+)/g, (_, n) => (names.push(n), "([^/]+)")) + "$");
+    const m = re.exec(path);
+    if (m) return { route, params: Object.fromEntries(names.map((n, i) => [n, decodeURIComponent(m[i + 1])])) };
+  }
+  return null;
+}
+
 async function render() {
   const mine = ++token;
   const path = currentPath();
-  const route = routes.find((r) => r.path === path) || notFound;
+  const found = match(path);
+  const route = found?.route || notFound;
+  const params = found?.params || {};
 
   let mod;
   try {
@@ -57,7 +74,8 @@ async function render() {
 
   if (typeof cleanup === "function") cleanup();
   root.replaceChildren();
-  cleanup = mod.default(root, { path }) || null;
+  document.body.dataset.layout = route.layout || "app";
+  cleanup = mod.default(root, { path, params }) || null;
 
   const title = route.title === "Home" ? `${APP_NAME} · Free private resume builder` : `${route.title} · ${APP_NAME}`;
   document.title = title;
@@ -65,7 +83,7 @@ async function render() {
   void root.offsetWidth; // restart the enter animation
   root.classList.add("page-enter");
 
-  document.dispatchEvent(new CustomEvent("cc:route", { detail: { path: route.path === "*" ? null : path } }));
+  document.dispatchEvent(new CustomEvent("cc:route", { detail: { path: route.path === "*" ? null : route.navPath || route.path } }));
 
   if (!isFirst) {
     window.scrollTo(0, 0);

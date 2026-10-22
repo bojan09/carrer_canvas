@@ -1,0 +1,77 @@
+.page-head--row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.page-head--row .empty__actions {
+  margin: 0;
+}
+
+.page > .notice {
+  margin-bottom: var(--space-4);
+}
+
+.doc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+  gap: var(--space-4);
+}
+
+.doc-card {
+  display: grid;
+  align-content: start;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease), transform var(--dur) var(--ease);
+}
+
+@media (hover: hover) {
+  .doc-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--border-strong);
+    box-shadow: var(--shadow-md);
+  }
+}
+
+.doc-card__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.doc-card__title {
+  font-size: 1.1875rem;
+  overflow-wrap: anywhere;
+}
+
+.doc-card__title a {
+  color: var(--text);
+  text-decoration: none;
+}
+
+.doc-card__title a:hover {
+  text-decoration: underline;
+}
+
+.doc-card__meta {
+  color: var(--text-2);
+  font-size: 0.875rem;
+}
+
+.doc-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  margin-top: var(--space-2);
+}
+
+.start__action {
+  margin-top: var(--space-4);
+}

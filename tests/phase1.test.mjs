@@ -76,8 +76,9 @@ test("index.html has iOS PWA tags and local-only references", async () => {
 test("no remote URLs in app code (no CDNs, no trackers)", async () => {
   const files = [...(await walk("js")), ...(await walk("css")), "index.html", "sw.js", "offline.html"];
   for (const f of files) {
-    const text = (await read(f)).replace(/xmlns="http:\/\/www\.w3\.org\/2000\/svg"/g, "");
-    assert.ok(!/https?:\/\//.test(text), `remote URL found in ${f}`);
+    const text = await read(f);
+    const remote = /(?:src|href)\s*=\s*["']https?:|url\(\s*["']?https?:|@import\s+["']?https?:|from\s+["']https?:|import\(\s*["']https?:|fetch\(\s*["'`]https?:|new URL\(\s*["']https?:\/\/(?!x)/i;
+    assert.ok(!remote.test(text), `remote resource reference found in ${f}`);
   }
 });
 

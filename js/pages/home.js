@@ -126,7 +126,7 @@ export default function home(root) {
 
   <section class="section" aria-label="Project status">
     <div class="container">
-      <div class="status-strip">${icon("info")}<p><strong>Early build.</strong> The app shell, themes and offline support are live. The resume editor, templates and PDF export are being built in phases and are not available yet.</p></div>
+      <div class="status-strip">${icon("info")}<p><strong>Early build.</strong> The offline app and the resume editor (structured sections, autosave, undo/redo, reordering) are live. Template styling, design controls, PDF export and cover letters are still being built.</p></div>
     </div>
   </section>
 

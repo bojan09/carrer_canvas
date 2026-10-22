@@ -8,7 +8,7 @@ let counter = 0;
  * @param {{title: string, body: Node|string, actions?: Array<{label:string, value:any, variant?:string}>}} opts
  * @returns {Promise<any>} value of the chosen action, or undefined when dismissed
  */
-export function openDialog({ title, body, actions = [{ label: "Close", value: undefined, variant: "outline" }] }) {
+export function openDialog({ title, body, actions = [{ label: "Close", value: undefined, variant: "outline" }], initialFocus = null }) {
   return new Promise((resolve) => {
     const id = `dlg-${++counter}`;
     const dialog = h("dialog", { class: "dialog", "aria-labelledby": `${id}-t` });
@@ -29,7 +29,7 @@ export function openDialog({ title, body, actions = [{ label: "Close", value: un
         class: `btn btn--${a.variant || "outline"}`,
         text: a.label,
         onclick: () => {
-          result = a.value;
+          result = typeof a.value === "function" ? a.value() : a.value;
           dialog.close("action");
         },
       });
@@ -54,6 +54,7 @@ export function openDialog({ title, body, actions = [{ label: "Close", value: un
 
     document.body.append(dialog);
     dialog.showModal();
+    if (initialFocus) dialog.querySelector(initialFocus)?.focus();
   });
 }
 

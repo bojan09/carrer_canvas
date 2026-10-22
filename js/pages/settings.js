@@ -6,6 +6,9 @@ import { confirmDialog } from "../components/dialog.js";
 import { toast } from "../components/toast.js";
 import { checkForUpdates, getOfflineState, onOfflineState } from "../pwa/register.js";
 import { isStandalone } from "../utils/platform.js";
+import { getRepository } from "../storage/repository.js";
+import { closeSession, settleSaves } from "../state/resume-store.js";
+import { openDialog } from "../components/dialog.js";
 
 const OFFLINE_TEXT = {
   ready: "Ready. The app opens without a connection.",
@@ -69,9 +72,15 @@ export default function settings(root) {
         <h2 id="s-storage">Storage</h2>
         <p class="setting-card__lead">Documents will be stored only in this browser. Clearing site data, private browsing or browser storage pressure can remove them, so regular JSON backups are planned.</p>
         <dl class="kv">
+          <dt>Storage engine</dt><dd id="kv-engine">Checking…</dd>
+          <dt>Documents</dt><dd id="kv-docs">Checking…</dd>
           <dt>Used by this app</dt><dd id="kv-usage">Checking…</dd>
           <dt>Protected from cleanup</dt><dd id="kv-persist">Checking…</dd>
         </dl>
+        <div class="setting-row">
+          <div class="setting-row__label"><strong>Delete all documents</strong><span>Permanently removes every resume from this device. Cannot be undone.</span></div>
+          <button type="button" class="btn btn--outline btn--sm btn--danger-text" id="wipe">Delete all…</button>
+        </div>
         <div class="setting-row" id="persist-row" hidden>
           <div class="setting-row__label"><strong>Keep my data</strong><span>Ask the browser not to clear this app's storage automatically. The browser may decline.</span></div>
           <button type="button" class="btn btn--outline btn--sm" id="persist-btn">Request protection</button>
@@ -83,7 +92,7 @@ export default function settings(root) {
         <ul class="prose-list">
           <li><strong>No accounts, ads or trackers.</strong> The app makes no network requests after it is installed, apart from checking for its own updates.</li>
           <li><strong>Your content stays on your device</strong> unless you deliberately download, print or share a file.</li>
-          <li><strong>Only appearance preferences are saved today.</strong> No documents are stored yet.</li>
+          <li><strong>Documents and preferences are saved in this browser only.</strong> There is no sync, so clearing site data or switching browsers means starting over.</li>
         </ul>
         <div class="setting-row">
           <div class="setting-row__label"><strong>Reset settings</strong><span>Restores theme and motion to their defaults.</span></div>
@@ -161,6 +170,46 @@ export default function settings(root) {
     const granted = await storage.persist();
     toast({ message: granted ? "Storage is now protected." : "The browser declined. Back up your documents regularly.", tone: granted ? "ok" : "warn" });
     paintPersist();
+  });
+
+  // Documents: engine + count + double-confirmed wipe
+  const paintDocs = async () => {
+    await settleSaves();
+    const repo = await getRepository();
+    $("#kv-engine").textContent = repo.persistent ? "IndexedDB (this browser)" : "Unavailable. Using temporary memory only";
+    const { items, unreadable } = await repo.list();
+    $("#kv-docs").textContent = `${items.length}${unreadable.length ? ` (+${unreadable.length} unreadable)` : ""}`;
+  };
+  paintDocs().catch(() => ($("#kv-docs").textContent = "Unavailable"));
+
+  $("#wipe").addEventListener("click", async () => {
+    const first = await confirmDialog({
+      title: "Delete all documents?",
+      message: "Every resume stored in this browser will be permanently deleted. There is no backup and no cloud copy.",
+      confirmLabel: "Continue",
+      danger: true,
+    });
+    if (!first) return;
+    const input = h("input", { class: "input", id: "wipe-confirm", type: "text", autocomplete: "off", spellcheck: "false" });
+    const typed = await openDialog({
+      title: "Type DELETE to confirm",
+      body: h("div", { class: "fields" }, h("label", { class: "field__label", for: "wipe-confirm", text: "Type DELETE (capital letters) to delete everything" }), input),
+      initialFocus: "#wipe-confirm",
+      actions: [
+        { label: "Cancel", value: false, variant: "outline" },
+        { label: "Delete everything", value: () => input.value.trim() === "DELETE", variant: "danger" },
+      ],
+    });
+    if (typed !== true) return;
+    try {
+      await closeSession();
+      const repo = await getRepository();
+      await repo.clear();
+      toast({ message: "All documents deleted.", tone: "ok" });
+      paintDocs();
+    } catch {
+      toast({ message: "Could not delete documents. Storage may be unavailable.", tone: "warn" });
+    }
   });
 
   // Reset

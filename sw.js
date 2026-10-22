@@ -6,7 +6,7 @@
  *   they live in IndexedDB.
  * Keep CACHE_VERSION in sync with js/config.js APP_VERSION (tests enforce this).
  */
-const CACHE_VERSION = "0.1.0";
+const CACHE_VERSION = "0.2.0";
 const CACHE_PREFIX = "careercanvas-shell-";
 const CACHE_NAME = `${CACHE_PREFIX}${CACHE_VERSION}`;
 
@@ -26,6 +26,8 @@ const PRECACHE = [
   "css/pages/templates.css",
   "css/pages/settings.css",
   "css/pages/placeholder.css",
+  "css/pages/editor.css",
+  "css/pages/saved.css",
   "js/theme-boot.js",
   "js/main.js",
   "js/config.js",
@@ -50,6 +52,26 @@ const PRECACHE = [
   "js/pwa/install.js",
   "js/utils/dom.js",
   "js/utils/platform.js",
+  "js/components/announcer.js",
+  "js/editors/bullets.js",
+  "js/editors/fields.js",
+  "js/editors/hints.js",
+  "js/editors/section-forms.js",
+  "js/editors/sections-rail.js",
+  "js/editors/sortable.js",
+  "js/editors/studio.js",
+  "js/models/resume.js",
+  "js/models/section-defs.js",
+  "js/preview/render.js",
+  "js/state/history.js",
+  "js/state/resume-store.js",
+  "js/state/save-queue.js",
+  "js/storage/idb.js",
+  "js/storage/memory.js",
+  "js/storage/migrations.js",
+  "js/storage/repository.js",
+  "js/utils/sanitization.js",
+  "js/utils/validation.js",
   "assets/icons/favicon.svg",
   "assets/icons/favicon-32.png",
   "assets/icons/apple-touch-icon.png",
