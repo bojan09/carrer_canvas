@@ -57,10 +57,10 @@ export function mountStudio(root, session, { persistent, adapter = resumeAdapter
   sectionsBtn?.classList.add("studio__sections-btn");
   const exportBtn = h("button", { type: "button", class: "btn btn--primary btn--sm btn--tool studio__export" });
   exportBtn.innerHTML = `${icon("printer")}<span class="tool-label">Export PDF</span>`;
-  exportBtn.setAttribute("aria-label", "Export as PDF (opens the print dialog)");
+  exportBtn.setAttribute("aria-label", "Export PDF (opens the print dialog)");
   exportBtn.addEventListener("click", () => doExport());
   const checklistBadge = h("span", { class: "badge badge--warn studio__badge", hidden: true });
-  const checklistBtn = toolButton({ name: "list-check", label: "Writing checklist", text: "Checklist", onClick: () => openChecklist() });
+  const checklistBtn = toolButton({ name: "list-check", label: "Checklist", text: "Checklist", onClick: () => openChecklist() });
   checklistBtn.append(checklistBadge);
   checklistBtn.dataset.tour = "checklist";
   exportBtn.dataset.tour = "export";
@@ -379,8 +379,10 @@ export function mountStudio(root, session, { persistent, adapter = resumeAdapter
     paintIssues(checks);
     const n = checks.filter((c) => !c.ok).length;
     checklistBadge.hidden = n === 0;
-    checklistBadge.textContent = String(n);
-    checklistBtn.setAttribute("aria-label", n ? `Writing checklist, ${n} to review` : "Writing checklist");
+    // With items to review the button's name comes from its content: "Checklist" + the count + "to review".
+    checklistBadge.replaceChildren(document.createTextNode(String(n)), h("span", { class: "sr-only", text: " to review" }));
+    if (n) checklistBtn.removeAttribute("aria-label");
+    else checklistBtn.setAttribute("aria-label", "Checklist");
   }
   const schedulePreview = () => {
     clearTimeout(previewTimer);

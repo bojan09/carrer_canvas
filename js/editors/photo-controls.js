@@ -16,7 +16,7 @@ export function photoControls({ doc, ctx, headingId = "photo-h", level = "h3" })
   const section = h("section", { class: "design__group photo", "aria-labelledby": headingId }, h(level, { id: headingId, text: "Photo (optional)" }));
   section.append(h("p", { class: "field__hint", text: "Photos are never required. Some regions, employers and applicant systems discourage or ignore them, and a photo can make a resume less ATS-friendly. It stays on this device and appears on the resume only while “Show photo” is on." }));
 
-  const fileInput = h("input", { type: "file", class: "sr-only", accept: PHOTO_TYPES.join(","), id: idf, tabindex: "-1" });
+  const fileInput = h("input", { type: "file", class: "sr-only", accept: PHOTO_TYPES.join(","), id: idf, tabindex: "-1", "aria-label": "Choose a photo file" });
   const choose = h("button", { type: "button", class: "btn btn--outline btn--sm", text: doc.photo ? "Replace photo…" : "Add a photo…" });
   choose.dataset.focusKey = "design:photo-choose";
   choose.addEventListener("click", () => fileInput.click());

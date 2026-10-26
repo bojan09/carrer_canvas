@@ -165,7 +165,7 @@ const openSection = async (page, id) => {
   await page.waitForSelector(".studio");
   check("sample warns it is fictional", (await page.textContent(".studio__banners")).includes("fictional sample content"));
   check("sample preview renders", (await page.textContent(".doc__name")) === "Alex Sample");
-  await page.getByRole("button", { name: /Writing checklist/ }).click();
+  await page.getByRole("button", { name: /Checklist/ }).click();
   check("checklist dialog flags sample content", (await page.textContent("dialog")).includes("Sample content is still present"));
   await page.getByRole("button", { name: "Close", exact: true }).last().click();
   await page.getByRole("button", { name: "I've replaced the sample content" }).click();

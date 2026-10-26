@@ -93,7 +93,7 @@ function startPage(root) {
       const btn = h("button", { type: "button", class: `btn btn--${primary ? "primary" : "outline"}`, text: label, onclick: onClick });
       const art = h("span", { class: "trust-card__icon" });
       art.innerHTML = icon(iconName);
-      return h("article", { class: "trust-card" }, art, h("h3", { text: title }), h("p", { text }), h("div", { class: "start__action" }, btn));
+      return h("article", { class: "trust-card" }, art, h("h2", { text: title }), h("p", { text }), h("div", { class: "start__action" }, btn));
     };
 
     root.replaceChildren(

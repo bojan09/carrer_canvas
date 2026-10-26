@@ -1,7 +1,7 @@
 # Roadmap and backlog
 
-## Next: Phase 7, quality gate and shipping
-Phases 3b, 5, 5.1 and 6 are done, see PHASE_STATUS.md. Needs real devices: Safari, Firefox, iOS, Android, screen readers, Lighthouse.
+## Next: real-device pass and deploy
+Phases 1 to 7 are done, see PHASE_STATUS.md. Remaining needs devices you own: Safari, Firefox, iOS and Android install and print, screen readers; then deploy to Vercel (docs/DEPLOYMENT.md).
 
 ## Later
 - Phase 5: cover letters (reuse template identity, print and backup support).

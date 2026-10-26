@@ -30,3 +30,33 @@ Phase 4 adds `tests/phase4.test.mjs` (57 unit/structure tests in total) and `e2e
 ## Phase 6.1 (Style tab, click-to-style, Format text)
 - `tests/phase61.test.mjs`: element validation including hostile values, photo limits, round trips, migration, template-switch reporting, bundled fonts (stack, @font-face, file, OFL licence, precache), elements.css covers every role x property, renderer only uses known roles.
 - `e2e/phase61.mjs`: Style tab and button are findable (name, icon, New badge, hint), click-to-pick on resumes and letters, every Format control (font, boldness, size, colour, capitals, italic, spacing, alignment incl. flex contact line), resets, undo, reload, panel groups and jump chips, template-switch toast with Undo, photo size and nudge, real PDFs (bundled fonts embedded, custom colour prints, dark templates keep readable text), no third-party requests, 320/390px.
+
+
+## Phase 7 acceptance matrix
+Status is "Passed" only if executed in this repository's environment (Chromium 141 via Playwright, Linux). Everything else is Unverified.
+
+| Check | Status | Evidence |
+| --- | --- | --- |
+| Viewports 320, 360, 390, 430, 768, 1024, 1440 and landscape 844x390, 667x375, on 8 routes: no sideways scroll, no clipped buttons | Passed | `e2e/phase7.mjs` |
+| axe-core WCAG 2.2 A/AA + best practice, light and dark, 10 views (incl. both Style panels): no serious or critical findings | Passed (after fixes in 0.9.1) | `e2e/phase7.mjs` |
+| Lighthouse accessibility / best practices / SEO | 100 / 100 / 100 on Home and Templates | run by hand, see LIMITATIONS.md |
+| Lighthouse performance (mobile, throttled, local) | 78 Home, 92 Templates | LIMITATIONS.md |
+| Reduced motion | Passed (no looping animations, instant transitions) | `e2e/phase7.mjs` |
+| Keyboard only: Tab reaches controls, no trap, focus indicator on every stop | Passed (Home, Settings, editor) | `e2e/phase7.mjs` |
+| Forced colours (high contrast) | Partly: Style button visible and distinct only | `e2e/phase7.mjs` |
+| Light / dark / system | Passed (axe in both; theme persistence in phase 1) | phases 1 and 7 |
+| Offline reload after an online visit | Passed | phase 1 |
+| Update with unsaved typing: announced, not auto-applied, saved before reload, new cache active | Passed | `e2e/phase7b.mjs` |
+| PWA install on Android / iOS | Unverified | needs devices |
+| JSON backup round trip, invalid file, newer-version records | Passed | phase 4, 5 |
+| Storage quota exceeded while typing | Passed (status says "Couldn't save", Retry shown, text kept) | `e2e/phase7b.mjs` |
+| IndexedDB blocked | Passed (warning banner, editor still works) | phase 2 |
+| One page, two page, long multi-page resume; A4 and Letter | Passed (6 pages, no blank page, correct paper size) | phase 4, `e2e/phase7b.mjs` |
+| Cover letter print | Passed | phase 5 |
+| Empty, partial, fictional sample | Passed | phases 2 to 5 |
+| Special Unicode (Latin-ext, CJK, Arabic, emoji), bidi override stripped | Passed in Chromium; CJK font availability depends on the device | `e2e/phase7b.mjs` |
+| Malicious text in fields and backups | Passed | phases 2, 4, 5, 7b |
+| Long URL (300 characters) | Passed (wraps, one page) | `e2e/phase7b.mjs` |
+| Firefox, Safari, Edge, mobile Safari, mobile Chrome (real) | Unverified | needs browsers and devices |
+| Screen reader spot checks | Unverified | needs NVDA / VoiceOver / TalkBack |
+| Deployment to Vercel | Not done | docs/DEPLOYMENT.md |

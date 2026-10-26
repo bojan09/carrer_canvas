@@ -87,7 +87,7 @@ export default function templates(root) {
     const list = active === "All" ? TEMPLATES : TEMPLATES.filter((t) => t.categories.includes(active));
     grid.replaceChildren();
     for (const t of list) {
-      const card = createTemplateCard(t, { onPreview: preview, onUse: (tpl) => useTemplate(tpl) });
+      const card = createTemplateCard(t, { level: "h2", onPreview: preview, onUse: (tpl) => useTemplate(tpl) });
       disposers.push(card.destroy);
       grid.append(card.el);
     }

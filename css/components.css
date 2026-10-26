@@ -138,17 +138,9 @@
 /* Filter chips */
 .chips {
   display: flex;
+  flex-wrap: wrap; /* wrapping keeps every filter visible on a phone; a hidden sideways scroller did not */
   gap: var(--space-2);
-  overflow-x: auto;
   padding-bottom: var(--space-2);
-  margin-inline: calc(var(--gutter) * -1);
-  padding-inline: var(--gutter);
-  scrollbar-width: none;
-  scroll-snap-type: x proximity;
-}
-
-.chips::-webkit-scrollbar {
-  display: none;
 }
 
 .chip {
@@ -161,7 +153,6 @@
   color: var(--text-2);
   font-size: 0.875rem;
   font-weight: 600;
-  scroll-snap-align: start;
   transition: background var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease),
     border-color var(--dur-fast) var(--ease);
 }

@@ -222,7 +222,7 @@ await page.evaluate(() => window.dispatchEvent(new Event("afterprint")));
 check("afterprint restores the page", (await page.locator("#print-root .doc").count()) === 0 && (await page.evaluate(() => document.body.dataset.print)) === undefined && (await page.title()) !== "Pat Printer - Resume");
 
 // ---------- export dialog flow ----------
-await page.getByRole("button", { name: /Export as PDF/ }).click();
+await page.getByRole("button", { name: /Export PDF/ }).click();
 await page.waitForSelector("dialog .print-dialog");
 const dlg = await page.textContent("dialog");
 check("export dialog explains Save as PDF, paper, checklist and browser steps", /Save as PDF/.test(dlg) && /A4|US Letter/.test(dlg) && /Chrome, Edge/.test(dlg) && /Safari/.test(dlg) && /iPhone/.test(dlg) && /fictional sample text/.test(dlg));
@@ -234,11 +234,11 @@ check("Open print dialog calls window.print with the resume prepared", (await pa
 await page.evaluate(() => window.dispatchEvent(new Event("afterprint")));
 
 // skip review next time
-await page.getByRole("button", { name: /Export as PDF/ }).click();
+await page.getByRole("button", { name: /Export PDF/ }).click();
 await page.locator("#print-skip").check();
 await page.getByRole("button", { name: "Open print dialog" }).click();
 await page.waitForFunction(() => window.__printed === 2);
-await page.getByRole("button", { name: /Export as PDF/ }).click();
+await page.getByRole("button", { name: /Export PDF/ }).click();
 await page.waitForFunction(() => window.__printed === 3);
 check("review can be skipped, then export prints directly", (await page.locator("dialog").count()) === 0);
 

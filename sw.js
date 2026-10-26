@@ -6,7 +6,7 @@
  *   they live in IndexedDB.
  * Keep CACHE_VERSION in sync with js/config.js APP_VERSION (tests enforce this).
  */
-const CACHE_VERSION = "0.9.0";
+const CACHE_VERSION = "0.9.1";
 const CACHE_PREFIX = "careercanvas-shell-";
 const CACHE_NAME = `${CACHE_PREFIX}${CACHE_VERSION}`;
 

@@ -75,7 +75,7 @@ const textNow = (await page.locator(".stage__sizer > .doc").innerText()).replace
 check("text content is unaffected by styling changes", textNow.includes("Senior Designer (sample)") && textNow.includes("Alex Sample"));
 
 // ---------- reset, undo, persistence ----------
-await page.getByRole("button", { name: "Reset text colour to the template colour" }).click();
+await page.getByRole("button", { name: "Use template colour for text colour" }).click();
 await page.waitForTimeout(300);
 check("a single colour can be reset to the template colour", (await docVar("--ink")) === "" && (await css(".doc__entry-title", "color")) === inkBefore && (await docVar("--deco-c")) === "#0f766e");
 await page.locator('button[aria-label="Undo"]').click();

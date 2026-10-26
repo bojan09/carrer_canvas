@@ -118,7 +118,7 @@ await page.getByLabel("Greeting").fill("Dear Robin Reader,");
 
 // ---------- checklist ----------
 await page.waitForTimeout(300);
-await page.getByRole("button", { name: /Writing checklist/ }).click();
+await page.getByRole("button", { name: /Checklist/ }).click();
 const dlg = page.locator("dialog[open]");
 check("checklist opens as friendly guidance without ATS or scoring claims", /Everything on this list looks good|friendly guidance/.test(await dlg.innerText()) && !/\bATS\b|guarantee/i.test(await dlg.innerText()));
 await page.locator("dialog[open]").getByRole("button", { name: "Close", exact: true }).last().click();
@@ -126,7 +126,7 @@ await page.locator("dialog[open]").getByRole("button", { name: "Close", exact: t
 await open("recipient");
 await page.getByLabel("Company or organisation").fill("Other Company");
 await page.waitForTimeout(300);
-await page.getByRole("button", { name: /Writing checklist/ }).click();
+await page.getByRole("button", { name: /Checklist/ }).click();
 check("checklist notices when the organisation is never mentioned", /Mention Other Company/.test(await page.locator("dialog[open]").innerText()));
 await page.locator("dialog[open]").getByRole("button", { name: "Close", exact: true }).last().click();
 await page.getByLabel("Company or organisation").fill("Acme Example");
@@ -367,7 +367,7 @@ await page.goto(`${base}/#/saved`);
 await page.waitForSelector(".doc-card");
 await page.locator(".doc-card", { hasText: "Letter for Acme" }).locator("a").first().click();
 await page.waitForSelector(".studio[data-doc='letter']");
-await page.getByRole("button", { name: /Export as PDF/ }).click();
+await page.getByRole("button", { name: /Export PDF/ }).click();
 await page.waitForSelector("dialog[open] .print-dialog");
 const pd = await page.locator("dialog[open]").innerText();
 check("export review for a letter shows paper, length and honest wording", /A4|US Letter/.test(pd) && /Save as PDF/.test(pd) && !/guarantee/i.test(pd));

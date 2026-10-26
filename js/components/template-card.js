@@ -7,18 +7,18 @@ export const sampleResume = () => (sample ||= createSample());
 
 /** Card with a real, locally rendered thumbnail. `mode: "link"` makes the whole card a link (Home);
  *  otherwise it shows Preview / Use template buttons (gallery). Returns {el, destroy}. */
-export function createTemplateCard(t, { mode = "gallery", href = "#/templates", onPreview, onUse } = {}) {
-  const frame = h("div", {});
+export function createTemplateCard(t, { mode = "gallery", href = "#/templates", level = "h3", onPreview, onUse } = {}) {
+  const frame = h("div", { "aria-hidden": "true" }); // a rendered sample resume is decoration, not link text
   const destroy = mountThumb(frame, sampleResume(), t.id);
   const badges = [...t.tags.map((b) => h("span", { class: `badge badge--${b.tone}`, text: b.label })), h("span", { class: "badge badge--muted", text: "Sample content" })];
-  const meta = h("div", { class: "template-card__meta" }, h("h3", { class: "template-card__name", text: t.name }), h("p", { class: "template-card__blurb", text: t.blurb }), h("div", { class: "template-card__tags" }, badges));
+  const meta = h("div", { class: "template-card__meta" }, h(level, { class: "template-card__name", text: t.name }), h("p", { class: "template-card__blurb", text: t.blurb }), h("div", { class: "template-card__tags" }, badges));
 
   if (mode === "link") {
-    return { el: h("a", { class: "template-card", href, "aria-label": `${t.name} template` }, frame, meta), destroy };
+    return { el: h("a", { class: "template-card", href }, frame, meta), destroy };
   }
 
   const preview = h("button", { type: "button", class: "btn btn--outline btn--sm", text: "Preview", "aria-label": `Preview ${t.name}` });
-  const use = h("button", { type: "button", class: "btn btn--primary btn--sm", text: "Use template", "aria-label": `Use ${t.name} template` });
+  const use = h("button", { type: "button", class: "btn btn--primary btn--sm", text: "Use template", "aria-label": `Use template: ${t.name}` });
   preview.addEventListener("click", () => onPreview?.(t));
   use.addEventListener("click", () => onUse?.(t));
   meta.append(h("div", { class: "template-card__actions" }, preview, use));

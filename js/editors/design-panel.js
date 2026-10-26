@@ -152,7 +152,7 @@ export function designPanel({ session, ctx, sample: sampleFor = sample, role = "
       note.classList.toggle("is-warn", ratio < 4.5);
     };
     const reset = h("button", { type: "button", class: "btn btn--ghost btn--sm", text: "Use template colour", disabled: disabled || design[key] === undefined });
-    reset.setAttribute("aria-label", `Reset ${label.toLowerCase()} to the template colour`);
+    reset.setAttribute("aria-label", `Use template colour for ${label.toLowerCase()}`);
     input.addEventListener("input", () => {
       set(key, input.value.toLowerCase());
       reset.disabled = false;

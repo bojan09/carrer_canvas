@@ -292,7 +292,7 @@ await page.goto(`${base}/#/resume`);
 await page.waitForSelector(".studio");
 const nameBefore = await page.getByLabel("Full name").inputValue();
 await page.goto(`${base}/#/templates`);
-await page.getByRole("button", { name: "Use Bloom template" }).click();
+await page.getByRole("button", { name: "Use template: Bloom" }).click();
 await page.waitForSelector(".studio");
 check("Use template on an existing resume keeps its content", (await page.getByLabel("Full name").inputValue()) === nameBefore && (await page.locator(".stage__sizer > .doc").getAttribute("data-chosen")) === "bloom");
 
