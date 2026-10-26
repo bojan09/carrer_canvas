@@ -53,7 +53,7 @@ check("the tour appears the first time an editor opens", (await page.locator(".t
 check("it is a labelled, non-modal dialog and says which step it is", (await page.locator(".tour").getAttribute("role")) === "dialog" && (await page.locator(".tour").getAttribute("aria-modal")) === "false" && /Step 1 of \d/.test(await page.locator(".tour__count").innerText()));
 check("focus moves to the Next button so keyboard users can continue at once", (await page.evaluate(() => document.activeElement?.textContent)) === "Next");
 const total = Number(/of (\d+)/.exec(await page.locator(".tour__count").innerText())[1]);
-check("the tour is short", total >= 3 && total <= 5, `${total} steps`);
+check("the tour is short", total >= 3 && total <= 6, `${total} steps`);
 const inView = async () => page.evaluate(() => { const c = document.querySelector(".tour").getBoundingClientRect(); const t = document.querySelector(".tour-target")?.getBoundingClientRect(); return { card: c.left >= 0 && c.top >= 0 && c.right <= innerWidth && c.bottom <= innerHeight, target: Boolean(t) && t.width > 0 && t.top >= -1 && t.bottom <= innerHeight + 1, overlap: t ? !(c.right < t.left || c.left > t.right || c.bottom < t.top || c.top > t.bottom) : false }; });
 let bad = [];
 for (let i = 1; i <= total; i++) {

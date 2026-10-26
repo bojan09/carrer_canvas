@@ -21,7 +21,7 @@ export const SHORTCUT_GROUPS = [
       { keys: ["mod", "P"], label: "Print or save the open document as PDF" },
       { keys: ["Alt", "1"], label: "Edit tab (when not typing in a field)" },
       { keys: ["Alt", "2"], label: "Preview tab (small screens)" },
-      { keys: ["Alt", "3"], label: "Design tab" },
+      { keys: ["Alt", "3"], label: "Style tab" },
     ],
   },
   {

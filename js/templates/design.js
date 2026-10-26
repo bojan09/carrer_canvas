@@ -27,6 +27,80 @@ export const OPACITY_LIMITS = {
   photoOpacity: { min: 0.2, max: 1, step: 0.05, label: "Photo" },
 };
 
+// ---------- per-element formatting ----------
+/** The kinds of text a user can format separately. Every element of a kind is formatted together, so the
+ *  document stays consistent. The renderer tags elements with data-role; css/templates/elements.css applies them. */
+export const ELEMENT_ROLES = {
+  name: { label: "Name", hint: "Your name at the top", align: true },
+  role: { label: "Job title line", hint: "The line under your name", align: true },
+  contact: { label: "Contact details", hint: "Email, phone, location and links", align: true },
+  heading: { label: "Section headings", hint: "Experience, Education and so on" },
+  title: { label: "Entry titles", hint: "Job titles, schools, projects" },
+  body: { label: "Body text", hint: "Summaries, bullets and skills", align: true, justify: true },
+  meta: { label: "Dates and details", hint: "Dates, companies, locations" },
+};
+
+export const WEIGHTS = [
+  [400, "Regular"],
+  [500, "Medium"],
+  [600, "Semibold"],
+  [700, "Bold"],
+  [800, "Extra bold"],
+  [900, "Black"],
+];
+
+const SYS_SANS = 'ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+const SYS_SERIF = 'Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", serif';
+const SYS_MONO = 'ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace';
+
+/** Bundled open-licence fonts (css/fonts.css) plus system stacks. Non-Latin text falls back to the system font. */
+export const FONT_FAMILIES = {
+  inter: { label: "Inter", group: "Sans-serif", stack: `"Inter Variable", ${SYS_SANS}` },
+  "dm-sans": { label: "DM Sans", group: "Sans-serif", stack: `"DM Sans Variable", ${SYS_SANS}` },
+  "space-grotesk": { label: "Space Grotesk", group: "Sans-serif", stack: `"Space Grotesk Variable", ${SYS_SANS}` },
+  "system-sans": { label: "System sans", group: "Sans-serif", stack: SYS_SANS },
+  lora: { label: "Lora", group: "Serif", stack: `"Lora Variable", ${SYS_SERIF}` },
+  playfair: { label: "Playfair Display", group: "Serif", stack: `"Playfair Display Variable", ${SYS_SERIF}` },
+  "source-serif": { label: "Source Serif", group: "Serif", stack: `"Source Serif 4 Variable", ${SYS_SERIF}` },
+  "system-serif": { label: "System serif", group: "Serif", stack: SYS_SERIF },
+  jetbrains: { label: "JetBrains Mono", group: "Monospace", stack: `"JetBrains Mono Variable", ${SYS_MONO}` },
+  "system-mono": { label: "System mono", group: "Monospace", stack: SYS_MONO },
+};
+
+export const ELEMENT_LIMITS = {
+  size: { min: 6, max: 72, step: 0.5, label: "Size" },
+  track: { min: -0.05, max: 0.4, step: 0.01, label: "Letter spacing" },
+};
+export const PHOTO_LIMITS = {
+  photoSize: { min: 15, max: 70, step: 1, label: "Photo size" },
+  photoX: { min: -30, max: 30, step: 1, label: "Nudge photo sideways" },
+  photoY: { min: -30, max: 30, step: 1, label: "Nudge photo up or down" },
+};
+
+/** Keeps only valid per-element settings. */
+export function normalizeElements(raw) {
+  const out = {};
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return out;
+  for (const role of Object.keys(ELEMENT_ROLES)) {
+    const src = raw[role];
+    if (!src || typeof src !== "object" || Array.isArray(src)) continue;
+    const el = {};
+    if (typeof src.color === "string" && HEX.test(src.color)) el.color = src.color.toLowerCase();
+    if (typeof src.font === "string" && FONT_FAMILIES[src.font]) el.font = src.font;
+    if (WEIGHTS.some(([w]) => w === src.weight)) el.weight = src.weight;
+    for (const key of Object.keys(ELEMENT_LIMITS)) {
+      const n = Number(src[key]);
+      if (src[key] !== undefined && src[key] !== null && src[key] !== "" && Number.isFinite(n)) el[key] = Math.round(clamp(n, ELEMENT_LIMITS[key].min, ELEMENT_LIMITS[key].max) * 100) / 100;
+    }
+    if (typeof src.italic === "boolean") el.italic = src.italic;
+    if (typeof src.upper === "boolean") el.upper = src.upper;
+    const spec = ELEMENT_ROLES[role];
+    if (spec.align && (["left", "center", "right"].includes(src.align) || (spec.justify && src.align === "justify"))) el.align = src.align;
+    if (Object.keys(el).length) out[role] = el;
+  }
+  return out;
+}
+
 export const ACCENT_SWATCHES = ["#1f2a44", "#1f64e0", "#3f55e6", "#6d3fd6", "#c0397b", "#d63b25", "#c9791a", "#2a8a64", "#55733f", "#111111"];
 
 export const PAPER = { A4: { w: 794, h: 1123, label: "A4 (210 × 297 mm)" }, Letter: { w: 816, h: 1056, label: "US Letter (8.5 × 11 in)" } };
@@ -51,6 +125,12 @@ export function normalizeDesign(raw) {
     const n = Number(src[key]);
     if (src[key] !== undefined && src[key] !== null && Number.isFinite(n)) out[key] = Math.round(clamp(n, OPACITY_LIMITS[key].min, OPACITY_LIMITS[key].max) * 100) / 100;
   }
+  for (const key of Object.keys(PHOTO_LIMITS)) {
+    const n = Number(src[key]);
+    if (src[key] !== undefined && src[key] !== null && src[key] !== "" && Number.isFinite(n)) out[key] = Math.round(clamp(n, PHOTO_LIMITS[key].min, PHOTO_LIMITS[key].max));
+  }
+  const elements = normalizeElements(src.elements);
+  if (Object.keys(elements).length) out.elements = elements;
   if (src.mirror === true) out.mirror = true;
   if (src.dateAlign === "right") out.dateAlign = "right";
   if (DIVIDERS.includes(src.dividerStyle)) out.dividerStyle = src.dividerStyle;
@@ -72,6 +152,8 @@ export function resolveDesign(doc) {
   d.fillOpacity = o.fillOpacity ?? 1;
   d.photoOpacity = o.photoOpacity ?? 1;
   d.mirror = o.mirror === true;
+  d.elements = o.elements || {};
+  for (const k of Object.keys(PHOTO_LIMITS)) d[k] = o[k];
   d.dateAlign = o.dateAlign === "right" ? "right" : "left";
   if (!tpl.supports.headerAlign) d.headerAlign = tpl.defaults.headerAlign;
   return d;
@@ -92,9 +174,11 @@ export function photoVisible(doc) {
 /** Switching template keeps content and layout-independent choices, and drops visual overrides. */
 export function applyTemplate(doc, templateId) {
   const keep = normalizeDesign(doc.designSettings);
+  const dropped = Object.keys(keep).filter((k) => !["simplified", "showPhoto", "photoShape"].includes(k)).length;
   doc.templateId = getTemplate(templateId).id;
   doc.designSettings = {};
   for (const k of ["simplified", "showPhoto", "photoShape"]) if (keep[k] !== undefined) doc.designSettings[k] = keep[k];
+  return { dropped };
 }
 
 // ---------- contrast ----------

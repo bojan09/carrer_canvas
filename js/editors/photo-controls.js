@@ -5,7 +5,7 @@ import { compressPhoto, PHOTO_ERRORS, PHOTO_TYPES } from "./photo.js";
 
 let uid = 0;
 
-/** Photo upload/show/remove controls. Used in Personal Info and in the Design tab.
+/** Photo upload/show/remove controls. Used in Personal Info and in the Style tab.
  *  A photo is stored locally and is drawn only while "Show photo" is on AND the layout supports it. */
 export function photoControls({ doc, ctx, headingId = "photo-h", level = "h3" }) {
   const design = resolveDesign(doc);
@@ -72,9 +72,9 @@ export function photoControls({ doc, ctx, headingId = "photo-h", level = "h3" })
     section.append(shape);
 
     if (design.showPhoto && design.simplified) {
-      section.append(h("p", { class: "notice notice--warn", text: "Simplified layout never shows a photo. Turn it off in the Design tab to show your photo." }));
+      section.append(h("p", { class: "notice notice--warn", text: "Simplified layout never shows a photo. Turn it off in the Style tab to show your photo." }));
     } else if (design.showPhoto && !rendered.supports.photo) {
-      section.append(h("p", { class: "notice notice--warn", text: `${rendered.name} does not show photos. Choose another template in the Design tab to include yours.` }));
+      section.append(h("p", { class: "notice notice--warn", text: `${rendered.name} does not show photos. Choose another template in the Style tab to include yours.` }));
     }
   }
   return section;

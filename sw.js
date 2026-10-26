@@ -6,7 +6,7 @@
  *   they live in IndexedDB.
  * Keep CACHE_VERSION in sync with js/config.js APP_VERSION (tests enforce this).
  */
-const CACHE_VERSION = "0.7.0";
+const CACHE_VERSION = "0.8.0";
 const CACHE_PREFIX = "careercanvas-shell-";
 const CACHE_NAME = `${CACHE_PREFIX}${CACHE_VERSION}`;
 
@@ -22,6 +22,7 @@ const PRECACHE = [
   "css/motion.css",
   "css/print.css",
   "css/offline.css",
+  "css/fonts.css",
   "css/pages/home.css",
   "css/pages/templates.css",
   "css/pages/settings.css",
@@ -47,6 +48,8 @@ const PRECACHE = [
   "css/templates/mono.css",
   "css/templates/letter.css",
   "css/templates/mirror.css",
+  "css/templates/elements.css",
+  "js/editors/format-panel.js",
   "js/models/cover-letter.js",
   "js/editors/resume-adapter.js",
   "js/editors/letter-adapter.js",
@@ -114,6 +117,13 @@ const PRECACHE = [
   "js/utils/sanitization.js",
   "js/utils/validation.js",
   "assets/icons/favicon.svg",
+  "assets/fonts/inter/inter-latin-wght-normal.woff2",
+  "assets/fonts/dm-sans/dm-sans-latin-wght-normal.woff2",
+  "assets/fonts/space-grotesk/space-grotesk-latin-wght-normal.woff2",
+  "assets/fonts/lora/lora-latin-wght-normal.woff2",
+  "assets/fonts/playfair-display/playfair-display-latin-wght-normal.woff2",
+  "assets/fonts/source-serif-4/source-serif-4-latin-wght-normal.woff2",
+  "assets/fonts/jetbrains-mono/jetbrains-mono-latin-wght-normal.woff2",
   "assets/icons/favicon-32.png",
   "assets/icons/apple-touch-icon.png",
   "assets/icons/icon-192.png",

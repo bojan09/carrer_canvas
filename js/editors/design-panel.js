@@ -1,10 +1,11 @@
 import { h } from "../utils/dom.js";
 import { createSample } from "../models/resume.js";
 import { DEFAULT_INK, DEFAULT_INK2, TEMPLATES, getTemplate } from "../templates/registry.js";
-import { ACCENT_SWATCHES, DIVIDERS, FONT_PAIRS, LIMITS, OPACITY_LIMITS, PAPER, applyTemplate, contrastRatio, renderTemplateOf, resolveDesign } from "../templates/design.js";
+import { ACCENT_SWATCHES, DIVIDERS, FONT_PAIRS, LIMITS, OPACITY_LIMITS, PAPER, PHOTO_LIMITS, applyTemplate, contrastRatio, renderTemplateOf, resolveDesign } from "../templates/design.js";
 import { mountThumb } from "../preview/thumb.js";
 import { announce } from "../components/announcer.js";
 import { photoControls } from "./photo-controls.js";
+import { formatCard } from "./format-panel.js";
 
 let sampleDoc = null;
 const sample = () => (sampleDoc ||= createSample());
@@ -35,17 +36,38 @@ const FORMAT = {
 };
 
 /** Design controls. All values are overrides on the template defaults; undo/redo covers every change. */
-export function designPanel({ session, ctx, sample: sampleFor = sample }) {
+export function designPanel({ session, ctx, sample: sampleFor = sample, role = "body", onRole = () => {}, closed = new Set() }) {
   const doc = session.doc;
   const disposers = [];
   const root = h("div", { class: "design" });
+  const jump = h("nav", { class: "design__jump", "aria-label": "Jump to a style group" });
+  for (const [key, label] of [["template", "Template"], ["colour", "Colours"], ["type", "Text and fonts"], ["struct", "Layout"], ["photo", "Photo"]]) {
+    const b = h("button", { type: "button", class: "chip-btn", text: label });
+    b.addEventListener("click", () => {
+      const target = root.querySelector(`#dg-${key}`);
+      if (!target) return;
+      if (target.tagName === "DETAILS") target.open = true;
+      target.scrollIntoView({ block: "start", behavior: "smooth" });
+      target.querySelector("summary, h3")?.focus?.({ preventScroll: true });
+    });
+    jump.append(b);
+  }
+  root.append(jump);
   const design = resolveDesign(doc);
   const chosen = getTemplate(doc.templateId);
   const rendered = renderTemplateOf(doc);
   const set = (key, value, opts = {}) => ctx.change(() => (doc.designSettings[key] = value), { group: `design.${key}`, ...opts });
 
+  /** Collapsible group (native details/summary: keyboard and screen-reader friendly). */
+  const group = (key, id, title) => {
+    const d = h("details", { class: "design__group", id: `dg-${key}` }, h("summary", { class: "design__summary" }, h("h3", { id, text: title })));
+    d.open = !closed.has(key);
+    d.addEventListener("toggle", () => (d.open ? closed.delete(key) : closed.add(key)));
+    return d;
+  };
+
   // ---- templates ----
-  const templates = h("section", { class: "design__group", "aria-labelledby": "dz-tpl" }, h("h3", { id: "dz-tpl", text: "Template" }));
+  const templates = group("template", "dz-tpl", "Template");
   const grid = h("div", { class: "design__templates", role: "group", "aria-label": "Choose a template" });
   for (const t of TEMPLATES) {
     const frame = h("div", {});
@@ -54,8 +76,10 @@ export function designPanel({ session, ctx, sample: sampleFor = sample }) {
     disposers.push(mountThumb(frame, sampleFor(), t.id));
     btn.addEventListener("click", () => {
       if (t.id === doc.templateId) return;
-      ctx.change(() => applyTemplate(doc, t.id), { structural: true, focusKey: `tpl:${t.id}` });
-      announce(`${t.name} template applied. Your content is unchanged.`);
+      let dropped = 0;
+      ctx.change(() => (dropped = applyTemplate(doc, t.id).dropped), { structural: true, focusKey: `tpl:${t.id}` });
+      if (dropped) ctx.undoable(`${t.name} applied. Your custom colours and text styles were reset for the new template.`);
+      else announce(`${t.name} template applied. Your content is unchanged.`);
     });
     grid.append(btn);
   }
@@ -78,7 +102,7 @@ export function designPanel({ session, ctx, sample: sampleFor = sample }) {
   root.append(templates);
 
   // ---- colour ----
-  const colour = h("section", { class: "design__group", "aria-labelledby": "dz-col" }, h("h3", { id: "dz-col", text: "Accent colour" }));
+  const colour = group("colour", "dz-col", "Accent colour");
   const swatches = h("div", { class: "swatches", role: "group", "aria-label": "Accent colour swatches" });
   const contrast = h("p", { class: "field__hint", role: "status" });
   const paintContrast = (hex) => {
@@ -110,7 +134,7 @@ export function designPanel({ session, ctx, sample: sampleFor = sample }) {
   root.append(colour);
 
   // ---- text colours, fills and transparency ----
-  const tone = h("section", { class: "design__group", "aria-labelledby": "dz-tone" }, h("h3", { id: "dz-tone", text: "Text colour and transparency" }));
+  const tone = group("tone", "dz-tone", "Text colour and transparency");
   const clear = (key, focusKey) => ctx.change(() => delete doc.designSettings[key], { structural: true, focusKey });
 
   /** A colour picker with a reset button and an optional readability hint. */
@@ -166,11 +190,13 @@ export function designPanel({ session, ctx, sample: sampleFor = sample }) {
   root.append(tone);
 
   // ---- type & spacing ----
-  const type = h("section", { class: "design__group", "aria-labelledby": "dz-type" }, h("h3", { id: "dz-type", text: "Type and spacing" }));
+  const type = group("type", "dz-type", "Text, fonts and spacing");
   type.append(
-    h("p", { class: "field__label", text: "Font pairing" }),
+    formatCard({ doc, ctx, role, onRole, sample: sampleFor }),
+    h("h4", { class: "design__sub", text: "Whole document" }),
+    h("p", { class: "field__label", text: "Font pairing preset" }),
     segmented("dz-font", Object.entries(FONT_PAIRS).map(([k, v]) => [k, v.label]), design.fontPair, (v) => set("fontPair", v), { label: "Font pairing" }),
-    h("p", { class: "field__hint", text: "Uses fonts already on your device, so the look can differ slightly between phones and computers." }),
+    h("p", { class: "field__hint", text: "A quick preset that uses fonts already on your device, so it can look slightly different on other devices. For a specific font, use Format text above." }),
   );
   for (const key of Object.keys(LIMITS)) {
     const lim = LIMITS[key];
@@ -190,7 +216,7 @@ export function designPanel({ session, ctx, sample: sampleFor = sample }) {
   root.append(type);
 
   // ---- structure ----
-  const struct = h("section", { class: "design__group", "aria-labelledby": "dz-struct" }, h("h3", { id: "dz-struct", text: "Structure" }));
+  const struct = group("struct", "dz-struct", "Layout and page");
   if (doc.kind !== "cover-letter") {
     struct.append(
       h("p", { class: "field__label", text: "Section divider" }),
@@ -228,7 +254,33 @@ export function designPanel({ session, ctx, sample: sampleFor = sample }) {
   root.append(struct);
 
   // ---- photo ----
-  root.append(photoControls({ doc, ctx, headingId: "dz-photo", level: "h3" }));
+  const photo = photoControls({ doc, ctx, headingId: "dz-photo", level: "h3" });
+  photo.id = "dg-photo";
+  if (doc.photo) {
+    const spinner = (key) => {
+      const lim = PHOTO_LIMITS[key];
+      const id = nid("rng");
+      const live = doc.designSettings[key];
+      const shown = live ?? (key === "photoSize" ? Math.round((document.querySelector(".stage__sizer [data-role='photo']")?.offsetWidth || 90) / 3.7795) : 0);
+      const fmt = (v) => `${v} mm`;
+      const out = h("output", { for: id, text: fmt(shown) });
+      const input = h("input", { type: "range", id, class: "range", min: String(lim.min), max: String(lim.max), step: String(lim.step) });
+      input.value = String(Math.min(lim.max, Math.max(lim.min, shown)));
+      input.addEventListener("input", () => {
+        const v = Number(input.value);
+        out.textContent = fmt(v);
+        input.setAttribute("aria-valuetext", fmt(v));
+        set(key, v);
+        photoReset.disabled = false;
+      });
+      return h("div", { class: "slider" }, h("label", { for: id, text: lim.label }), out, input);
+    };
+    const photoReset = h("button", { type: "button", class: "btn btn--ghost btn--sm", text: "Reset size and position", disabled: !["photoSize", "photoX", "photoY"].some((k) => doc.designSettings[k] !== undefined) });
+    photoReset.addEventListener("click", () => ctx.change(() => ["photoSize", "photoX", "photoY"].forEach((k) => delete doc.designSettings[k]), { structural: true, focusKey: "design:photo-reset" }));
+    photoReset.dataset.focusKey = "design:photo-reset";
+    photo.append(h("h4", { class: "design__sub", text: "Resize and move" }), spinner("photoSize"), spinner("photoX"), spinner("photoY"), h("p", { class: "field__hint", text: "Nudging moves the photo without moving the text, so check the preview before you export." }), photoReset);
+  }
+  root.append(photo);
 
   // ---- reset ----
   const reset = h("button", { type: "button", class: "btn btn--outline", text: "Reset to template defaults" });

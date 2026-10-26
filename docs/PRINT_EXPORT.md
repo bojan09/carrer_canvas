@@ -30,3 +30,6 @@
 - **Dark-on-screen templates (Aurora, Slate, Glass) print on white with their own dark text.** A light text colour picked for the dark screen would vanish on paper, so on those templates the custom text colours apply on screen only. The design panel says so.
 - Header fills are replaced by an outlined white header in print (Horizon, Nexus, Vertex) and sidebars print as one column on white (Prism, Aurora, Swiss, Velo), so fill colour and opacity are screen-only there. Fills on light templates (Orbit, Bento, Bloom motif) print as shown.
 - A flipped header prints flipped; a flipped sidebar template prints as one ordinary column.
+
+## Fonts in print (Phase 6.1)
+Seven open-licence variable fonts are bundled (`assets/fonts`, SIL OFL, Latin subset). They load on first use, so `printResume()` waits for every font the document uses before it makes the print copy; otherwise a PDF could silently use a system font. Ctrl/Cmd+P relies on the preview having already loaded them. The PDF embeds the fonts and the text stays selectable. Non-Latin characters fall back to the system font.

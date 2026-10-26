@@ -13,7 +13,7 @@ const { SHORTCUT_GROUPS } = await import("../js/components/shortcuts.js");
 const { TOUR_STEPS } = await import("../js/components/tour.js");
 
 test("tour steps are well formed, short and honest", () => {
-  assert.ok(TOUR_STEPS.length >= 3 && TOUR_STEPS.length <= 6, "a tour should stay short");
+  assert.ok(TOUR_STEPS.length >= 3 && TOUR_STEPS.length <= 7, "a tour should stay short");
   const seen = new Set();
   for (const s of TOUR_STEPS) {
     assert.match(s.target, /^\[data-tour="[a-z-]+"\]$/);

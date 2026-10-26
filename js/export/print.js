@@ -1,6 +1,6 @@
 import { renderDocument } from "../preview/render.js";
 import { isLetter } from "../models/cover-letter.js";
-import { resolveDesign } from "../templates/design.js";
+import { FONT_FAMILIES, resolveDesign } from "../templates/design.js";
 import { cleanText } from "../utils/sanitization.js";
 
 /** Print-to-PDF support.
@@ -58,8 +58,22 @@ export function cleanupPrint() {
   }
 }
 
+/** Bundled fonts load on first use, so make sure every font the document uses is ready before paper is made.
+ *  Otherwise the PDF would silently fall back to a system font. */
+export async function loadDocFonts(doc) {
+  if (!document.fonts?.load) return;
+  const jobs = [];
+  for (const el of Object.values(resolveDesign(doc).elements)) {
+    const stack = el.font ? FONT_FAMILIES[el.font].stack : "";
+    const family = /^"([^"]+ Variable)"/.exec(stack)?.[1];
+    if (family) jobs.push(document.fonts.load(`${el.weight || 400} 16px "${family}"`).catch(() => {}));
+  }
+  await Promise.all(jobs);
+}
+
 /** Opens the browser print dialog for this document. Resolves after the dialog call returns. */
 export async function printResume(doc, opts = {}) {
+  await loadDocFonts(doc);
   const result = preparePrint(doc, opts);
   const imgs = [...document.querySelectorAll("#print-root img")];
   await Promise.all(imgs.map((img) => img.decode?.().catch(() => {})));

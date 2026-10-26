@@ -1,0 +1,282 @@
+/* Per-element formatting chosen by the user (Style tab, or click any text in the preview).
+ * Generated pattern: renderer sets data-st="role-prop ..." plus --el-role-prop variables, and each token turns on one
+ * rule here. !important is deliberate: a user's explicit choice must beat every template rule. Loads last. */
+.doc[data-st~="name-color"] [data-role="name"] {
+  color: var(--el-name-color) !important;
+}
+
+.doc[data-st~="name-font"] [data-role="name"] {
+  font-family: var(--el-name-font) !important;
+}
+
+.doc[data-st~="name-weight"] [data-role="name"] {
+  font-weight: var(--el-name-weight) !important;
+}
+
+.doc[data-st~="name-size"] [data-role="name"] {
+  font-size: calc(var(--el-name-size) * 1pt) !important;
+}
+
+.doc[data-st~="name-italic"] [data-role="name"] {
+  font-style: italic !important;
+}
+
+.doc[data-st~="name-upper-on"] [data-role="name"] {
+  text-transform: uppercase !important;
+}
+
+.doc[data-st~="name-upper-off"] [data-role="name"] {
+  text-transform: none !important;
+}
+
+.doc[data-st~="name-track"] [data-role="name"] {
+  letter-spacing: calc(var(--el-name-track) * 1em) !important;
+}
+
+.doc[data-st~="name-align"] [data-role="name"] {
+  text-align: var(--el-name-align) !important;
+}
+
+.doc[data-st~="role-color"] [data-role="role"] {
+  color: var(--el-role-color) !important;
+}
+
+.doc[data-st~="role-font"] [data-role="role"] {
+  font-family: var(--el-role-font) !important;
+}
+
+.doc[data-st~="role-weight"] [data-role="role"] {
+  font-weight: var(--el-role-weight) !important;
+}
+
+.doc[data-st~="role-size"] [data-role="role"] {
+  font-size: calc(var(--el-role-size) * 1pt) !important;
+}
+
+.doc[data-st~="role-italic"] [data-role="role"] {
+  font-style: italic !important;
+}
+
+.doc[data-st~="role-upper-on"] [data-role="role"] {
+  text-transform: uppercase !important;
+}
+
+.doc[data-st~="role-upper-off"] [data-role="role"] {
+  text-transform: none !important;
+}
+
+.doc[data-st~="role-track"] [data-role="role"] {
+  letter-spacing: calc(var(--el-role-track) * 1em) !important;
+}
+
+.doc[data-st~="role-align"] [data-role="role"] {
+  text-align: var(--el-role-align) !important;
+}
+
+.doc[data-st~="contact-color"] [data-role="contact"] {
+  color: var(--el-contact-color) !important;
+}
+
+.doc[data-st~="contact-font"] [data-role="contact"] {
+  font-family: var(--el-contact-font) !important;
+}
+
+.doc[data-st~="contact-weight"] [data-role="contact"] {
+  font-weight: var(--el-contact-weight) !important;
+}
+
+.doc[data-st~="contact-size"] [data-role="contact"] {
+  font-size: calc(var(--el-contact-size) * 1pt) !important;
+}
+
+.doc[data-st~="contact-italic"] [data-role="contact"] {
+  font-style: italic !important;
+}
+
+.doc[data-st~="contact-upper-on"] [data-role="contact"] {
+  text-transform: uppercase !important;
+}
+
+.doc[data-st~="contact-upper-off"] [data-role="contact"] {
+  text-transform: none !important;
+}
+
+.doc[data-st~="contact-track"] [data-role="contact"] {
+  letter-spacing: calc(var(--el-contact-track) * 1em) !important;
+}
+
+.doc[data-st~="contact-align"] [data-role="contact"] {
+  text-align: var(--el-contact-align) !important;
+}
+
+.doc[data-st~="heading-color"] [data-role="heading"] {
+  color: var(--el-heading-color) !important;
+}
+
+.doc[data-st~="heading-font"] [data-role="heading"] {
+  font-family: var(--el-heading-font) !important;
+}
+
+.doc[data-st~="heading-weight"] [data-role="heading"] {
+  font-weight: var(--el-heading-weight) !important;
+}
+
+.doc[data-st~="heading-size"] [data-role="heading"] {
+  font-size: calc(var(--el-heading-size) * 1pt) !important;
+}
+
+.doc[data-st~="heading-italic"] [data-role="heading"] {
+  font-style: italic !important;
+}
+
+.doc[data-st~="heading-upper-on"] [data-role="heading"] {
+  text-transform: uppercase !important;
+}
+
+.doc[data-st~="heading-upper-off"] [data-role="heading"] {
+  text-transform: none !important;
+}
+
+.doc[data-st~="heading-track"] [data-role="heading"] {
+  letter-spacing: calc(var(--el-heading-track) * 1em) !important;
+}
+
+.doc[data-st~="heading-align"] [data-role="heading"] {
+  text-align: var(--el-heading-align) !important;
+}
+
+.doc[data-st~="title-color"] [data-role="title"] {
+  color: var(--el-title-color) !important;
+}
+
+.doc[data-st~="title-font"] [data-role="title"] {
+  font-family: var(--el-title-font) !important;
+}
+
+.doc[data-st~="title-weight"] [data-role="title"] {
+  font-weight: var(--el-title-weight) !important;
+}
+
+.doc[data-st~="title-size"] [data-role="title"] {
+  font-size: calc(var(--el-title-size) * 1pt) !important;
+}
+
+.doc[data-st~="title-italic"] [data-role="title"] {
+  font-style: italic !important;
+}
+
+.doc[data-st~="title-upper-on"] [data-role="title"] {
+  text-transform: uppercase !important;
+}
+
+.doc[data-st~="title-upper-off"] [data-role="title"] {
+  text-transform: none !important;
+}
+
+.doc[data-st~="title-track"] [data-role="title"] {
+  letter-spacing: calc(var(--el-title-track) * 1em) !important;
+}
+
+.doc[data-st~="title-align"] [data-role="title"] {
+  text-align: var(--el-title-align) !important;
+}
+
+.doc[data-st~="body-color"] [data-role="body"] {
+  color: var(--el-body-color) !important;
+}
+
+.doc[data-st~="body-font"] [data-role="body"] {
+  font-family: var(--el-body-font) !important;
+}
+
+.doc[data-st~="body-weight"] [data-role="body"] {
+  font-weight: var(--el-body-weight) !important;
+}
+
+.doc[data-st~="body-size"] [data-role="body"] {
+  font-size: calc(var(--el-body-size) * 1pt) !important;
+}
+
+.doc[data-st~="body-italic"] [data-role="body"] {
+  font-style: italic !important;
+}
+
+.doc[data-st~="body-upper-on"] [data-role="body"] {
+  text-transform: uppercase !important;
+}
+
+.doc[data-st~="body-upper-off"] [data-role="body"] {
+  text-transform: none !important;
+}
+
+.doc[data-st~="body-track"] [data-role="body"] {
+  letter-spacing: calc(var(--el-body-track) * 1em) !important;
+}
+
+.doc[data-st~="body-align"] [data-role="body"] {
+  text-align: var(--el-body-align) !important;
+}
+
+.doc[data-st~="meta-color"] [data-role="meta"] {
+  color: var(--el-meta-color) !important;
+}
+
+.doc[data-st~="meta-font"] [data-role="meta"] {
+  font-family: var(--el-meta-font) !important;
+}
+
+.doc[data-st~="meta-weight"] [data-role="meta"] {
+  font-weight: var(--el-meta-weight) !important;
+}
+
+.doc[data-st~="meta-size"] [data-role="meta"] {
+  font-size: calc(var(--el-meta-size) * 1pt) !important;
+}
+
+.doc[data-st~="meta-italic"] [data-role="meta"] {
+  font-style: italic !important;
+}
+
+.doc[data-st~="meta-upper-on"] [data-role="meta"] {
+  text-transform: uppercase !important;
+}
+
+.doc[data-st~="meta-upper-off"] [data-role="meta"] {
+  text-transform: none !important;
+}
+
+.doc[data-st~="meta-track"] [data-role="meta"] {
+  letter-spacing: calc(var(--el-meta-track) * 1em) !important;
+}
+
+.doc[data-st~="meta-align"] [data-role="meta"] {
+  text-align: var(--el-meta-align) !important;
+}
+
+/* flex containers ignore text-align, so contact lines and headings align with justify-content */
+.doc[data-st~="contact-align"] [data-role="contact"] {
+  justify-content: var(--el-contact-justify) !important;
+}
+
+/* photo: size in millimetres, nudge with the translate property (never changes the page flow) */
+.doc[data-st~="photo-size"] [data-role="photo"] {
+  width: calc(var(--photo-size) * 1mm) !important;
+  height: calc(var(--photo-size) * 1mm) !important;
+}
+
+.doc[data-st~="photo-move"] [data-role="photo"] {
+  translate: calc(var(--photo-x) * 1mm) calc(var(--photo-y) * 1mm);
+}
+
+/* element picking in the editor preview (not present in print) */
+.stage--pick [data-role]:hover {
+  outline: 1.5px dashed rgba(106, 139, 255, 0.9);
+  outline-offset: 2px;
+  cursor: pointer;
+}
+
+.stage [data-role][data-selected] {
+  outline: 2px solid rgba(106, 139, 255, 0.95);
+  outline-offset: 2px;
+  border-radius: 2px;
+}

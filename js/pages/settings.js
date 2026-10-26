@@ -57,7 +57,7 @@ export default function settings(root) {
       <section class="setting-card" aria-labelledby="s-docs">
         <h2 id="s-docs">Documents and export</h2>
         <div class="setting-row">
-          <div class="setting-row__label"><strong id="paper-label">Default paper size</strong><span>For new documents. Each resume can change it in the Design tab.</span></div>
+          <div class="setting-row__label"><strong id="paper-label">Default paper size</strong><span>For new documents. Each resume can change it in the Style tab.</span></div>
           <div role="group" aria-labelledby="paper-label">${radioGroup("pageSize", "Default paper size", [["A4", "A4"], ["Letter", "US Letter"]], s.pageSize)}</div>
         </div>
         <div class="setting-row">

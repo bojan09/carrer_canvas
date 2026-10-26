@@ -12,6 +12,8 @@ export const MIGRATIONS = {
   // v3 (Phase 5.1): design overrides gained text/fill colours, opacity, mirrored layout and letter date side.
   // An older app version refuses v3 records instead of silently dropping those settings.
   2: (doc) => ({ ...doc, schemaVersion: 3 }),
+  // v4 (Phase 6.1): per-element formatting (colour, font, weight, size, ...) and photo size/nudge in designSettings.
+  3: (doc) => ({ ...doc, schemaVersion: 4 }),
 };
 
 /** Upgrades and validates a raw stored record. Throws ResumeDataError when it cannot be used

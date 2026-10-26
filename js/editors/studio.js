@@ -12,6 +12,7 @@ import { printResume } from "../export/print.js";
 import { toast } from "../components/toast.js";
 import { sectionsList } from "./sections-rail.js";
 import { startTour, tourPending } from "../components/tour.js";
+import { ELEMENT_ROLES } from "../templates/design.js";
 import { captureFlip, playFlip } from "../utils/flip.js";
 import { resumeAdapter } from "./resume-adapter.js";
 
@@ -29,6 +30,8 @@ function toolButton({ name, label, text, onClick }) {
 export function mountStudio(root, session, { persistent, adapter = resumeAdapter }) {
   const Noun = adapter.noun[0].toUpperCase() + adapter.noun.slice(1);
   const expanded = new Set(["contact"]);
+  let selectedRole = "body"; // the kind of text the Format panel is editing
+  const closedGroups = new Set(); // collapsed groups in the Style panel survive rebuilds
   const ctx = {
     change: (mutator, opts) => session.change(mutator, opts),
     announce,
@@ -79,14 +82,18 @@ export function mountStudio(root, session, { persistent, adapter = resumeAdapter
   const viewGroup = h("fieldset", { class: "studio__view", "data-tour": "view" }, h("legend", { class: "sr-only", text: "Show" }));
   const seg = h("div", { class: "segmented" });
   [
-    ["edit", "Edit"],
-    ["preview", "Preview"],
-    ["design", "Design"],
-  ].forEach(([value, label], i) => {
+    ["edit", "Edit", "pencil"],
+    ["design", "Style", "palette"],
+    ["preview", "Preview", "eye"],
+  ].forEach(([value, label, iconName], i) => {
     const input = h("input", { type: "radio", name: "studio-view", value });
     input.checked = i === 0;
     input.addEventListener("change", () => setView(value));
-    seg.append(h("label", { class: `segmented__option${value === "preview" ? " studio__opt-preview" : ""}` }, input, h("span", { class: "segmented__label", text: label })));
+    const text = h("span", { class: "segmented__label studio__tab" });
+    text.innerHTML = `${icon(iconName)}<span class="studio__tabtext"></span>`;
+    text.querySelector(".studio__tabtext").textContent = label;
+    if (value === "design" && !getSettings().styleSeen) text.append(h("span", { class: "studio__new", text: "New" }));
+    seg.append(h("label", { class: `segmented__option${value === "preview" ? " studio__opt-preview" : ""}` }, input, text));
   });
   viewGroup.append(seg);
 
@@ -99,15 +106,20 @@ export function mountStudio(root, session, { persistent, adapter = resumeAdapter
   zoomSelect.value = getSettings().previewZoom;
   const pageInfo = h("span", { class: "studio__pageinfo", role: "status" });
   const tplBadge = h("span", { class: "badge" });
+  const styleBtn = h("button", { type: "button", class: "btn btn--primary btn--sm studio__stylebtn", "data-tour": "style-btn" });
+  const pickHintIcon = h("span", { class: "studio__pickicon" });
+  pickHintIcon.innerHTML = icon("pointer");
   const preview = h(
     "section",
     { class: "studio__preview", "aria-label": "Preview" },
-    h("div", { class: "studio__previewhead" }, h("h2", { text: "Preview" }), tplBadge, h("div", { class: "studio__zoom" }, zoomSelect)),
+    h("div", { class: "studio__previewhead" }, h("h2", { text: "Preview" }), tplBadge, styleBtn, h("div", { class: "studio__zoom" }, zoomSelect)),
+    h("p", { class: "studio__pickhint" }, pickHintIcon, document.createTextNode(" Click any text in the preview to change its font, colour, size or boldness.")),
     previewScroll,
     h("p", { class: "studio__previewnote" }, pageInfo, document.createTextNode(" Page-break guides are estimates. The saved PDF is what counts.")),
   );
   const paper = mountPaper(previewScroll, {
     zoom: getSettings().previewZoom,
+    onPick: (role) => pickRole(role),
     onInfo: ({ pages, paper: size }) => {
       lastPages = pages;
       pageInfo.textContent = `About ${pages} page${pages === 1 ? "" : "s"} · ${PAPER[size].label.split(" (")[0]}.`;
@@ -132,14 +144,65 @@ export function mountStudio(root, session, { persistent, adapter = resumeAdapter
 
   function setView(value) {
     studio.dataset.view = value;
-    if (value === "design") ensureDesign();
+    if (value === "design") {
+      ensureDesign();
+      if (!getSettings().styleSeen) {
+        updateSettings({ styleSeen: true });
+        viewGroup.querySelectorAll(".studio__new").forEach((n) => n.remove());
+      }
+    }
+    syncStyleButton();
+    paper.setSelection(value === "design" ? selectedRole : null);
     window.scrollTo(0, 0);
+  }
+
+  /** The always-visible Style button flips between "open Style" and "back to editing". */
+  function syncStyleButton() {
+    const inStyle = studio.dataset.view === "design";
+    styleBtn.innerHTML = `${icon(inStyle ? "pencil" : "palette")}<span class="tool-label"></span>`;
+    styleBtn.querySelector(".tool-label").textContent = inStyle ? `Back to editing` : `Style this ${adapter.noun}`;
+    styleBtn.classList.toggle("btn--primary", !inStyle);
+    styleBtn.classList.toggle("btn--outline", inStyle);
+    styleBtn.setAttribute("aria-pressed", String(inStyle));
+  }
+  styleBtn.addEventListener("click", () => {
+    const next = studio.dataset.view === "design" ? "edit" : "design";
+    viewGroup.querySelector(`input[value="${next}"]`).checked = true;
+    setView(next);
+  });
+
+  /** A click on text in the preview (or a chip in the Format panel) chooses what to format. */
+  function pickRole(role, { focus = true } = {}) {
+    if (!ELEMENT_ROLES[role] || (adapter.kind === "letter" && role === "heading")) return;
+    selectedRole = role;
+    designStale = true;
+    viewGroup.querySelector('input[value="design"]').checked = true;
+    setView("design");
+    announce(`Formatting ${ELEMENT_ROLES[role].label}.`);
+    requestAnimationFrame(() => {
+      const card = designHost.querySelector(".format");
+      card?.scrollIntoView({ block: "nearest" });
+      if (focus) designHost.querySelector('.format__chips [aria-checked="true"]')?.focus({ preventScroll: true });
+    });
   }
 
   function ensureDesign() {
     if (!designStale) return;
     designApi?.destroy();
-    designApi = designPanel({ session, ctx, sample: adapter.sample });
+    designApi = designPanel({
+      session,
+      ctx,
+      sample: adapter.sample,
+      role: selectedRole,
+      closed: closedGroups,
+      onRole: (role, { focus = false } = {}) => {
+        selectedRole = role;
+        paper.setSelection(role);
+        designStale = true;
+        ensureDesign();
+        if (focus) designHost.querySelector(`[data-focus-key="format:role:${role}"]`)?.focus({ preventScroll: true });
+      },
+    });
     designHost.replaceChildren(designApi.el);
     designStale = false;
   }
@@ -396,6 +459,9 @@ export function mountStudio(root, session, { persistent, adapter = resumeAdapter
   renderHistoryButtons();
   renderStatus();
   renderPreview();
+  syncStyleButton();
+  const barObserver = new ResizeObserver(() => studio.style.setProperty("--bar-h", `${bar.offsetHeight}px`));
+  barObserver.observe(bar);
 
   // Offer back unsaved changes left by an interrupted session (never applied silently)
   const recovered = session.recoverable();
@@ -423,6 +489,7 @@ export function mountStudio(root, session, { persistent, adapter = resumeAdapter
   }, 700);
 
   return () => {
+    barObserver.disconnect();
     clearTimeout(tourTimer);
     tour?.stop();
     clearTimeout(previewTimer);

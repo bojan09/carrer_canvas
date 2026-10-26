@@ -91,22 +91,21 @@ test("registry flags are consistent for every template", () => {
 });
 
 test("schema bump: older records migrate, content and design survive, newer ones are refused", () => {
-  assert.equal(SCHEMA_VERSION, 3);
-  assert.equal(LETTER_SCHEMA_VERSION, 2);
+  assert.ok(SCHEMA_VERSION >= 3 && LETTER_SCHEMA_VERSION >= 2);
   const v2 = createSample();
   v2.schemaVersion = 2;
   v2.designSettings = { accent: "#aa3322", simplified: true };
   const up = migrateRecord(v2);
-  assert.equal(up.schemaVersion, 3);
+  assert.equal(up.schemaVersion, SCHEMA_VERSION);
   assert.equal(up.contact.fullName, v2.contact.fullName);
   assert.deepEqual(up.designSettings, { accent: "#aa3322", simplified: true });
   const l1 = createLetterSample();
   l1.schemaVersion = 1;
   const upL = migrateRecord(l1);
-  assert.equal(upL.schemaVersion, 2);
+  assert.equal(upL.schemaVersion, LETTER_SCHEMA_VERSION);
   assert.equal(upL.body.length, l1.body.length);
-  assert.throws(() => migrateRecord({ ...createBlank(), schemaVersion: 4 }), (e) => e.code === "newer-version");
-  assert.throws(() => migrateRecord({ ...createLetterSample(), schemaVersion: 3 }), (e) => e.code === "newer-version");
+  assert.throws(() => migrateRecord({ ...createBlank(), schemaVersion: SCHEMA_VERSION + 1 }), (e) => e.code === "newer-version");
+  assert.throws(() => migrateRecord({ ...createLetterSample(), schemaVersion: LETTER_SCHEMA_VERSION + 1 }), (e) => e.code === "newer-version");
 });
 
 test("resumes and letters round-trip the new settings unchanged", () => {

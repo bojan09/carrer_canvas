@@ -85,3 +85,10 @@ Limits (see `LETTER_FIELD_MAX`): opening 1500, paragraph 3000, address 300, othe
 | `dateAlign` | `"right"` | letters only: date on the right |
 
 Migration 2→3 (resumes) and 1→2 (letters) only stamp the version: an older app version refuses these records instead of silently dropping the settings. Switching template, or "Reset to template defaults", clears all of them (simplified, photo on/off and photo shape are kept).
+
+## Schema v4 / letter v3 (Phase 6.1): per-element formatting
+`designSettings.elements` holds formatting for each kind of text. Roles: `name`, `role`, `contact`, `heading`, `title`, `body`, `meta`. Each role may set `color` (hex), `font` (a key of `FONT_FAMILIES`), `weight` (400-900 in steps of 100), `size` (6-72 pt), `track` (letter spacing, -0.05 to 0.4 em), `italic`, `upper` (true/false; absent = template default) and `align` (left/center/right; justify for `body` only). Roles that would be empty are dropped. Top-level `photoSize` (15-70 mm), `photoX` and `photoY` (-30 to 30 mm) resize and nudge the photo.
+
+The renderer tags text with `data-role`, writes `--el-<role>-<prop>` variables and `data-st` tokens on the document, and `css/templates/elements.css` turns each token into one rule. Nothing user-supplied is ever written as CSS text: colours and font ids are validated first, font ids map to fixed stacks. Migration 3->4 (resumes) and 2->3 (letters) only stamp the version.
+
+Switching template clears these (like other visual overrides); the editor says so and offers Undo.

@@ -6,7 +6,8 @@ import { getSettings, updateSettings } from "../state/settings.js";
 
 export const TOUR_STEPS = [
   { target: '[data-tour="status"]', title: "Saved as you type", text: "Your work is saved on this device automatically. The line under the title tells you when it has been saved." },
-  { target: '[data-tour="view"]', title: "Edit, Preview and Design", text: "Write in Edit, change the look in Design, and check the page in Preview. On wide screens the preview stays beside you." },
+  { target: '[data-tour="view"]', title: "Edit, Style and Preview", text: "Write in Edit, make it yours in Style, and check the page in Preview. On wide screens the preview stays beside you." },
+  { target: '[data-tour="style-btn"]', title: "Style your document", text: "Change colours, fonts, boldness, size and layout. Or just click any text in the preview to format it." },
   { target: '[data-tour="undo"]', title: "Everything can be undone", text: "Undo and redo cover every change, including deletes. Ctrl or ⌘ + Z works too." },
   { target: '[data-tour="checklist"]', title: "Writing checklist", text: "Friendly reminders about gaps in your document. It is guidance, not a score." },
   { target: '[data-tour="export"]', title: "Save as PDF", text: "This opens your browser's print dialog, where you choose Save as PDF. We show you the steps first." },

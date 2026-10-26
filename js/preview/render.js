@@ -3,7 +3,7 @@ import { safeUrl } from "../utils/sanitization.js";
 import { isEmpty, titleOf } from "../editors/hints.js";
 import { getTemplate } from "../templates/registry.js";
 import { formatLetterDate, isLetter } from "../models/cover-letter.js";
-import { BASE_FONT_PX, FONT_PAIRS, MM, PAPER, effectiveFill, photoVisible, readableInk, renderTemplateOf, resolveDesign } from "../templates/design.js";
+import { BASE_FONT_PX, FONT_FAMILIES, FONT_PAIRS, MM, PAPER, effectiveFill, photoVisible, readableInk, renderTemplateOf, resolveDesign } from "../templates/design.js";
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
@@ -28,63 +28,63 @@ function link(text, url) {
 
 function bulletList(bullets) {
   const items = bullets.filter((b) => b.text.trim());
-  return items.length ? h("ul", { class: "doc__bullets" }, items.map((b) => h("li", { text: b.text }))) : null;
+  return items.length ? h("ul", { class: "doc__bullets", "data-role": "body" }, items.map((b) => h("li", { text: b.text }))) : null;
 }
 
 function entry(headline, sub, dates, extra) {
   return h(
     "div",
     { class: "doc__entry" },
-    h("div", { class: "doc__entry-head" }, h("strong", { class: "doc__entry-title", text: headline }), dates ? h("span", { class: "doc__dates", text: dates }) : null),
-    sub ? h("div", { class: "doc__entry-sub", text: sub }) : null,
+    h("div", { class: "doc__entry-head" }, h("strong", { class: "doc__entry-title", "data-role": "title", text: headline }), dates ? h("span", { class: "doc__dates", "data-role": "meta", text: dates }) : null),
+    sub ? h("div", { class: "doc__entry-sub", "data-role": "meta", text: sub }) : null,
     extra || null,
   );
 }
 
 function skillBlock(items, style) {
   if (style === "chips") {
-    return h("ul", { class: "doc__chips" }, items.map((t) => h("li", { text: t })));
+    return h("ul", { class: "doc__chips", "data-role": "body" }, items.map((t) => h("li", { text: t })));
   }
-  return h("p", { class: "doc__skills-text", text: items.join(", ") });
+  return h("p", { class: "doc__skills-text", "data-role": "body", text: items.join(", ") });
 }
 
 function sectionBody(s, skillsStyle) {
   const body = [];
   switch (s.type) {
     case "summary":
-      body.push(h("p", { class: "doc__text", text: s.text }));
+      body.push(h("p", { class: "doc__text", "data-role": "body", text: s.text }));
       break;
     case "experience":
       s.items.forEach((e) => body.push(entry(e.title || "Untitled position", [e.organization, e.location].filter(Boolean).join(", "), dateRange(e.startDate, e.endDate, e.current), bulletList(e.bullets))));
       break;
     case "education":
-      s.items.forEach((e) => body.push(entry(e.program || "Untitled program", [e.school, e.location].filter(Boolean).join(", "), dateRange(e.startDate, e.endDate, false), e.details ? h("p", { class: "doc__text", text: e.details }) : null)));
+      s.items.forEach((e) => body.push(entry(e.program || "Untitled program", [e.school, e.location].filter(Boolean).join(", "), dateRange(e.startDate, e.endDate, false), e.details ? h("p", { class: "doc__text", "data-role": "body", text: e.details }) : null)));
       break;
     case "skills":
       s.items.forEach((e) =>
-        body.push(h("div", { class: "doc__skillgroup" }, e.label ? h("strong", { class: "doc__skilllabel", text: e.label }) : null, skillBlock(e.items, skillsStyle))),
+        body.push(h("div", { class: "doc__skillgroup" }, e.label ? h("strong", { class: "doc__skilllabel", "data-role": "title", text: e.label }) : null, skillBlock(e.items, skillsStyle))),
       );
       break;
     case "projects":
       s.items.forEach((e) =>
-        body.push(entry(e.name || "Untitled project", e.role, dateRange(e.startDate, e.endDate, false), h("div", {}, e.url ? h("div", { class: "doc__entry-sub" }, link("", e.url)) : null, bulletList(e.bullets)))),
+        body.push(entry(e.name || "Untitled project", e.role, dateRange(e.startDate, e.endDate, false), h("div", {}, e.url ? h("div", { class: "doc__entry-sub", "data-role": "meta" }, link("", e.url)) : null, bulletList(e.bullets)))),
       );
       break;
     case "certifications":
-      s.items.forEach((e) => body.push(entry(e.title || "Untitled certification", e.issuer, fmtMonth(e.date), e.url ? h("div", { class: "doc__entry-sub" }, link("Credential", e.url)) : null)));
+      s.items.forEach((e) => body.push(entry(e.title || "Untitled certification", e.issuer, fmtMonth(e.date), e.url ? h("div", { class: "doc__entry-sub", "data-role": "meta" }, link("Credential", e.url)) : null)));
       break;
     case "languages":
-      s.items.forEach((e) => body.push(h("p", { class: "doc__lang" }, h("strong", { text: e.language || "Language" }), e.proficiency ? document.createTextNode(` (${e.proficiency})`) : null)));
+      s.items.forEach((e) => body.push(h("p", { class: "doc__lang", "data-role": "body" }, h("strong", { text: e.language || "Language" }), e.proficiency ? document.createTextNode(` (${e.proficiency})`) : null)));
       break;
     case "custom":
-      body.push(s.mode === "bullets" ? bulletList(s.bullets) : h("p", { class: "doc__text", text: s.text }));
+      body.push(s.mode === "bullets" ? bulletList(s.bullets) : h("p", { class: "doc__text", "data-role": "body", text: s.text }));
       break;
   }
   return body;
 }
 
 function renderSection(s, skillsStyle) {
-  return h("section", { class: "doc__section", "data-type": s.type }, h("h2", { class: "doc__heading", text: titleOf(s) }), sectionBody(s, skillsStyle));
+  return h("section", { class: "doc__section", "data-type": s.type }, h("h2", { class: "doc__heading", "data-role": "heading", text: titleOf(s) }), sectionBody(s, skillsStyle));
 }
 
 /** Shared document frame: header (photo, name, role, contact) plus a body built by `makeBody`.
@@ -110,9 +110,9 @@ function frame(doc, opts, kind, makeBody) {
   const header = h(
     "header",
     { class: "doc__header" },
-    showPhoto ? h("img", { class: "doc__photo", src: doc.photo.data, alt: "", width: "96", height: "96" }) : null,
-    h("div", { class: "doc__id" }, h("h1", { class: "doc__name", text: c.fullName || "Your name" }), c.title ? h("p", { class: "doc__role", text: c.title }) : null),
-    contactBits.length ? h("ul", { class: "doc__contact" }, contactBits.map((n) => h("li", {}, n))) : null,
+    showPhoto ? h("img", { class: "doc__photo", "data-role": "photo", src: doc.photo.data, alt: "", width: "96", height: "96" }) : null,
+    h("div", { class: "doc__id" }, h("h1", { class: "doc__name", "data-role": "name", text: c.fullName || "Your name" }), c.title ? h("p", { class: "doc__role", "data-role": "role", text: c.title }) : null),
+    contactBits.length ? h("ul", { class: "doc__contact", "data-role": "contact" }, contactBits.map((n) => h("li", {}, n))) : null,
   );
 
   const { body, hasSide } = makeBody(tpl);
@@ -158,6 +158,37 @@ function frame(doc, opts, kind, makeBody) {
     if (tpl.headerInk && (design.fillColor || design.fillOpacity !== 1)) vars["--hdr-ink"] = readableInk(effectiveFill(tpl, design), design.fillOpacity, tpl.printsOnWhite && opts.forPrint ? "#ffffff" : tpl.paperBg);
   }
   if (design.photoOpacity !== 1) vars["--photo-o"] = String(design.photoOpacity);
+
+  // Per-element formatting: each setting becomes a CSS variable plus a token on data-st that switches on the
+  // matching rule in css/templates/elements.css. Colours are skipped on paper for dark-on-screen templates.
+  const tokens = [];
+  for (const [role, el] of Object.entries(design.elements)) {
+    const add = (prop, value) => {
+      tokens.push(`${role}-${prop}`);
+      if (value !== undefined) vars[`--el-${role}-${prop}`] = String(value);
+    };
+    if (el.color && !keepTextColours) add("color", el.color);
+    if (el.font) add("font", FONT_FAMILIES[el.font].stack);
+    if (el.weight) add("weight", el.weight);
+    if (el.size) add("size", el.size);
+    if (el.track !== undefined) add("track", el.track);
+    if (el.italic === true) add("italic");
+    if (el.upper !== undefined) add(el.upper ? "upper-on" : "upper-off");
+    if (el.align) {
+      add("align", el.align);
+      vars[`--el-${role}-justify`] = { left: "flex-start", center: "center", right: "flex-end", justify: "flex-start" }[el.align];
+    }
+  }
+  if (design.photoSize !== undefined) {
+    tokens.push("photo-size");
+    vars["--photo-size"] = String(design.photoSize);
+  }
+  if (design.photoX !== undefined || design.photoY !== undefined) {
+    tokens.push("photo-move");
+    vars["--photo-x"] = String(design.photoX ?? 0);
+    vars["--photo-y"] = String(design.photoY ?? 0);
+  }
+  if (tokens.length) root.setAttribute("data-st", tokens.join(" "));
   for (const [k, v] of Object.entries(vars)) root.style.setProperty(k, v);
   root.append(header, body);
   return root;
@@ -186,7 +217,7 @@ export function renderResume(doc, opts = {}) {
 }
 
 const lines = (text) => text.split("\n").map((l) => l.trim()).filter(Boolean);
-const paras = (text, cls) => text.split(/\n{2,}/).map((p) => p.trim()).filter(Boolean).map((p) => h("p", { class: cls, text: p }));
+const paras = (text, cls) => text.split(/\n{2,}/).map((p) => p.trim()).filter(Boolean).map((p) => h("p", { class: cls, "data-role": "body", text: p }));
 
 /** Cover letter tree: the same header as the resume, then one borderless block of letter parts.
  *  Layout is always single column (a letter has no sidebar content). */
@@ -196,14 +227,14 @@ export function renderLetter(doc, opts = {}) {
     const date = formatLetterDate(doc.date);
     const recipientLines = [r.name, r.title, r.company, ...lines(r.address)].filter(Boolean);
     const parts = [
-      date ? h("p", { class: "doc__date", text: date }) : null,
-      recipientLines.length ? h("address", { class: "doc__recipient" }, recipientLines.map((l) => h("span", { text: l }))) : null,
-      doc.role.trim() ? h("p", { class: "doc__subject", text: `Re: ${doc.role.trim()}` }) : null,
-      doc.greeting.trim() ? h("p", { class: "doc__greeting", text: doc.greeting.trim() }) : null,
+      date ? h("p", { class: "doc__date", "data-role": "meta", text: date }) : null,
+      recipientLines.length ? h("address", { class: "doc__recipient", "data-role": "meta" }, recipientLines.map((l) => h("span", { text: l }))) : null,
+      doc.role.trim() ? h("p", { class: "doc__subject", "data-role": "title", text: `Re: ${doc.role.trim()}` }) : null,
+      doc.greeting.trim() ? h("p", { class: "doc__greeting", "data-role": "body", text: doc.greeting.trim() }) : null,
       ...paras(doc.opening, "doc__para"),
       ...doc.body.flatMap((p) => paras(p.text, "doc__para")),
-      doc.closing.trim() ? h("p", { class: "doc__closing", text: doc.closing.trim() }) : null,
-      doc.signature.trim() ? h("p", { class: "doc__signature", text: doc.signature.trim() }) : null,
+      doc.closing.trim() ? h("p", { class: "doc__closing", "data-role": "body", text: doc.closing.trim() }) : null,
+      doc.signature.trim() ? h("p", { class: "doc__signature", "data-role": "title", text: doc.signature.trim() }) : null,
     ].filter(Boolean);
     const content = parts.length ? parts : [h("p", { class: "doc__empty", text: "Write your letter on the left and it appears here." })];
     const body = h("div", { class: "doc__body" }, h("div", { class: "doc__main" }, h("section", { class: "doc__section doc__letter", "data-type": "letter" }, content)));

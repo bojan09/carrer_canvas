@@ -126,14 +126,14 @@ test("photo normalisation accepts only our own JPEG data URLs within the size ca
 });
 
 test("schema v2: v1 records migrate, content and photo survive, templateId and design are repaired", () => {
-  assert.equal(SCHEMA_VERSION, 3);
+  assert.equal(SCHEMA_VERSION, 4);
   const v1 = createSample();
   v1.schemaVersion = 1;
   v1.templateId = "does-not-exist";
   v1.designSettings = { accent: "#123456", junk: 1 };
   v1.photo = { data: "data:image/jpeg;base64,/9j/4AAQ", width: 320, height: 320 };
   const out = migrateRecord(v1);
-  assert.equal(out.schemaVersion, 3);
+  assert.equal(out.schemaVersion, SCHEMA_VERSION);
   assert.equal(out.templateId, "summit");
   assert.deepEqual(out.designSettings, { accent: "#123456" });
   assert.ok(out.photo);

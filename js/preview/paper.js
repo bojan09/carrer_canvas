@@ -18,10 +18,26 @@ const clamp = (n, a, b) => Math.min(b, Math.max(a, n));
  * Page-break guides are ESTIMATES from the content height; real pagination is decided by the
  * browser's print engine (see docs/PRINT_EXPORT.md in a later phase).
  */
-export function mountPaper(container, { zoom = "fit-width", onInfo = () => {} } = {}) {
+export function mountPaper(container, { zoom = "fit-width", onInfo = () => {}, onPick = null } = {}) {
   const sizer = h("div", { class: "stage__sizer" });
   const scroller = h("div", { class: "stage", tabindex: "0", role: "region", "aria-label": "Document preview, scrollable" }, sizer);
   container.replaceChildren(scroller);
+  let selected = null;
+
+  const paintSelection = () => {
+    scroller.querySelectorAll("[data-selected]").forEach((n) => n.removeAttribute("data-selected"));
+    if (selected) scroller.querySelectorAll(`[data-role="${selected}"]`).forEach((n) => n.setAttribute("data-selected", "true"));
+  };
+
+  // Clicking text in the preview picks it for formatting. Links are inert here so a click never leaves the editor.
+  if (onPick) {
+    scroller.classList.add("stage--pick");
+    scroller.addEventListener("click", (e) => {
+      const hit = e.target.closest?.("[data-role]");
+      if (e.target.closest?.("a")) e.preventDefault();
+      if (hit) onPick(hit.dataset.role);
+    });
+  }
 
   let doc = null;
   let mode = zoom;
@@ -63,6 +79,8 @@ export function mountPaper(container, { zoom = "fit-width", onInfo = () => {} } 
 
   const ro = new ResizeObserver(schedule);
   ro.observe(scroller);
+  // bundled fonts load on first use and change line breaks and page length, so measure again when they arrive
+  document.fonts?.addEventListener?.("loadingdone", schedule);
 
   return {
     update(nextDoc) {
@@ -74,7 +92,12 @@ export function mountPaper(container, { zoom = "fit-width", onInfo = () => {} } 
       if (current) current.replaceWith(next);
       else sizer.prepend(next);
       current = next;
+      paintSelection();
       layout();
+    },
+    setSelection(role) {
+      selected = role;
+      paintSelection();
     },
     setZoom(next) {
       mode = next;
@@ -82,6 +105,7 @@ export function mountPaper(container, { zoom = "fit-width", onInfo = () => {} } 
     },
     destroy() {
       cancelAnimationFrame(raf);
+      document.fonts?.removeEventListener?.("loadingdone", schedule);
       ro.disconnect();
     },
   };

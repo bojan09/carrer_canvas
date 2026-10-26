@@ -190,3 +190,20 @@ Phase 2: versioned resume schema, IndexedDB repositories + migrations, section e
 **Verified (Chromium only):** 88 unit tests; e2e phases 1-6 pass (phase 6: 43 checks across 9 viewport sizes including landscape phones).
 **Not verified:** Safari, Firefox, real phones and tablets; screen readers (the tour and shortcut dialog use standard roles but have not been heard); Web Animations support on older Safari (transitions simply do not play there).
 **Known limits:** drag-and-drop reordering still has no animation of the dragged item itself (the drop result animates); Alt+number shortcuts are ignored while typing in a field so they never swallow characters on Mac keyboards.
+
+## Phase 6.1: Style tab, click-to-style and Format text (v0.8.0)
+**Why:** users could not find the colour and font controls (they sat behind an unlabelled "Design" tab) and wanted per-element control: colour, fonts, boldness, size, move and resize.
+
+**Done**
+- **Findable:** the tab is now **Style** with a palette icon and a "New" badge until first opened; the preview has a primary **Style this resume / cover letter** button (it becomes **Back to editing**), a one-line hint that text can be clicked, and the tour has a step for it. Alt+3 and the shortcut list say Style.
+- **Click-to-style:** click any text in the preview (name, title line, contact, headings, entry titles, body, dates) and Format text opens for that kind of text, outlined in the preview. On phones, tapping text in Preview jumps to Format text. Links in the preview are inert so a click never leaves the editor.
+- **Format text:** font (7 bundled fonts plus system fonts), boldness (Regular to Black), size in points, colour with a contrast hint, capitals (template default / on / off), italic, letter spacing and alignment where it works. Every property has "Template default"; "Reset" clears one kind of text; "Use this font for all text".
+- **Move and resize:** photo size (mm) and nudge sideways/up-down, plus the earlier flip, header alignment and section reordering. Nudging never moves the text.
+- **Better panel:** collapsible groups remembered across rebuilds, sticky jump chips (Template, Colours, Text and fonts, Layout, Photo), Format text at the top of "Text, fonts and spacing", switching template tells you if custom styles were reset and offers Undo.
+- **Bundled fonts:** Inter, DM Sans, Space Grotesk, Lora, Playfair Display, Source Serif 4, JetBrains Mono (about 370 KB, precached so they work offline). Print waits for them and PDFs embed them (found and fixed during testing: without the wait the PDF fell back to a system font).
+- Schema v4 (resumes) and v3 (letters).
+
+**Not built, on purpose:** free dragging or resizing of arbitrary blocks (see the earlier advice: it breaks pagination, print and reading order). **What you can do instead:** photo size and nudge, flip, alignment, section order, per-element styling.
+**Verified (Chromium only):** 98 unit tests; e2e phases 1-6.1 pass (6.1: 57 checks, 10 real PDFs).
+**Not verified:** Safari, Firefox, iOS, Android (variable-font and `translate` support on older versions), screen readers on the Format panel, Ctrl+P (as opposed to the Export button) with fonts the preview has not yet loaded.
+**Limits:** italics use the browser's slanted version of each font (only upright files are bundled); non-Latin scripts use system fonts; element styles reset when you change template.
