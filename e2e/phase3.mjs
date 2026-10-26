@@ -30,7 +30,7 @@ const PNG = makePng(40, 24);
 
 const browser = await chromium.launch();
 const errors = [];
-const context = await browser.newContext({ viewport: { width: 1500, height: 950 } });
+const context = await browser.newContext({ viewport: { width: 1500, height: 950 }, locale: "en-GB" });
 const page = await context.newPage();
 page.on("console", (m) => m.type() === "error" && errors.push(m.text()));
 page.on("pageerror", (e) => errors.push(String(e)));

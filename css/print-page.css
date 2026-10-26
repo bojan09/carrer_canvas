@@ -1,0 +1,6 @@
+/* Default page box. js/export/print.js replaces this rule at print time with the resume's
+   paper size and margins. Safari ignores @page size: choose the paper size in its dialog. */
+@page {
+  size: A4;
+  margin: 18mm;
+}

@@ -1,3 +1,4 @@
+import { getSettings } from "../state/settings.js";
 import { CATEGORIES, TEMPLATES } from "../templates/registry.js";
 import { applyTemplate } from "../templates/design.js";
 import { createTemplateCard, sampleResume } from "../components/template-card.js";
@@ -27,7 +28,7 @@ async function useTemplate(t, { fresh = false } = {}) {
       doc.updatedAt = new Date().toISOString();
       toast({ message: `${t.name} applied to “${doc.title}”. Your content is unchanged.`, tone: "ok" });
     } else {
-      doc = createBlank();
+      doc = createBlank("Untitled resume", getSettings().pageSize);
       applyTemplate(doc, t.id);
       toast({ message: `New resume created with ${t.name}.`, tone: "ok" });
     }

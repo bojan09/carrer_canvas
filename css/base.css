@@ -170,3 +170,7 @@ main:focus,
   height: 0;
   overflow: hidden;
 }
+
+#print-root {
+  display: none;
+}

@@ -9,6 +9,7 @@ import { isStandalone } from "../utils/platform.js";
 import { getRepository } from "../storage/repository.js";
 import { closeSession, settleSaves } from "../state/resume-store.js";
 import { openDialog } from "../components/dialog.js";
+import { backupFlow, lastBackupText, restoreFlow } from "../export/backup-ui.js";
 
 const OFFLINE_TEXT = {
   ready: "Ready. The app opens without a connection.",
@@ -50,6 +51,25 @@ export default function settings(root) {
           <div class="setting-row__label"><label for="zoom-default"><strong>Default preview zoom</strong></label><span>Used when you open the resume preview.</span></div>
           <select id="zoom-default" class="input input--select">${[["fit-width", "Fit width"], ["fit-page", "Fit page"], ["75", "75%"], ["100", "100%"], ["125", "125%"]].map(([v, l]) => `<option value="${v}"${v === s.previewZoom ? " selected" : ""}>${l}</option>`).join("")}</select>
         </div>
+      </section>
+
+      <section class="setting-card" aria-labelledby="s-docs">
+        <h2 id="s-docs">Documents and export</h2>
+        <div class="setting-row">
+          <div class="setting-row__label"><strong id="paper-label">Default paper size</strong><span>For new documents. Each resume can change it in the Design tab.</span></div>
+          <div role="group" aria-labelledby="paper-label">${radioGroup("pageSize", "Default paper size", [["A4", "A4"], ["Letter", "US Letter"]], s.pageSize)}</div>
+        </div>
+        <div class="setting-row">
+          <label class="check" for="print-review"><input type="checkbox" class="check__input" id="print-review"${s.printReview ? " checked" : ""}><span><strong>Show the PDF review before printing</strong><br><small class="field__hint">Checklist, steps and browser tips each time you export.</small></span></label>
+        </div>
+        <div class="setting-row">
+          <div class="setting-row__label"><strong>Back up and restore</strong><span id="backup-status">${lastBackupText()}</span></div>
+          <div class="install-card__actions">
+            <button type="button" class="btn btn--outline btn--sm" id="backup-all">${icon("download")}Back up all…</button>
+            <button type="button" class="btn btn--outline btn--sm" id="restore">${icon("upload")}Restore…</button>
+          </div>
+        </div>
+        <p class="setting-card__lead">Backups are JSON files saved on this device. They are the only copy outside this browser, so make one regularly.</p>
       </section>
 
       <section class="setting-card" aria-labelledby="s-install">
@@ -116,11 +136,20 @@ export default function settings(root) {
     }),
   );
   const unsubSettings = subscribe((next) => {
-    root.querySelectorAll('input[name="theme"], input[name="motion"]').forEach((i) => {
+    root.querySelectorAll('input[name="theme"], input[name="motion"], input[name="pageSize"]').forEach((i) => {
       i.checked = next[i.name] === i.value;
     });
   });
 
+  root.querySelectorAll('input[name="pageSize"]').forEach((i) => i.addEventListener("change", () => updateSettings({ pageSize: i.value })));
+  root.querySelector("#print-review").addEventListener("change", (e) => updateSettings({ printReview: e.target.checked }));
+  root.querySelector("#backup-all").addEventListener("click", async () => {
+    await backupFlow();
+    root.querySelector("#backup-status").textContent = lastBackupText();
+  });
+  root.querySelector("#restore").addEventListener("click", async () => {
+    if (await restoreFlow()) paintDocs?.();
+  });
   root.querySelector("#zoom-default").addEventListener("change", (e) => updateSettings({ previewZoom: e.target.value }));
 
   // Install

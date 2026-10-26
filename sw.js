@@ -6,7 +6,7 @@
  *   they live in IndexedDB.
  * Keep CACHE_VERSION in sync with js/config.js APP_VERSION (tests enforce this).
  */
-const CACHE_VERSION = "0.3.0";
+const CACHE_VERSION = "0.4.0";
 const CACHE_PREFIX = "careercanvas-shell-";
 const CACHE_NAME = `${CACHE_PREFIX}${CACHE_VERSION}`;
 
@@ -45,6 +45,13 @@ const PRECACHE = [
   "js/preview/thumb.js",
   "js/templates/registry.js",
   "js/templates/design.js",
+  "css/print-page.css",
+  "js/export/print.js",
+  "js/export/backup.js",
+  "js/export/backup-ui.js",
+  "js/export/download.js",
+  "js/editors/print-dialog.js",
+  "js/state/shadow.js",
   "js/theme-boot.js",
   "js/main.js",
   "js/config.js",

@@ -53,3 +53,14 @@
 .doc[data-template="bloom"] .doc__photo {
   box-shadow: 0 0 0 3px #f6f0e2, 0 0 0 4px var(--accent);
 }
+
+@media print {
+  .doc[data-template="bloom"] {
+    --paper-bg: #fff;
+    background: #fff;
+  }
+
+  .doc[data-template="bloom"]::before {
+    opacity: 0.6;
+  }
+}

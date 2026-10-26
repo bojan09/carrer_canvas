@@ -1,3 +1,4 @@
+import { getSettings } from "../state/settings.js";
 import { h, icon } from "../utils/dom.js";
 import { getRepository } from "../storage/repository.js";
 import { settleSaves } from "../state/resume-store.js";
@@ -6,6 +7,7 @@ import { cleanText } from "../utils/sanitization.js";
 import { confirmDialog, openDialog } from "../components/dialog.js";
 import { toast } from "../components/toast.js";
 import { announce } from "../components/announcer.js";
+import { backupFlow, lastBackupText, restoreFlow } from "../export/backup-ui.js";
 
 const fmt = (iso) => new Date(iso).toLocaleString([], { dateStyle: "medium", timeStyle: "short" });
 
@@ -106,6 +108,7 @@ export default function saved(root) {
         { class: "doc-card__actions" },
         h("a", { class: "btn btn--outline btn--sm", href: `#/resume/${doc.id}`, "aria-label": `Open ${doc.title}`, text: "Open" }),
         act("pencil", "Rename", () => rename(repo, doc)),
+        act("download", "Export", () => backupFlow({ docIds: [doc.id] })),
         act("copy", "Duplicate", () => duplicate(repo, doc)),
         act("trash", "Delete", () => remove(repo, doc), "btn--danger-text"),
       ),
@@ -116,8 +119,8 @@ export default function saved(root) {
     const newButtons = h(
       "div",
       { class: "empty__actions" },
-      h("button", { type: "button", class: "btn btn--primary", text: "New blank resume", onclick: () => create(createBlank()) }),
-      h("button", { type: "button", class: "btn btn--outline", text: "New fictional sample", onclick: () => create(createSample()) }),
+      h("button", { type: "button", class: "btn btn--primary", text: "New blank resume", onclick: () => create(createBlank("Untitled resume", getSettings().pageSize)) }),
+      h("button", { type: "button", class: "btn btn--outline", text: "New fictional sample", onclick: () => create(createSample(getSettings().pageSize)) }),
     );
 
     const notices = [];
@@ -149,6 +152,13 @@ export default function saved(root) {
           { class: "page-head page-head--row" },
           h("div", {}, h("h1", { class: "page-head__title", tabindex: "-1", text: "Saved documents" }), h("p", { class: "page-head__lead", text: "Stored only on this device. Clearing site data or using private browsing can remove them." })),
           items.length ? newButtons : null,
+        ),
+        h(
+          "div",
+          { class: "backup-bar" },
+          h("span", { class: "backup-bar__text", text: lastBackupText() }),
+          items.length ? h("button", { type: "button", class: "btn btn--outline btn--sm", text: "Back up all", onclick: async () => { if (await backupFlow()) load(); } }) : null,
+          h("button", { type: "button", class: "btn btn--outline btn--sm", text: "Restore from backup", onclick: async () => { if (await restoreFlow()) load(); } }),
         ),
         ...notices,
         body,

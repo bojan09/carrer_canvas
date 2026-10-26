@@ -2,7 +2,7 @@
 
 Free, private, offline-capable resume and cover-letter builder. Vanilla HTML, CSS and JavaScript (ES modules). No framework, no build step, no backend, no accounts, no trackers.
 
-**Status:** Phase 3 of 7 done (PWA shell, resume editor with local autosave, eight templates with live paper preview and design controls). Print-to-PDF, backup and cover letters are next. See [docs/PHASE_STATUS.md](docs/PHASE_STATUS.md).
+**Status:** Phase 4 of 7 done (PWA shell, resume editor with local autosave, eight templates with paper preview and design controls, print-to-PDF, JSON backup and restore, crash recovery). A modern template refresh (Phase 3b) and cover letters are next, see docs/ROADMAP.md. See [docs/PHASE_STATUS.md](docs/PHASE_STATUS.md).
 
 ## Run locally
 
@@ -14,6 +14,7 @@ npm test             # unit/structure tests (Node 20+)
 NODE_PATH=<dir containing playwright> node e2e/phase1.mjs   # browser checks + screenshots (needs Playwright + Chromium)
 NODE_PATH=<dir containing playwright> node e2e/phase2.mjs   # editor, storage and persistence checks
 NODE_PATH=<dir containing playwright> node e2e/phase3.mjs   # templates, design controls, photo, zoom
+NODE_PATH=<dir containing playwright> node e2e/phase4.mjs   # real PDFs (needs poppler-utils), backup/restore, recovery
 ```
 
 ## Structure
@@ -38,6 +39,7 @@ js/
   storage/            IndexedDB + memory fallback, repository, migrations
   editors/            Studio, section forms, bullets, rail, checklist
   templates/          Template registry + design settings (pure data/logic)
+  export/             Print/PDF preparation, JSON backup/restore, downloads
   preview/            Resume renderer, paper preview (zoom), thumbnails
   pages/              One module per route
   pwa/                Service worker registration, install handling
@@ -57,6 +59,6 @@ When releasing a new version: bump `APP_VERSION` in `js/config.js`, `CACHE_VERSI
 
 ## Honest limitations
 
-- PDF output will use the browser's Print → Save as PDF. There is no custom PDF engine and no DOCX export.
+- PDF output uses the browser's Print → Save as PDF. There is no custom PDF engine and no DOCX export. See docs/PRINT_EXPORT.md.
 - Documents live in browser storage (IndexedDB). Clearing site data or private browsing can remove them; JSON backup is planned.
 - On iOS, an installed Home Screen app has storage separate from Safari.

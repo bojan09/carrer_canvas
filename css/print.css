@@ -1,24 +1,152 @@
-/* Phase 1: make sure no app chrome or dark theme ever reaches paper.
-   Document-specific print rules arrive with the template phases. */
+/* Print output.
+ * Only #print-root (the canonical resume) is printed while body[data-print="resume"] is set.
+ * Page size and margins come from @page (css/print-page.css, updated per resume), so every
+ * page has real margins. Templates add their own @media print fallbacks in css/templates/. */
 
 @media print {
+  /* The page margin area is painted with the canvas colour: force a light scheme so a dark UI theme
+     can never leak onto paper. */
+  :root,
+  :root[data-theme="dark"],
+  :root[data-theme="light"] {
+    color-scheme: light !important;
+  }
+
   html,
   body {
+    margin: 0 !important;
     background: #fff !important;
     color: #000 !important;
   }
 
-  .site-header,
-  .bottom-nav,
-  .site-footer,
-  .toasts,
   .skip-link,
-  dialog {
+  .toasts,
+  dialog,
+  .bottom-nav {
+    display: none !important;
+  }
+
+  body[data-print="resume"] > *:not(#print-root) {
+    display: none !important;
+  }
+
+  body[data-print="resume"] #print-root {
+    display: block !important;
+  }
+
+  /* On any other page, still keep app chrome off paper */
+  body:not([data-print]) .site-header,
+  body:not([data-print]) .site-footer {
     display: none !important;
   }
 
   main {
     padding: 0 !important;
     min-height: 0 !important;
+  }
+
+  #print-root .doc {
+    width: auto !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    position: static !important;
+    transform: none !important;
+    animation: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    orphans: 3;
+    widows: 3;
+  }
+
+  /* ---- page-break guards ---- */
+  #print-root .doc__heading {
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
+  #print-root .doc__header {
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
+  #print-root .doc__entry,
+  #print-root .doc__bullets li,
+  #print-root .doc__skillgroup,
+  #print-root .doc__lang {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  #print-root .doc__chips li {
+    break-inside: avoid;
+  }
+
+  /* ---- two-column layouts print as one content-complete column ---- */
+  #print-root .doc[data-layout^="sidebar"],
+  #print-root .doc[data-layout^="sidebar"] .doc__header,
+  #print-root .doc[data-layout^="sidebar"] .doc__body {
+    display: block !important;
+  }
+
+  #print-root .doc[data-layout^="sidebar"] .doc__id,
+  #print-root .doc[data-layout^="sidebar"] .doc__main,
+  #print-root .doc[data-layout^="sidebar"] .doc__side {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: none !important;
+    border: 0 !important;
+  }
+
+  #print-root .doc[data-layout^="sidebar"] .doc__id {
+    padding-left: 0 !important;
+  }
+
+  #print-root .doc[data-layout^="sidebar"] .doc__contact {
+    flex-direction: row !important;
+    margin: 0.7em 0 0 !important;
+    padding: 0 !important;
+    background: none !important;
+    border: 0 !important;
+  }
+
+  #print-root .doc[data-layout^="sidebar"] .doc__body {
+    margin-top: calc(var(--gap) * 1.1) !important;
+  }
+
+  #print-root .doc[data-layout^="sidebar"] .doc__side {
+    margin-top: var(--gap) !important;
+  }
+
+  #print-root .doc[data-layout^="sidebar"] .doc__photo {
+    float: right;
+    margin: 0 0 0.6em 1em !important;
+  }
+
+  #print-root .doc[data-layout^="sidebar"] .doc__header::after {
+    content: "";
+    display: block;
+    clear: both;
+  }
+
+  /* ---- templates with full-bleed blocks ---- */
+  #print-root .doc[data-template="vertex"] .doc__header {
+    margin: 0 !important;
+    padding: 1.1em !important;
+  }
+
+  #print-root .doc[data-template="vertex"] .doc__section {
+    display: block !important;
+  }
+
+  #print-root .doc[data-template="vertex"] .doc__heading {
+    margin-bottom: 0.5em !important;
+    padding-top: 0.35em !important;
+  }
+
+  #print-root .doc[data-template="nexus"] .doc__header,
+  #print-root .doc[data-template="nexus"] .doc__section {
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
   }
 }

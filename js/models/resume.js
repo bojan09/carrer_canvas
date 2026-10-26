@@ -49,7 +49,7 @@ function builtinSection(type) {
   return def.kind === "text" ? { id: type, type, visible: true, text: "" } : { id: type, type, visible: true, items: [] };
 }
 
-export function createBlank(title = "Untitled resume") {
+export function createBlank(title = "Untitled resume", pageSize = "A4") {
   const sections = Object.fromEntries(BUILTIN_ORDER.map((t) => [t, builtinSection(t)]));
   const stamp = nowIso();
   return {
@@ -59,7 +59,7 @@ export function createBlank(title = "Untitled resume") {
     createdAt: stamp,
     updatedAt: stamp,
     templateId: DEFAULT_TEMPLATE_ID,
-    pageSize: "A4",
+    pageSize: PAGE_SIZES.includes(pageSize) ? pageSize : "A4",
     designSettings: {},
     contact: Object.fromEntries(CONTACT_FIELDS.map((f) => [f.key, ""])),
     links: [],
@@ -71,8 +71,8 @@ export function createBlank(title = "Untitled resume") {
 }
 
 /** Clearly fictional content. Contains no invented metrics. Must be replaced before real use. */
-export function createSample() {
-  const doc = createBlank("Sample resume (fictional)");
+export function createSample(pageSize = "A4") {
+  const doc = createBlank("Sample resume (fictional)", pageSize);
   doc.metadata.isSample = true;
   Object.assign(doc.contact, {
     fullName: "Alex Sample",

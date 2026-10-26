@@ -6,6 +6,8 @@ import "./pwa/install.js"; // attaches beforeinstallprompt listener as early as 
 import { toast } from "./components/toast.js";
 import { icon } from "./utils/dom.js";
 import { APP_VERSION } from "./config.js";
+import { initPrintSupport } from "./export/print.js";
+import { activeSession } from "./state/resume-store.js";
 
 applySettings();
 mountNav();
@@ -47,6 +49,8 @@ function paintNet(announce) {
 window.addEventListener("online", () => paintNet(true));
 window.addEventListener("offline", () => paintNet(true));
 paintNet(false);
+
+initPrintSupport(() => activeSession()?.doc || null);
 
 document.getElementById("footer-version").textContent = `Version ${APP_VERSION}`;
 

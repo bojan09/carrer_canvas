@@ -1,3 +1,4 @@
+import { getSettings } from "../state/settings.js";
 import { h, icon } from "../utils/dom.js";
 import { getRepository } from "../storage/repository.js";
 import { closeSession, openSession, settleSaves } from "../state/resume-store.js";
@@ -92,8 +93,8 @@ function startPage(root) {
         h(
           "div",
           { class: "trust-grid" },
-          card("file-text", "Blank resume", "Start from an empty structure and fill in your own details.", "Start blank", () => createAndOpen(createBlank()), true),
-          card("layers", "Fictional sample", "Explore the editor with clearly marked placeholder content. Replace it before real use.", "Open sample", () => createAndOpen(createSample()), false),
+          card("file-text", "Blank resume", "Start from an empty structure and fill in your own details.", "Start blank", () => createAndOpen(createBlank("Untitled resume", getSettings().pageSize)), true),
+          card("layers", "Fictional sample", "Explore the editor with clearly marked placeholder content. Replace it before real use.", "Open sample", () => createAndOpen(createSample(getSettings().pageSize)), false),
           items.length ? card("folder", "Saved resumes", `You have ${items.length} saved on this device.`, "View saved", () => (location.hash = "#/saved"), false) : null,
         ),
       ),

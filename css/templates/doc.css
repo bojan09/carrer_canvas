@@ -148,7 +148,7 @@
   color: var(--ink-2);
 }
 
-.doc__bullets {
+.doc .doc__bullets {
   margin-top: 0.35em;
   padding-left: 1.15em;
   list-style: disc;

@@ -1,6 +1,35 @@
 # Phase status
 
-Latest: **Phase 3 implemented** (below). Earlier phases follow.
+Latest: **Phase 4 implemented** (below). Earlier phases follow. Requested next: Phase 3b template refresh, see ROADMAP.md.
+
+## Phase 4: Print-to-PDF, backup/restore, reliability — implemented (v0.4.0)
+
+### Scope finished
+- **Print-to-PDF** via the browser print engine (docs/PRINT_EXPORT.md): Export PDF button + review dialog (checklist, paper/margins/length, steps, per-browser tips, optional print-only simplified layout, "skip next time"), Ctrl/Cmd+P support, per-resume `@page` size and margins through CSSOM, white-paper fallbacks, single-column print for sidebar templates, page-break guards, file name from the person's name. No claim of direct PDF generation; no DOCX.
+- **Backup/restore**: versioned JSON (`format: 1`), sensitive-data warning, photos only if ticked, single-document or all-documents export, validated import with preview, per-document rejection reasons, keep-both / replace / skip, last-backup time. Entry points: Settings and Saved.
+- **Draft recovery**: synchronous shadow copy when the tab is hidden with a save pending; newer valid shadow is offered on next open (undoable), never applied silently.
+- **Settings**: default paper size (locale default: Letter for US/CA, else A4), PDF review toggle, backup/restore, storage and delete-all.
+- Fixed along the way: list bullets had no markers (selector specificity), `beforeprint` clobbering an explicit print preparation, a missing import caught by a new guard test, dark colour scheme leaking into the page margin of PDFs.
+
+### Executed checks (results)
+- `npm test`: 57/57 pass (backup build/parse/plan, hostile imports, filename/@page helpers, shadow validity/failure handling, page-module import guard).
+- `e2e/phase4.mjs`: 101 checks pass, three consecutive runs, including **real PDFs** for all 8 templates (3 pages each, A4, selectable text, margins respected on every page, no stranded headings, no UI text), Letter + 25 mm margins, photo present only when enabled, dark templates on white with backgrounds off, sidebar content printed after main content, export dialog flow, backup/restore round trip after a full wipe, duplicate strategies, hostile/newer/damaged files, crash recovery, default paper size, 320/390 px overflow.
+- `e2e/phase1.mjs`, `phase2.mjs`, `phase3.mjs` still pass (Phase 3 test made locale-independent).
+- Screenshots reviewed by eye: export dialog, PDF pages for Aurora and Vertex.
+
+### Not verified
+- **Safari, Firefox, iOS, Android printing** (Chromium only here). **Download/share of files on iOS**, including the installed app. Opening PDFs in other viewers. Screen-reader pass of the new dialogs.
+
+### Known limitations
+- Page-break guides in the preview remain estimates; the PDF is the source of truth.
+- Safari ignores `@page size`.
+- Backup is manual; there is no automatic reminder beyond showing the last backup time.
+- Shadow copies live in localStorage (about 5 MB shared), so a very large photo-heavy document may not fit.
+
+### Handoff
+Next: **Phase 3b template refresh** (10 modern templates, profile photo in every sample, see docs/ROADMAP.md), then Phase 5 cover letters. Do not start until approved.
+
+---
 
 ## Phase 3: Templates, live paper preview, design customization — implemented (v0.3.0)
 

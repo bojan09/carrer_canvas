@@ -8,6 +8,9 @@ import { getTemplate } from "../templates/registry.js";
 import { PAPER } from "../templates/design.js";
 import { getSettings, updateSettings } from "../state/settings.js";
 import { designPanel } from "./design-panel.js";
+import { openPrintDialog, shouldReview } from "./print-dialog.js";
+import { printResume } from "../export/print.js";
+import { toast } from "../components/toast.js";
 import { analyze, openIssues, titleOf } from "./hints.js";
 import { checkboxField } from "./fields.js";
 import { contactBody, sectionBody } from "./section-forms.js";
@@ -42,6 +45,10 @@ export function mountStudio(root, session, { persistent }) {
   const redoBtn = toolButton({ name: "redo", label: "Redo", text: "Redo", onClick: () => doRedo() });
   const sectionsBtn = toolButton({ name: "layers", label: "Manage sections", text: "Sections", onClick: () => openSectionsDialog() });
   sectionsBtn.classList.add("studio__sections-btn");
+  const exportBtn = h("button", { type: "button", class: "btn btn--primary btn--sm btn--tool studio__export" });
+  exportBtn.innerHTML = `${icon("printer")}<span class="tool-label">Export PDF</span>`;
+  exportBtn.setAttribute("aria-label", "Export as PDF (opens the print dialog)");
+  exportBtn.addEventListener("click", () => doExport());
   const checklistBadge = h("span", { class: "badge badge--warn studio__badge", hidden: true });
   const checklistBtn = toolButton({ name: "list-check", label: "Writing checklist", text: "Checklist", onClick: () => openChecklist() });
   checklistBtn.append(checklistBadge);
@@ -57,7 +64,7 @@ export function mountStudio(root, session, { persistent }) {
       title,
       h("div", { class: "studio__statusrow" }, statusVisual, retry, statusLive),
     ),
-    h("div", { class: "studio__actions" }, undoBtn, redoBtn, sectionsBtn, checklistBtn),
+    h("div", { class: "studio__actions" }, undoBtn, redoBtn, sectionsBtn, checklistBtn, exportBtn),
   );
   bar.querySelector(".studio__back").innerHTML = icon("arrow-left") + '<span class="tool-label">Saved</span>';
 
@@ -94,6 +101,7 @@ export function mountStudio(root, session, { persistent }) {
   const paper = mountPaper(previewScroll, {
     zoom: getSettings().previewZoom,
     onInfo: ({ pages, paper: size }) => {
+      lastPages = pages;
       pageInfo.textContent = `About ${pages} page${pages === 1 ? "" : "s"} · ${PAPER[size].label.split(" (")[0]}.`;
     },
   });
@@ -309,6 +317,23 @@ export function mountStudio(root, session, { persistent }) {
     previewTimer = setTimeout(renderPreview, 120);
   };
 
+  let lastPages = 1;
+  async function doExport() {
+    await session.flush();
+    let options = { simplified: false };
+    if (shouldReview()) {
+      const choice = await openPrintDialog({ doc: session.doc, pages: lastPages });
+      if (!choice) return;
+      options = choice;
+    }
+    try {
+      const { pageRule } = await printResume(session.doc, options);
+      if (!pageRule) toast({ message: "This browser did not accept the page size. Pick the paper size in the print dialog.", tone: "warn", duration: 8000 });
+    } catch {
+      toast({ message: "Could not open the print dialog in this browser.", tone: "warn" });
+    }
+  }
+
   function doUndo() {
     if (undoBtn.getAttribute("aria-disabled") === "true") return;
     if (session.undo()) announce("Undone.");
@@ -333,7 +358,7 @@ export function mountStudio(root, session, { persistent }) {
     if (event.structural) {
       const y = window.scrollY;
       if (event.expand) expanded.add(event.expand);
-      if (event.restored) title.value = session.doc.title;
+      if (document.activeElement !== title) title.value = session.doc.title;
       renderEditor();
       renderRails();
       designStale = true;
@@ -369,6 +394,25 @@ export function mountStudio(root, session, { persistent }) {
   renderHistoryButtons();
   renderStatus();
   renderPreview();
+
+  // Offer back unsaved changes left by an interrupted session (never applied silently)
+  const recovered = session.recoverable();
+  if (recovered) {
+    const when = new Date(recovered.savedAt).toLocaleString([], { dateStyle: "medium", timeStyle: "short" });
+    openDialog({
+      title: "Recover unsaved changes?",
+      body: `This resume has newer changes from ${when} that were not fully saved because the page closed first. Restore them, or keep the last saved version.`,
+      actions: [
+        { label: "Keep saved version", value: false, variant: "outline" },
+        { label: "Restore changes", value: true, variant: "primary" },
+      ],
+    }).then((restore) => {
+      if (restore) {
+        session.adoptRecovered(recovered.doc);
+        announce("Unsaved changes restored. You can undo.");
+      } else session.discardRecovered();
+    });
+  }
 
   return () => {
     clearTimeout(previewTimer);

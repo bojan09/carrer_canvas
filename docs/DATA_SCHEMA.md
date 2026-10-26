@@ -39,3 +39,16 @@ Dates are `YYYY-MM` strings. Limits: 50 entries per section, 30 bullets per list
 - `photo` is optional. It is created only by our canvas re-encode (centre-cropped 320px JPEG, EXIF discarded). Anything else (other MIME types, remote URLs, oversized data) is dropped by `normalizePhoto`. A photo is **rendered only when** `designSettings.showPhoto` is true **and** the rendered layout supports photos (Summit, Grid, Slate and the simplified layout never show it).
 - Migration 1→2 only stamps the version; `normalizeResume` repairs `templateId` and `designSettings`. App versions that only know v1 refuse v2 records instead of silently dropping photos.
 - Switching template (`applyTemplate`) keeps content, section order, `simplified`, `showPhoto` and `photoShape`, and clears visual overrides.
+
+## Backup file (format 1)
+```
+{ app: "CareerCanvas", kind: "backup", format: 1, schemaVersion: 2, appVersion, exportedAt (ISO),
+  includesPhotos: boolean, documents: [ Resume, ... ] }
+```
+- Photos are embedded only when the user ticks "Include photos" (`photo: null` otherwise).
+- Import (`js/export/backup.js`) never executes anything: size cap (30 MB), `JSON.parse`, then **every** document goes through `migrateRecord` + `normalizeResume`. Unknown/newer-version/duplicate-id documents are rejected individually with a reason. A newer backup *format* is refused as a whole.
+- A bare single resume or an array of resumes is also accepted.
+- Existing ids: *keep both* (renamed copy, new id) is the default, *replace* overwrites, *skip* ignores.
+
+## Crash-recovery shadow copy
+`localStorage["cc.shadow.<id>"] = { savedAt, doc }` is written **synchronously** when the tab is hidden/closed while a save is still pending, and removed when the real save succeeds. On the next open, a shadow that validates and is newer than the stored record is *offered* (restore is undoable; keeping the saved version deletes it). Corrupt or foreign shadows are discarded.

@@ -2,6 +2,7 @@ import { getRepository } from "../storage/repository.js";
 import { createSaveQueue } from "./save-queue.js";
 import { History } from "./history.js";
 import { onBeforeUpdateReload } from "../pwa/register.js";
+import { clearShadow, readNewerShadow, writeShadow } from "./shadow.js";
 
 const nowIso = () => new Date().toISOString();
 
@@ -17,6 +18,7 @@ export class ResumeSession {
       write: (d) => repo.put(d),
       onState: (info) => {
         this.saveInfo = info;
+        if (info.state === "saved") clearShadow(this.doc.id);
         this.emit({ type: "save" });
       },
     });
@@ -67,6 +69,32 @@ export class ResumeSession {
     return this.queue.flush();
   }
 
+  /** Synchronous safety copy for tab hide/close while an async save is still pending. */
+  shadowIfPending() {
+    if (this.queue.hasPending) writeShadow(this.doc);
+  }
+
+  /** A newer unsaved copy left by an interrupted session, if any (offered to the user, never auto-applied). */
+  recoverable() {
+    return readNewerShadow(this.doc.id, this.doc);
+  }
+
+  /** Replace the working document with a recovered copy (undoable). */
+  adoptRecovered(recoveredDoc) {
+    this.change(
+      () => {
+        this.doc = recoveredDoc;
+      },
+      { structural: true },
+    );
+    this.doc.updatedAt = new Date().toISOString();
+    clearShadow(this.doc.id);
+  }
+
+  discardRecovered() {
+    clearShadow(this.doc.id);
+  }
+
   retrySave() {
     return this.queue.retry();
   }
@@ -105,7 +133,10 @@ export function closeSession() {
 export const activeSession = () => current;
 
 // Never lose pending edits: flush when the tab is hidden/closed and before an app update reload.
-const flushNow = () => current?.flush();
+const flushNow = () => {
+  current?.shadowIfPending();
+  return current?.flush();
+};
 document.addEventListener("visibilitychange", () => {
   if (document.visibilityState === "hidden") flushNow();
 });

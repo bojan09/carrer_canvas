@@ -3,3 +3,4 @@ e2e/screenshots/
 .DS_Store
 *.log
 .vercel
+e2e/pdf/
