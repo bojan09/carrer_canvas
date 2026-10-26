@@ -23,7 +23,7 @@
 
 .doc[data-template="velo"][data-layout="sidebar-right"] {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 31%;
+  grid-template-columns: minmax(0, 1fr) 34%;
   grid-template-rows: auto auto 1fr;
   grid-template-areas:
     "id photo"
@@ -67,4 +67,56 @@
   padding: var(--gap) var(--margin) var(--margin) calc(var(--margin) * 0.7);
   background: color-mix(in srgb, var(--accent) 8%, #fff);
   border-left: 3px solid var(--accent);
+}
+
+/* Phase 3b modernisation */
+.doc[data-template="velo"] .doc__dates,
+.doc[data-template="velo"] .doc__skilllabel {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  font-size: 0.82em;
+}
+
+.doc[data-template="velo"] .doc__chips li {
+  border-radius: 0.35em;
+  border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+  background: #fff;
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  font-size: 0.8em;
+}
+
+.doc[data-template="velo"] .doc__heading {
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.doc[data-template="velo"] .doc__heading::before {
+  content: "";
+  width: 0.55em;
+  height: 0.55em;
+  border-radius: 0.15em;
+  background: var(--accent);
+}
+
+.doc[data-template="velo"] .doc__main .doc__entry {
+  padding-left: 0.9em;
+  border-left: 2px solid color-mix(in srgb, var(--accent) 22%, transparent);
+}
+
+.doc[data-template="velo"] .doc__photo {
+  width: 7em;
+  height: 7em;
+  box-shadow: 0.35em 0.35em 0 color-mix(in srgb, var(--accent) 35%, transparent);
+}
+
+.doc[data-template="velo"][data-layout="sidebar-right"] .doc__contact,
+.doc[data-template="velo"][data-layout="sidebar-right"] .doc__side {
+  border-left: 0;
+  background: color-mix(in srgb, var(--accent) 7%, #f5f7fc);
+}
+
+.doc[data-template="velo"][data-layout="sidebar-right"] .doc__contact {
+  font-size: 0.84em;
 }

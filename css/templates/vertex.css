@@ -68,6 +68,43 @@
   font-weight: 800;
 }
 
+/* Phase 3b modernisation */
+.doc[data-template="vertex"] .doc__body {
+  counter-reset: sec;
+}
+
+.doc[data-template="vertex"] .doc__section {
+  counter-increment: sec;
+}
+
+.doc[data-template="vertex"] .doc__heading::before {
+  content: counter(sec, decimal-leading-zero);
+  display: block;
+  margin-bottom: 0.15em;
+  color: var(--accent);
+  font-size: 0.78em;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+}
+
+.doc[data-template="vertex"] .doc__photo {
+  width: 8.2em;
+  height: 8.2em;
+}
+
+.doc[data-template="vertex"][data-photo="square"] .doc__photo {
+  border-radius: 0;
+  box-shadow: 0.45em 0.45em 0 var(--accent);
+}
+
+.doc[data-template="vertex"][data-photo="circle"] .doc__photo {
+  box-shadow: 0 0 0 4px var(--accent);
+}
+
+.doc[data-template="vertex"] .doc__chips li {
+  border-radius: 0;
+}
+
 @media print {
   .doc[data-template="vertex"] .doc__header {
     background: #fff;

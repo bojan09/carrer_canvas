@@ -12,14 +12,15 @@ import { ResumeDataError } from "../js/models/resume.js";
 const root = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const exists = (f) => stat(join(root, f)).then(() => true, () => false);
 
-test("eight distinct templates with the required identities", () => {
-  assert.equal(TEMPLATES.length, 8);
-  assert.deepEqual([...TEMPLATE_IDS].sort(), ["aurora", "bloom", "grid", "nexus", "slate", "summit", "velo", "vertex"]);
-  assert.equal(new Set(TEMPLATES.map((t) => t.id)).size, 8);
+test("ten distinct templates with the required identities", () => {
+  assert.equal(TEMPLATES.length, 10);
+  assert.deepEqual([...TEMPLATE_IDS].sort(), ["aurora", "bloom", "grid", "nexus", "orbit", "prism", "slate", "summit", "velo", "vertex"]);
+  assert.equal(new Set(TEMPLATES.map((t) => t.id)).size, 10);
 });
 
-test("Summit and Grid are single-column, ATS-conscious, plain skills; only Grid never shows a photo", () => {
-  assert.equal(getTemplate("grid").supports.photo, false);
+test("Summit and Grid are single-column, ATS-conscious, plain skills; photos are opt-in and never part of the simplified layout", () => {
+  assert.equal(getTemplate("grid").supports.photo, true, "opt-in photo is allowed, with a warning");
+  assert.ok(getTemplate("grid").warnings.length > 0);
   assert.equal(getTemplate("summit").supports.photo, true, "opt-in photo is allowed, with a warning");
   assert.ok(getTemplate("summit").warnings.length > 0);
   for (const id of ["summit", "grid"]) {
@@ -92,7 +93,7 @@ test("photo is shown only when stored, explicitly enabled and supported by the r
   assert.equal(photoVisible(doc), false, "simplified never shows a photo");
   doc.designSettings = { showPhoto: true };
   doc.templateId = "grid";
-  assert.equal(photoVisible(doc), false, "Grid never shows a photo");
+  assert.equal(photoVisible(doc), true, "Grid shows an explicitly enabled photo");
 });
 
 test("applyTemplate keeps content and layout-independent choices, drops visual overrides", () => {

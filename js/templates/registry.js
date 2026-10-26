@@ -1,4 +1,4 @@
-/** The eight templates. Pure data: no DOM, no imports (safe for models, tests and the renderer).
+/** The ten templates. Pure data: no DOM, no imports (safe for models, tests and the renderer).
  *  `layout`:  single | sidebar-left | sidebar-right  (two-column layouts collapse in simplified mode)
  *  `side`:    section types placed in the sidebar of two-column layouts
  *  `atsConscious` is a DESIGN GOAL (single column, real text, standard headings), not a guarantee. */
@@ -9,9 +9,42 @@ const SIDE = ["skills", "languages", "certifications"];
 
 export const TEMPLATES = [
   {
+    id: "prism",
+    name: "Prism",
+    blurb: "Solid colour sidebar with a portrait, contact details and skill chips beside a crisp main column.",
+    categories: ["Modern", "Creative"],
+    layout: "sidebar-left",
+    side: SIDE,
+    skills: "chips",
+    atsConscious: false,
+    supports: { photo: true, headerAlign: false },
+    paperBg: "#ffffff",
+    tags: [{ label: "Colour block", tone: "warn" }],
+    warnings: [
+      "Two columns with a coloured sidebar. Applicant systems may read the sidebar after the main column.",
+      "Prints as one column on white to save ink. Use Simplified layout for a plain single column.",
+    ],
+    defaults: { accent: "#4f46e5", fontPair: "clean", titleScale: 1.15, bodyScale: 0.98, lineHeight: 1.48, sectionGap: 20, margins: 14, dividerStyle: "none", headerAlign: "left" },
+  },
+  {
+    id: "orbit",
+    name: "Orbit",
+    blurb: "Light, airy timeline with a centred portrait, soft header card and rounded section labels.",
+    categories: ["Modern", "Creative"],
+    layout: "single",
+    side: [],
+    skills: "chips",
+    atsConscious: false,
+    supports: { photo: true, headerAlign: true },
+    paperBg: "#ffffff",
+    tags: [{ label: "Timeline", tone: "warn" }],
+    warnings: ["Timeline markers and rounded labels are decorative. Enable Simplified layout for a plain version."],
+    defaults: { accent: "#6d3fd6", fontPair: "clean", titleScale: 1.15, bodyScale: 1, lineHeight: 1.5, sectionGap: 20, margins: 14, dividerStyle: "none", headerAlign: "center" },
+  },
+  {
     id: "aurora",
     name: "Aurora",
-    blurb: "Expressive navy and violet presentation for design and portfolio roles.",
+    blurb: "Dark gradient sidebar with a glowing portrait ring, for design and portfolio roles.",
     categories: ["Creative", "Modern"],
     layout: "sidebar-left",
     side: SIDE,
@@ -44,7 +77,7 @@ export const TEMPLATES = [
   {
     id: "velo",
     name: "Velo",
-    blurb: "Crisp technology resume with strong skills and project hierarchy.",
+    blurb: "Crisp engineering layout: monospaced dates, skill chips and a tinted detail panel.",
     categories: ["Tech", "Modern"],
     layout: "sidebar-right",
     side: SIDE,
@@ -59,7 +92,7 @@ export const TEMPLATES = [
   {
     id: "slate",
     name: "Slate",
-    blurb: "Dark-inspired executive identity with an ink-efficient print mode.",
+    blurb: "Dark executive identity with a framed portrait and gold detailing. Prints on white.",
     categories: ["Executive", "Professional"],
     layout: "single",
     side: [],
@@ -74,7 +107,7 @@ export const TEMPLATES = [
   {
     id: "bloom",
     name: "Bloom",
-    blurb: "Warm, nature-inspired and elegant for human-centred roles.",
+    blurb: "Warm paper, serif italics and an arched portrait for human-centred roles.",
     categories: ["Creative"],
     layout: "single",
     side: [],
@@ -89,22 +122,22 @@ export const TEMPLATES = [
   {
     id: "grid",
     name: "Grid",
-    blurb: "Strict alignment and hierarchy in black and white.",
+    blurb: "Strict alignment and hierarchy in black and white, with an optional small photo.",
     categories: ["Minimal", "Professional", "Academic"],
     layout: "single",
     side: [],
     skills: "text",
     atsConscious: true,
-    supports: { photo: false, headerAlign: false },
+    supports: { photo: true, headerAlign: false },
     paperBg: "#ffffff",
     tags: [{ label: "ATS-conscious", tone: "ok" }],
-    warnings: [],
+    warnings: ["Photos are optional. Adding one makes this layout less plain for applicant systems."],
     defaults: { accent: "#111111", fontPair: "clean", titleScale: 1.05, bodyScale: 0.97, lineHeight: 1.42, sectionGap: 16, margins: 16, dividerStyle: "thick", headerAlign: "left" },
   },
   {
     id: "vertex",
     name: "Vertex",
-    blurb: "Bold editorial headings for leadership and personal-brand resumes.",
+    blurb: "Bold editorial header, numbered sections and an offset portrait block.",
     categories: ["Creative", "Executive"],
     layout: "single",
     side: [],
@@ -119,7 +152,7 @@ export const TEMPLATES = [
   {
     id: "nexus",
     name: "Nexus",
-    blurb: "Modern, modular and restrained for technical and product roles.",
+    blurb: "Gradient hero card and modular sections for product and technical roles.",
     categories: ["Modern", "Tech"],
     layout: "single",
     side: [],

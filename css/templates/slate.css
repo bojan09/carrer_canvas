@@ -71,3 +71,33 @@
   grid-template-areas: "photo" "id" "contact";
   justify-items: center;
 }
+
+/* Phase 3b modernisation */
+.doc[data-template="slate"] .doc__header:has(.doc__photo) .doc__photo {
+  width: 8.2em;
+  height: 8.2em;
+  box-shadow: 0 0 0 2px #1b2130, 0 0 0 4px var(--accent), 0 12px 28px rgba(0, 0, 0, 0.4);
+}
+
+.doc[data-template="slate"] .doc__name {
+  font-weight: 300;
+  font-size: calc(var(--fs) * 2.4 * var(--title-scale));
+  letter-spacing: 0.07em;
+}
+
+.doc[data-template="slate"] .doc__heading {
+  display: flex;
+  align-items: center;
+  gap: 0.7em;
+}
+
+.doc[data-template="slate"] .doc__heading::before {
+  content: "";
+  width: 1.6em;
+  height: 2px;
+  background: var(--accent);
+}
+
+.doc[data-template="slate"] .doc__chips li {
+  border-radius: 0.3em;
+}

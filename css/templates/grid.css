@@ -57,3 +57,27 @@
 .doc[data-template="grid"] .doc__bullets li::marker {
   color: var(--ink);
 }
+
+/* Optional photo (off by default): small square at the right of the header. */
+.doc[data-template="grid"] .doc__header:has(.doc__photo) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas: "id photo" "contact contact";
+  align-items: center;
+  column-gap: 1.2em;
+}
+
+.doc[data-template="grid"] .doc__header:has(.doc__photo) .doc__id {
+  grid-area: id;
+}
+
+.doc[data-template="grid"] .doc__header:has(.doc__photo) .doc__photo {
+  grid-area: photo;
+  width: 5.6em;
+  height: 5.6em;
+  filter: grayscale(1);
+}
+
+.doc[data-template="grid"] .doc__header:has(.doc__photo) .doc__contact {
+  grid-area: contact;
+}

@@ -60,4 +60,57 @@
   .doc[data-template="nexus"] {
     --paper-bg: #fff;
   }
+
+  .doc[data-template="nexus"] .doc__header {
+    background: #fff;
+    color: #111;
+  }
+
+  .doc[data-template="nexus"] .doc__header .doc__role,
+  .doc[data-template="nexus"] .doc__header .doc__contact {
+    color: #333;
+  }
+}
+
+/* Phase 3b modernisation */
+.doc[data-template="nexus"] .doc__header {
+  border-top: 0;
+  background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 55%, #8b5cf6));
+  color: #fff;
+  padding: 1.3em 1.5em;
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--accent) 28%, transparent);
+}
+
+.doc[data-template="nexus"] .doc__header .doc__role,
+.doc[data-template="nexus"] .doc__header .doc__contact {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.doc[data-template="nexus"] .doc__photo {
+  width: 7.6em;
+  height: 7.6em;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.9), 0 8px 20px rgba(0, 0, 0, 0.25);
+}
+
+.doc[data-template="nexus"] .doc__section {
+  border-top: 0;
+  border-left: 4px solid var(--accent);
+}
+
+.doc[data-template="nexus"] .doc__chips li {
+  background: color-mix(in srgb, var(--accent) 10%, #fff);
+}
+
+@media print {
+  .doc[data-template="nexus"] .doc__header {
+    background: #fff;
+    color: #111;
+    box-shadow: none;
+    border-left: 4px solid var(--accent);
+  }
+
+  .doc[data-template="nexus"] .doc__header .doc__role,
+  .doc[data-template="nexus"] .doc__header .doc__contact {
+    color: #333;
+  }
 }

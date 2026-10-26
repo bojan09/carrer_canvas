@@ -1,6 +1,7 @@
 import { icon } from "../utils/dom.js";
 import { TEMPLATES } from "../templates/registry.js";
 import { createTemplateCard } from "../components/template-card.js";
+import { SAMPLE_PHOTO } from "../models/sample-photo.js";
 import { mountInstallCard } from "../components/install-card.js";
 
 const FEATURES = [
@@ -33,6 +34,7 @@ export default function home(root) {
       <div class="hero__visual">
         <div class="hero__stage" aria-hidden="true">
           <div class="mock mock--summit">
+            <img class="mock__photo" data-sample-photo alt="" width="40" height="40" />
             <div class="mock__name">Alex Johnson</div>
             <div class="mock__bars"><i></i><i></i><i></i></div>
             <div class="mock__h">Experience</div>
@@ -41,6 +43,7 @@ export default function home(root) {
             <div class="mock__bars"><i></i><i></i><i></i></div>
           </div>
           <div class="mock mock--bloom">
+            <img class="mock__photo" data-sample-photo alt="" width="40" height="40" />
             <div class="mock__name">Alex Johnson</div>
             <div class="mock__bars"><i></i><i></i></div>
             <div class="mock__h">Profile</div>
@@ -52,7 +55,7 @@ export default function home(root) {
             <div class="mock__rail"><i></i><i></i><i></i><i></i><i></i></div>
             <div class="mock__main">
               <div class="mock__head">
-                <span class="mock__avatar">AJ</span>
+                <img class="mock__avatar" data-sample-photo alt="" width="64" height="64" />
                 <div><div class="mock__name">Alex Johnson</div><div class="mock__role">Product Designer</div></div>
               </div>
               <div class="mock__h">About</div>
@@ -67,7 +70,7 @@ export default function home(root) {
             </div>
           </div>
         </div>
-        <p class="hero__caption">Illustrative layouts with fictional placeholder content.</p>
+        <p class="hero__caption">Illustrative layouts with fictional placeholder content and an illustrated sample avatar.</p>
       </div>
     </div>
   </section>
@@ -76,7 +79,7 @@ export default function home(root) {
     <div class="container">
       <div class="section__head">
         <p class="eyebrow">Templates</p>
-        <h2 class="section__title" id="templates-title">Eight templates, built to be different</h2>
+        <h2 class="section__title" id="templates-title">Ten templates, built to be different</h2>
         <p class="section__lead">From a plain, ATS-conscious single column to expressive creative layouts. Pick the one that fits the role, not just the colour.</p>
       </div>
       <div class="teaser-strip" id="home-teaser" role="list"></div>
@@ -124,7 +127,7 @@ export default function home(root) {
 
   <section class="section" aria-label="Project status">
     <div class="container">
-      <div class="status-strip">${icon("info")}<p><strong>Early build.</strong> The offline app and the resume editor (structured sections, autosave, undo/redo, reordering) are live. Template styling, design controls, PDF export and cover letters are still being built.</p></div>
+      <div class="status-strip">${icon("info")}<p><strong>Early build.</strong> The offline app, resume editor, ten templates, design controls, print-to-PDF and backup are live. Cover letters are still being built.</p></div>
     </div>
   </section>
 
@@ -141,6 +144,11 @@ export default function home(root) {
   root.querySelectorAll("[style-i]").forEach((el) => {
     el.style.setProperty("--i", el.getAttribute("style-i"));
     el.removeAttribute("style-i");
+  });
+
+  root.querySelectorAll("[data-sample-photo]").forEach((img) => {
+    img.src = SAMPLE_PHOTO.data;
+    img.removeAttribute("data-sample-photo");
   });
 
   const disposers = [];

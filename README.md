@@ -2,7 +2,7 @@
 
 Free, private, offline-capable resume and cover-letter builder. Vanilla HTML, CSS and JavaScript (ES modules). No framework, no build step, no backend, no accounts, no trackers.
 
-**Status:** Phase 4 of 7 done (PWA shell, resume editor with local autosave, eight templates with paper preview and design controls, print-to-PDF, JSON backup and restore, crash recovery). A modern template refresh (Phase 3b) and cover letters are next, see docs/ROADMAP.md. See [docs/PHASE_STATUS.md](docs/PHASE_STATUS.md).
+**Status:** Phase 4 of 7 done plus the Phase 3b template refresh (PWA shell, resume editor with local autosave, ten templates with paper preview and design controls, print-to-PDF, JSON backup and restore, crash recovery). Cover letters are next, see docs/ROADMAP.md. See [docs/PHASE_STATUS.md](docs/PHASE_STATUS.md).
 
 ## Run locally
 

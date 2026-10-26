@@ -1,0 +1,162 @@
+/* Prism: solid colour sidebar (portrait, contact, skills) beside a crisp main column.
+   Two columns on screen; prints as one column on white (see css/print.css) to save ink. */
+.doc[data-template="prism"] {
+  --side-bg: color-mix(in srgb, var(--accent) 68%, #0b1020);
+  --side-ink: #ffffff;
+  --side-ink-2: rgba(255, 255, 255, 0.82);
+}
+
+.doc[data-template="prism"] .doc__name {
+  font-weight: 800;
+  letter-spacing: -0.025em;
+}
+
+.doc[data-template="prism"] .doc__role {
+  color: var(--accent);
+  font-size: 1.12em;
+  font-weight: 700;
+}
+
+.doc[data-template="prism"] .doc__heading {
+  display: flex;
+  align-items: center;
+  gap: 0.7em;
+  border-bottom: 0;
+  padding-bottom: 0;
+  font-size: 0.84em;
+  letter-spacing: 0.14em;
+}
+
+.doc[data-template="prism"] .doc__heading::after {
+  content: "";
+  flex: 1;
+  height: 2px;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--accent) 28%, transparent);
+}
+
+.doc[data-template="prism"] .doc__entry-title {
+  font-weight: 800;
+}
+
+.doc[data-template="prism"][data-layout="sidebar-left"] {
+  display: grid;
+  grid-template-columns: 33% minmax(0, 1fr);
+  grid-template-rows: auto auto 1fr;
+  grid-template-areas:
+    "photo id"
+    "contact main"
+    "side main";
+  padding: 0;
+}
+
+.doc[data-template="prism"][data-layout="sidebar-left"]::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 33%;
+  background: linear-gradient(180deg, var(--side-bg), color-mix(in srgb, var(--side-bg) 82%, #000));
+  pointer-events: none;
+}
+
+.doc[data-template="prism"][data-layout="sidebar-left"] .doc__header,
+.doc[data-template="prism"][data-layout="sidebar-left"] .doc__body {
+  display: contents;
+}
+
+.doc[data-template="prism"][data-layout="sidebar-left"] .doc__photo {
+  grid-area: photo;
+  position: relative;
+  justify-self: center;
+  width: 8.6em;
+  height: 8.6em;
+  margin: calc(var(--margin) * 1.1) var(--margin) 0;
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.92), 0 10px 26px rgba(0, 0, 0, 0.28);
+}
+
+.doc[data-template="prism"][data-layout="sidebar-left"] .doc__id {
+  grid-area: id;
+  align-self: end;
+  padding: calc(var(--margin) * 1.1) var(--margin) 0 calc(var(--margin) * 0.9);
+}
+
+.doc[data-template="prism"][data-layout="sidebar-left"] .doc__contact {
+  grid-area: contact;
+  position: relative;
+  flex-direction: column;
+  margin: 0;
+  padding: var(--gap) calc(var(--margin) * 0.7) 0 var(--margin);
+  color: var(--side-ink-2);
+  font-size: 0.88em;
+}
+
+.doc[data-template="prism"][data-layout="sidebar-left"] .doc__main {
+  grid-area: main;
+  padding: var(--gap) var(--margin) var(--margin) calc(var(--margin) * 0.9);
+}
+
+.doc[data-template="prism"][data-layout="sidebar-left"] .doc__side {
+  grid-area: side;
+  position: relative;
+  padding: var(--gap) calc(var(--margin) * 0.7) var(--margin) var(--margin);
+  color: var(--side-ink);
+}
+
+.doc[data-template="prism"] .doc__side .doc__heading {
+  color: var(--side-ink);
+}
+
+.doc[data-template="prism"] .doc__side .doc__heading::after {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.doc[data-template="prism"] .doc__side .doc__entry-sub,
+.doc[data-template="prism"] .doc__side .doc__dates {
+  color: var(--side-ink-2);
+}
+
+.doc[data-template="prism"] .doc__side .doc__chips li {
+  border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.14);
+  color: var(--side-ink);
+}
+
+.doc[data-template="prism"] .doc__side .doc__skilllabel {
+  color: var(--side-ink);
+}
+
+@media print {
+  .doc[data-template="prism"][data-layout="sidebar-left"]::before {
+    display: none;
+  }
+
+  .doc[data-template="prism"] .doc__contact,
+  .doc[data-template="prism"] .doc__side,
+  .doc[data-template="prism"] .doc__side .doc__heading,
+  .doc[data-template="prism"] .doc__side .doc__skilllabel {
+    color: var(--ink) !important;
+  }
+
+  .doc[data-template="prism"] .doc__contact {
+    font-size: 0.92em;
+  }
+
+  .doc[data-template="prism"] .doc__side .doc__heading {
+    color: var(--accent) !important;
+  }
+
+  .doc[data-template="prism"] .doc__side .doc__entry-sub,
+  .doc[data-template="prism"] .doc__side .doc__dates {
+    color: var(--ink-2);
+  }
+
+  .doc[data-template="prism"] .doc__side .doc__heading::after {
+    background: color-mix(in srgb, var(--accent) 28%, transparent);
+  }
+
+  .doc[data-template="prism"] .doc__side .doc__chips li {
+    border-color: color-mix(in srgb, var(--accent) 50%, transparent);
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+    color: var(--ink);
+  }
+}

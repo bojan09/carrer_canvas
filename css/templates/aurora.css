@@ -83,6 +83,40 @@
   padding: var(--gap) calc(var(--margin) * 0.6) var(--margin) var(--margin);
 }
 
+/* Phase 3b modernisation */
+.doc[data-template="aurora"][data-layout="sidebar-left"] .doc__photo {
+  width: 8.2em;
+  height: 8.2em;
+  box-shadow: 0 0 0 3px #0e1733, 0 0 0 5px var(--accent), 0 10px 34px rgba(143, 164, 255, 0.45);
+}
+
+.doc[data-template="aurora"] .doc__heading {
+  border-bottom: 0;
+  padding-bottom: 0.45em;
+  position: relative;
+}
+
+.doc[data-template="aurora"] .doc__heading::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 2.6em;
+  height: 3px;
+  border-radius: 3px;
+  background: linear-gradient(90deg, var(--accent), #b06cf2);
+}
+
+.doc[data-template="aurora"] .doc__chips li {
+  border-color: rgba(143, 164, 255, 0.45);
+  background: rgba(143, 164, 255, 0.14);
+  color: #e9edff;
+}
+
+.doc[data-template="aurora"] .doc__role {
+  font-size: 1.2em;
+}
+
 @media print {
   /* Dark page backgrounds are replaced by white; see PRINT notes (Phase 4 refines this). */
   .doc[data-template="aurora"] {

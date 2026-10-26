@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320" width="320" height="320">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#6f7dff"/>
+      <stop offset="1" stop-color="#b06cf2"/>
+    </linearGradient>
+    <linearGradient id="shirt" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1f2a5c"/>
+      <stop offset="1" stop-color="#121a3d"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="320" fill="url(#bg)"/>
+  <circle cx="250" cy="70" r="70" fill="#ffffff" fill-opacity=".10"/>
+  <circle cx="40" cy="290" r="90" fill="#22d3ee" fill-opacity=".14"/>
+  <!-- shoulders -->
+  <path d="M30 330c0-62 52-92 130-92s130 30 130 92z" fill="url(#shirt)"/>
+  <path d="M128 240l32 34 32-34c-10-5-21-7-32-7s-22 2-32 7z" fill="#f4f6ff"/>
+  <path d="M160 274l-10 56h20z" fill="#22d3ee"/>
+  <!-- neck -->
+  <path d="M135 190h50v52c-8 8-17 12-25 12s-17-4-25-12z" fill="#d9a07a"/>
+  <path d="M135 222c8 8 17 12 25 12s17-4 25-12v-14c-8 8-17 12-25 12s-17-4-25-12z" fill="#c68b64" fill-opacity=".55"/>
+  <!-- ears -->
+  <ellipse cx="108" cy="150" rx="9" ry="14" fill="#d9a07a"/>
+  <ellipse cx="212" cy="150" rx="9" ry="14" fill="#d9a07a"/>
+  <!-- head -->
+  <path d="M112 140c0-38 20-62 48-62s48 24 48 62c0 38-20 66-48 66s-48-28-48-66z" fill="#e8b48d"/>
+  <!-- hair -->
+  <path d="M106 138c-6-52 22-84 58-84 38 0 60 28 52 84-6-20-14-34-26-42-22 10-52 12-70-2-8 8-12 26-14 44z" fill="#2a2230"/>
+  <path d="M120 100c18 8 46 6 66-6" fill="none" stroke="#3b3144" stroke-width="4" stroke-linecap="round"/>
+  <!-- face -->
+  <ellipse cx="139" cy="148" rx="5" ry="6" fill="#2a2230"/>
+  <ellipse cx="181" cy="148" rx="5" ry="6" fill="#2a2230"/>
+  <path d="M146 178c9 8 19 8 28 0" fill="none" stroke="#9a5b45" stroke-width="4.5" stroke-linecap="round"/>
+  <path d="M130 134c5-4 12-4 17 0M173 134c5-4 12-4 17 0" fill="none" stroke="#2a2230" stroke-width="4" stroke-linecap="round"/>
+  <ellipse cx="128" cy="166" rx="9" ry="5" fill="#ef8f8f" fill-opacity=".28"/>
+  <ellipse cx="192" cy="166" rx="9" ry="5" fill="#ef8f8f" fill-opacity=".28"/>
+</svg>

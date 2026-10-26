@@ -3,6 +3,7 @@ import { cleanText } from "../utils/sanitization.js";
 import { BUILTIN_ORDER, CONTACT_FIELDS, SECTION_DEFS } from "./section-defs.js";
 import { DEFAULT_TEMPLATE_ID, TEMPLATE_IDS } from "../templates/registry.js";
 import { normalizeDesign } from "../templates/design.js";
+import { SAMPLE_PHOTO } from "./sample-photo.js";
 
 export const SCHEMA_VERSION = 2;
 export const PHOTO_MAX_CHARS = 150_000; // data-URL length cap (~110 KB of image data)
@@ -74,6 +75,8 @@ export function createBlank(title = "Untitled resume", pageSize = "A4") {
 export function createSample(pageSize = "A4") {
   const doc = createBlank("Sample resume (fictional)", pageSize);
   doc.metadata.isSample = true;
+  doc.photo = { ...SAMPLE_PHOTO }; // original illustrated avatar, not a real person
+  doc.designSettings = { showPhoto: true };
   Object.assign(doc.contact, {
     fullName: "Alex Sample",
     title: "Product Designer (sample)",

@@ -14,7 +14,7 @@ const check = (name, ok, detail = "") => {
   console.log(`${ok ? "PASS" : "FAIL"}  ${name}${detail ? "  " + detail : ""}`);
 };
 
-const IDS = ["summit", "grid", "aurora", "velo", "slate", "bloom", "vertex", "nexus"];
+const IDS = ["summit", "grid", "aurora", "velo", "slate", "bloom", "vertex", "nexus", "prism", "orbit"];
 // Valid 16x16 red PNG generated at runtime (proper CRCs), so createImageBitmap can decode it
 import { deflateSync } from "node:zlib";
 function makePng(w, h) {
@@ -51,7 +51,7 @@ const edit = () => page.check('input[name="studio-view"][value="edit"]');
 // ---------- gallery ----------
 await page.goto(`${base}/#/templates`);
 await page.waitForSelector(".template-card .thumb .doc");
-check("gallery shows 8 real rendered thumbnails", (await page.locator(".template-card .thumb .doc").count()) === 8);
+check("gallery shows 10 real rendered thumbnails", (await page.locator(".template-card .thumb .doc").count()) === 10);
 const rendered = await page.locator(".template-card .thumb .doc").evaluateAll((els) => els.map((e) => e.dataset.template));
 check("each gallery card renders its own template", IDS.every((id) => rendered.includes(id)));
 await page.click('[data-cat="Tech"]');
@@ -210,7 +210,7 @@ await page.waitForTimeout(200);
 check("photo appears in a layout that supports it once enabled", (await page.locator(".stage__sizer .doc__photo").count()) === 1);
 await page.locator(`[data-focus-key="tpl:grid"]`).click();
 await page.waitForTimeout(250);
-check("Grid never shows the photo and explains why", (await page.locator(".stage__sizer .doc__photo").count()) === 0 && (await page.textContent(".design .photo .notice")).includes("does not show photos"));
+check("Grid shows an explicitly enabled photo", (await page.locator(".stage__sizer .doc__photo").count()) === 1);
 await page.locator(`[data-focus-key="tpl:summit"]`).click();
 await page.waitForTimeout(250);
 check("Summit shows an explicitly enabled photo", (await page.locator(".stage__sizer .doc__photo").count()) === 1);

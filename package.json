@@ -1,6 +1,6 @@
 {
   "name": "careercanvas",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "private": true,
   "description": "Free, private, offline-capable resume and cover-letter builder (vanilla HTML/CSS/JS PWA).",
   "type": "module",

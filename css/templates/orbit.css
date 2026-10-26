@@ -1,0 +1,105 @@
+/* Orbit: light and airy. Soft header card, centred portrait, rounded section labels and a timeline
+   for experience, education and projects. All decoration is CSS only (no content is generated). */
+.doc[data-template="orbit"] {
+  --tint: color-mix(in srgb, var(--accent) 12%, #ffffff);
+  --line: color-mix(in srgb, var(--accent) 32%, #ffffff);
+}
+
+.doc[data-template="orbit"] .doc__header {
+  padding: 1.3em 1.5em;
+  border-radius: 1.2em;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 16%, #fff), color-mix(in srgb, var(--accent) 4%, #fff));
+}
+
+.doc[data-template="orbit"] .doc__header:has(.doc__photo) {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-areas: "photo id" "contact contact";
+  align-items: center;
+  column-gap: 1.4em;
+}
+
+.doc[data-template="orbit"] .doc__header:has(.doc__photo) .doc__photo {
+  grid-area: photo;
+  width: 7.6em;
+  height: 7.6em;
+  box-shadow: 0 0 0 3px #fff, 0 0 0 5px var(--accent);
+}
+
+.doc[data-template="orbit"] .doc__header:has(.doc__photo) .doc__id {
+  grid-area: id;
+}
+
+.doc[data-template="orbit"] .doc__header:has(.doc__photo) .doc__contact {
+  grid-area: contact;
+}
+
+.doc[data-template="orbit"][data-align="center"] .doc__header:has(.doc__photo) {
+  grid-template-columns: 1fr;
+  grid-template-areas: "photo" "id" "contact";
+  justify-items: center;
+  row-gap: 0.6em;
+}
+
+.doc[data-template="orbit"] .doc__name {
+  font-weight: 800;
+}
+
+.doc[data-template="orbit"] .doc__role {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.doc[data-template="orbit"] .doc__heading {
+  display: inline-block;
+  margin-bottom: 0.85em;
+  padding: 0.3em 1em;
+  border-bottom: 0;
+  border-radius: 99px;
+  background: var(--tint);
+  font-size: 0.78em;
+  letter-spacing: 0.14em;
+}
+
+.doc[data-template="orbit"] .doc__section:is([data-type="experience"], [data-type="education"], [data-type="projects"], [data-type="certifications"]) .doc__entry {
+  position: relative;
+  margin: 0 0 0 0.4em;
+  padding: 0 0 0.95em 1.5em;
+  border-left: 2px solid var(--line);
+}
+
+.doc[data-template="orbit"] .doc__section:is([data-type="experience"], [data-type="education"], [data-type="projects"], [data-type="certifications"]) .doc__entry:last-child {
+  padding-bottom: 0;
+}
+
+.doc[data-template="orbit"] .doc__section:is([data-type="experience"], [data-type="education"], [data-type="projects"], [data-type="certifications"]) .doc__entry::before {
+  content: "";
+  position: absolute;
+  top: 0.3em;
+  left: -0.46em;
+  width: 0.7em;
+  height: 0.7em;
+  border: 2px solid var(--accent);
+  border-radius: 50%;
+  background: #fff;
+}
+
+.doc[data-template="orbit"] .doc__entry-title {
+  font-weight: 800;
+}
+
+.doc[data-template="orbit"] .doc__dates {
+  padding: 0.05em 0.6em;
+  border-radius: 99px;
+  background: var(--tint);
+  color: var(--ink);
+  font-size: 0.82em;
+  font-weight: 600;
+}
+
+@media print {
+  .doc[data-template="orbit"] .doc__header {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
