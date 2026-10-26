@@ -95,14 +95,3 @@
 .doc[data-template="bento"] .doc__chips li {
   background: color-mix(in srgb, color-mix(in srgb, var(--deco-c, var(--accent)) 9%, #fff) calc(var(--fill-o, 1) * 100%), transparent);
 }
-
-@media print {
-  .doc[data-template="bento"] {
-    --paper-bg: #fff;
-    background: #fff;
-  }
-
-  .doc[data-template="bento"] .doc__header {
-    background: #fff;
-  }
-}

@@ -2,6 +2,10 @@
 
 Dates are omitted on purpose: versions are git commits on `master`.
 
+## 0.9.2
+- **PDF now matches the preview.** Horizon, Nexus, Bento, Vertex, Prism, Swiss and Bloom no longer drop their header/sidebar fills in print, and two-column templates (Prism, Swiss, Velo, Aurora) keep their two columns. Fills print because `.doc` sets `print-color-adjust: exact`. Checked by rasterising page 1 of every template next to its screen render, and with 10-role long resumes on ten templates (no lost text, no blank page).
+- Still different on purpose: Glass, Aurora and Slate are dark on screen and print on white (a dark page would leave a white margin frame).
+
 ## 0.9.1 (Phase 7: quality gate)
 - Accessibility fixes from an axe-core audit: muted text and filled-control colours now meet WCAG AA contrast in both themes; control names now contain their visible text (template cards, Use template, Checklist, Export PDF, colour reset); photo file input is labelled; heading order fixed on Templates and the cover-letter start page; template filter chips wrap instead of hiding behind a sideways scroller.
 - Template-card thumbnails are hidden from assistive technology (a rendered sample resume is not link text).

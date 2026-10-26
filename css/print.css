@@ -102,68 +102,7 @@
     page-break-after: avoid;
   }
 
-  /* ---- two-column layouts print as one content-complete column ---- */
-  #print-root .doc[data-layout^="sidebar"],
-  #print-root .doc[data-layout^="sidebar"] .doc__header,
-  #print-root .doc[data-layout^="sidebar"] .doc__body {
-    display: block !important;
-  }
-
-  #print-root .doc[data-layout^="sidebar"] .doc__id,
-  #print-root .doc[data-layout^="sidebar"] .doc__main,
-  #print-root .doc[data-layout^="sidebar"] .doc__side {
-    margin: 0 !important;
-    padding: 0 !important;
-    background: none !important;
-    border: 0 !important;
-  }
-
-  #print-root .doc[data-layout^="sidebar"] .doc__id {
-    padding-left: 0 !important;
-  }
-
-  #print-root .doc[data-layout^="sidebar"] .doc__contact {
-    flex-direction: row !important;
-    margin: 0.7em 0 0 !important;
-    padding: 0 !important;
-    background: none !important;
-    border: 0 !important;
-  }
-
-  #print-root .doc[data-layout^="sidebar"] .doc__body {
-    margin-top: calc(var(--gap) * 1.1) !important;
-  }
-
-  #print-root .doc[data-layout^="sidebar"] .doc__side {
-    margin-top: var(--gap) !important;
-  }
-
-  #print-root .doc[data-layout^="sidebar"] .doc__photo {
-    float: right;
-    margin: 0 0 0.6em 1em !important;
-  }
-
-  #print-root .doc[data-layout^="sidebar"] .doc__header::after {
-    content: "";
-    display: block;
-    clear: both;
-  }
-
-  /* ---- templates with full-bleed blocks ---- */
-  #print-root .doc[data-template="vertex"] .doc__header {
-    margin: 0 !important;
-    padding: 1.1em !important;
-  }
-
-  #print-root .doc[data-template="vertex"] .doc__section {
-    display: block !important;
-  }
-
-  #print-root .doc[data-template="vertex"] .doc__heading {
-    margin-bottom: 0.5em !important;
-    padding-top: 0.35em !important;
-  }
-
+  /* ---- full-bleed blocks keep their screen look: fills print because .doc sets print-color-adjust: exact ---- */
   #print-root .doc[data-template="nexus"] .doc__header,
   #print-root .doc[data-template="nexus"] .doc__section {
     -webkit-box-decoration-break: clone;

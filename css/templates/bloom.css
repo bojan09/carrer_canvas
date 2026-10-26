@@ -101,14 +101,3 @@
   background: var(--accent);
   opacity: 0.7;
 }
-
-@media print {
-  .doc[data-template="bloom"] {
-    --paper-bg: #fff;
-    background: #fff;
-  }
-
-  .doc[data-template="bloom"]::before {
-    opacity: calc(0.6 * var(--fill-o, 1));
-  }
-}

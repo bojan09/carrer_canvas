@@ -148,7 +148,7 @@ for (const id of ["slate", "aurora"]) {
   check(`${id}: page prints on white (ink-efficient)`, b.mean > 0.9 && b.darkShare < 0.08, JSON.stringify(b));
 }
 const vb = await brightness(`${outDir}/px-vertex-1.png`);
-check("vertex: header prints outlined, not as a dark block", vb.darkShare < 0.08, JSON.stringify(vb));
+check("vertex: the dark header block prints as on screen", vb.darkShare > 0.03, JSON.stringify(vb));
 
 // ---------- sidebar templates print as ONE content-complete column ----------
 for (const id of ["aurora", "velo"]) {

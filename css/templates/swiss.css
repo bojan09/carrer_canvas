@@ -101,15 +101,3 @@
   border-color: var(--ink-2);
 }
 
-@media print {
-  .doc[data-template="swiss"][data-layout="sidebar-left"]::before {
-    display: none;
-  }
-}
-
-@media print {
-  .doc[data-template="swiss"][data-layout="sidebar-left"] .doc__photo {
-    width: 6.4em;
-    height: 6.4em;
-  }
-}

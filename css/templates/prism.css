@@ -124,39 +124,3 @@
 .doc[data-template="prism"] .doc__side .doc__skilllabel {
   color: var(--side-ink);
 }
-
-@media print {
-  .doc[data-template="prism"][data-layout="sidebar-left"]::before {
-    display: none;
-  }
-
-  .doc[data-template="prism"] .doc__contact,
-  .doc[data-template="prism"] .doc__side,
-  .doc[data-template="prism"] .doc__side .doc__heading,
-  .doc[data-template="prism"] .doc__side .doc__skilllabel {
-    color: var(--ink) !important;
-  }
-
-  .doc[data-template="prism"] .doc__contact {
-    font-size: 0.92em;
-  }
-
-  .doc[data-template="prism"] .doc__side .doc__heading {
-    color: var(--accent) !important;
-  }
-
-  .doc[data-template="prism"] .doc__side .doc__entry-sub,
-  .doc[data-template="prism"] .doc__side .doc__dates {
-    color: var(--ink-2);
-  }
-
-  .doc[data-template="prism"] .doc__side .doc__heading::after {
-    background: color-mix(in srgb, var(--accent) 28%, transparent);
-  }
-
-  .doc[data-template="prism"] .doc__side .doc__chips li {
-    border-color: color-mix(in srgb, var(--accent) 50%, transparent);
-    background: color-mix(in srgb, var(--accent) 12%, transparent);
-    color: var(--ink);
-  }
-}

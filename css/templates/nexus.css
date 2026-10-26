@@ -50,28 +50,6 @@
   letter-spacing: 0.1em;
 }
 
-@media print {
-  .doc[data-template="nexus"] .doc__header,
-  .doc[data-template="nexus"] .doc__section {
-    box-shadow: none;
-    border: 1px solid #ccd2e0;
-  }
-
-  .doc[data-template="nexus"] {
-    --paper-bg: #fff;
-  }
-
-  .doc[data-template="nexus"] .doc__header {
-    background: #fff;
-    color: #111;
-  }
-
-  .doc[data-template="nexus"] .doc__header .doc__role,
-  .doc[data-template="nexus"] .doc__header .doc__contact {
-    color: #333;
-  }
-}
-
 /* Phase 3b modernisation */
 .doc[data-template="nexus"] .doc__header {
   border-top: 0;
@@ -99,18 +77,4 @@
 
 .doc[data-template="nexus"] .doc__chips li {
   background: color-mix(in srgb, color-mix(in srgb, var(--deco-c, var(--accent)) 10%, #fff) calc(var(--fill-o, 1) * 100%), transparent);
-}
-
-@media print {
-  .doc[data-template="nexus"] .doc__header {
-    background: #fff;
-    color: #111;
-    box-shadow: none;
-    border-left: 4px solid var(--accent);
-  }
-
-  .doc[data-template="nexus"] .doc__header .doc__role,
-  .doc[data-template="nexus"] .doc__header .doc__contact {
-    color: #333;
-  }
 }

@@ -259,7 +259,7 @@ await page.emulateMedia({ media: "print" });
 const printColors = await page.evaluate(() => [...document.querySelectorAll('.doc[data-probe="slate"],.doc[data-probe="aurora"]')].map((e) => getComputedStyle(e).backgroundColor));
 check("dark templates print on white", printColors.length > 0 && printColors.every((c) => c === "rgb(255, 255, 255)"), printColors.join(","));
 const headerPrint = await page.evaluate(() => getComputedStyle(document.querySelector('.doc[data-probe="vertex"] .doc__header')).backgroundColor);
-check("Vertex header prints without a dark fill", headerPrint === "rgb(255, 255, 255)", headerPrint);
+check("Vertex header keeps its dark fill in print, as on screen", headerPrint !== "rgb(255, 255, 255)" && headerPrint !== "rgba(0, 0, 0, 0)", headerPrint);
 await page.emulateMedia({ media: "screen" });
 
 // ---------- mobile ----------

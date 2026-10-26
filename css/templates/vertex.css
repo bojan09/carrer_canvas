@@ -104,19 +104,3 @@
 .doc[data-template="vertex"] .doc__chips li {
   border-radius: 0;
 }
-
-@media print {
-  .doc[data-template="vertex"] .doc__header {
-    background: #fff;
-    border: 3px solid #15151d;
-    color: #111;
-  }
-
-  .doc[data-template="vertex"] .doc__contact {
-    color: #333;
-  }
-
-  .doc[data-template="vertex"] .doc__role {
-    color: #111;
-  }
-}
