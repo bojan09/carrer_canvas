@@ -11,7 +11,7 @@ import { SAMPLE_PHOTO } from "./sample-photo.js";
  *  and optional photo with resumes so the same templates and design panel work for both. */
 
 export const LETTER_KIND = "cover-letter";
-export const LETTER_SCHEMA_VERSION = 3;
+export const LETTER_SCHEMA_VERSION = 4;
 export const LETTER_LIMITS = { bodyParagraphs: 3, links: 10 };
 export const LETTER_FIELD_MAX = { name: 120, title: 120, company: 120, address: 300, role: 160, greeting: 160, opening: 1500, paragraph: 3000, closing: 120, signature: 120 };
 
@@ -168,6 +168,8 @@ export const LETTER_MIGRATIONS = {
   1: (doc) => ({ ...doc, schemaVersion: 2 }),
   // v3 (Phase 6.1): same per-element formatting additions as resume schema v4.
   2: (doc) => ({ ...doc, schemaVersion: 3 }),
+  // v4 (Phase 6.2): designSettings.moves, same as resume schema v5.
+  3: (doc) => ({ ...doc, schemaVersion: 4 }),
 };
 
 export function migrateLetter(raw) {

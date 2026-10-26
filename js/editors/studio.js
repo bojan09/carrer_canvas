@@ -30,6 +30,7 @@ function toolButton({ name, label, text, onClick }) {
 export function mountStudio(root, session, { persistent, adapter = resumeAdapter }) {
   const Noun = adapter.noun[0].toUpperCase() + adapter.noun.slice(1);
   const expanded = new Set(["contact"]);
+  let selectedBlock = null; // the block the Move panel nudges
   let selectedRole = "body"; // the kind of text the Format panel is editing
   const closedGroups = new Set(); // collapsed groups in the Style panel survive rebuilds
   const ctx = {
@@ -113,13 +114,27 @@ export function mountStudio(root, session, { persistent, adapter = resumeAdapter
     "section",
     { class: "studio__preview", "aria-label": "Preview" },
     h("div", { class: "studio__previewhead" }, h("h2", { text: "Preview" }), tplBadge, styleBtn, h("div", { class: "studio__zoom" }, zoomSelect)),
-    h("p", { class: "studio__pickhint" }, pickHintIcon, document.createTextNode(" Click any text in the preview to change its font, colour, size or boldness.")),
+    h("p", { class: "studio__pickhint" }, pickHintIcon, document.createTextNode(" Click any text in the preview to change its font, colour, size or boldness. Drag a block to move it.")),
     previewScroll,
     h("p", { class: "studio__previewnote" }, pageInfo, document.createTextNode(" Page-break guides are estimates. The saved PDF is what counts.")),
   );
   const paper = mountPaper(previewScroll, {
     zoom: getSettings().previewZoom,
-    onPick: (role) => pickRole(role),
+    onPick: (role, blockId) => pickRole(role, { block: blockId }),
+    getMove: (id) => session.doc.designSettings.moves?.[id] || null,
+    onMove: (id, x, y) => {
+      selectedBlock = id;
+      ctx.change(
+        () => {
+          const moves = (session.doc.designSettings.moves ||= {});
+          if (x || y) moves[id] = { x, y };
+          else delete moves[id];
+          if (!Object.keys(moves).length) delete session.doc.designSettings.moves;
+        },
+        { group: `move.${id}`, structural: true },
+      );
+      paper.setBlock(id);
+    },
     onInfo: ({ pages, paper: size }) => {
       lastPages = pages;
       pageInfo.textContent = `About ${pages} page${pages === 1 ? "" : "s"} · ${PAPER[size].label.split(" (")[0]}.`;
@@ -153,6 +168,8 @@ export function mountStudio(root, session, { persistent, adapter = resumeAdapter
     }
     syncStyleButton();
     paper.setSelection(value === "design" ? selectedRole : null);
+    paper.setDrag(value === "design");
+    paper.setBlock(value === "design" ? selectedBlock : null);
     window.scrollTo(0, 0);
   }
 
@@ -172,9 +189,10 @@ export function mountStudio(root, session, { persistent, adapter = resumeAdapter
   });
 
   /** A click on text in the preview (or a chip in the Format panel) chooses what to format. */
-  function pickRole(role, { focus = true } = {}) {
+  function pickRole(role, { focus = true, block = null } = {}) {
     if (!ELEMENT_ROLES[role] || (adapter.kind === "letter" && role === "heading")) return;
     selectedRole = role;
+    if (block) selectedBlock = block;
     designStale = true;
     viewGroup.querySelector('input[value="design"]').checked = true;
     setView("design");
@@ -194,6 +212,14 @@ export function mountStudio(root, session, { persistent, adapter = resumeAdapter
       ctx,
       sample: adapter.sample,
       role: selectedRole,
+      block: selectedBlock,
+      onBlock: (id) => {
+        selectedBlock = id;
+        paper.setBlock(id);
+        designStale = true;
+        ensureDesign();
+        designHost.querySelector('[data-focus-key="move:block"]')?.focus({ preventScroll: true });
+      },
       closed: closedGroups,
       onRole: (role, { focus = false } = {}) => {
         selectedRole = role;

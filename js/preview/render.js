@@ -84,7 +84,7 @@ function sectionBody(s, skillsStyle) {
 }
 
 function renderSection(s, skillsStyle) {
-  return h("section", { class: "doc__section", "data-type": s.type }, h("h2", { class: "doc__heading", "data-role": "heading", text: titleOf(s) }), sectionBody(s, skillsStyle));
+  return h("section", { class: "doc__section", "data-type": s.type, "data-move": `sec:${s.id}`, "data-move-label": titleOf(s) }, h("h2", { class: "doc__heading", "data-role": "heading", text: titleOf(s) }), sectionBody(s, skillsStyle));
 }
 
 /** Shared document frame: header (photo, name, role, contact) plus a body built by `makeBody`.
@@ -111,8 +111,8 @@ function frame(doc, opts, kind, makeBody) {
     "header",
     { class: "doc__header" },
     showPhoto ? h("img", { class: "doc__photo", "data-role": "photo", src: doc.photo.data, alt: "", width: "96", height: "96" }) : null,
-    h("div", { class: "doc__id" }, h("h1", { class: "doc__name", "data-role": "name", text: c.fullName || "Your name" }), c.title ? h("p", { class: "doc__role", "data-role": "role", text: c.title }) : null),
-    contactBits.length ? h("ul", { class: "doc__contact", "data-role": "contact" }, contactBits.map((n) => h("li", {}, n))) : null,
+    h("div", { class: "doc__id", "data-move": "identity", "data-move-label": "Name and title" }, h("h1", { class: "doc__name", "data-role": "name", text: c.fullName || "Your name" }), c.title ? h("p", { class: "doc__role", "data-role": "role", text: c.title }) : null),
+    contactBits.length ? h("ul", { class: "doc__contact", "data-role": "contact", "data-move": "contact", "data-move-label": "Contact details" }, contactBits.map((n) => h("li", {}, n))) : null,
   );
 
   const { body, hasSide } = makeBody(tpl);
@@ -191,6 +191,17 @@ function frame(doc, opts, kind, makeBody) {
   if (tokens.length) root.setAttribute("data-st", tokens.join(" "));
   for (const [k, v] of Object.entries(vars)) root.style.setProperty(k, v);
   root.append(header, body);
+  // Moved blocks: a CSS translate in millimetres. Layout, page breaks and reading order are unchanged.
+  // Simplified (ATS-conscious) mode ignores moves so the page stays a plain single column.
+  if (!design.simplified) {
+    for (const node of root.querySelectorAll("[data-move]")) {
+      const m = design.moves[node.dataset.move];
+      if (!m) continue;
+      node.setAttribute("data-moved", "true");
+      node.style.setProperty("--mv-x", `${m.x}mm`);
+      node.style.setProperty("--mv-y", `${m.y}mm`);
+    }
+  }
   return root;
 }
 
@@ -227,14 +238,14 @@ export function renderLetter(doc, opts = {}) {
     const date = formatLetterDate(doc.date);
     const recipientLines = [r.name, r.title, r.company, ...lines(r.address)].filter(Boolean);
     const parts = [
-      date ? h("p", { class: "doc__date", "data-role": "meta", text: date }) : null,
-      recipientLines.length ? h("address", { class: "doc__recipient", "data-role": "meta" }, recipientLines.map((l) => h("span", { text: l }))) : null,
-      doc.role.trim() ? h("p", { class: "doc__subject", "data-role": "title", text: `Re: ${doc.role.trim()}` }) : null,
-      doc.greeting.trim() ? h("p", { class: "doc__greeting", "data-role": "body", text: doc.greeting.trim() }) : null,
+      date ? h("p", { class: "doc__date", "data-move": "date", "data-move-label": "Date", "data-role": "meta", text: date }) : null,
+      recipientLines.length ? h("address", { class: "doc__recipient", "data-move": "recipient", "data-move-label": "Recipient", "data-role": "meta" }, recipientLines.map((l) => h("span", { text: l }))) : null,
+      doc.role.trim() ? h("p", { class: "doc__subject", "data-move": "subject", "data-move-label": "Subject line", "data-role": "title", text: `Re: ${doc.role.trim()}` }) : null,
+      doc.greeting.trim() ? h("p", { class: "doc__greeting", "data-move": "greeting", "data-move-label": "Greeting", "data-role": "body", text: doc.greeting.trim() }) : null,
       ...paras(doc.opening, "doc__para"),
       ...doc.body.flatMap((p) => paras(p.text, "doc__para")),
-      doc.closing.trim() ? h("p", { class: "doc__closing", "data-role": "body", text: doc.closing.trim() }) : null,
-      doc.signature.trim() ? h("p", { class: "doc__signature", "data-role": "title", text: doc.signature.trim() }) : null,
+      doc.closing.trim() ? h("p", { class: "doc__closing", "data-move": "closing", "data-move-label": "Closing", "data-role": "body", text: doc.closing.trim() }) : null,
+      doc.signature.trim() ? h("p", { class: "doc__signature", "data-move": "signature", "data-move-label": "Signature", "data-role": "title", text: doc.signature.trim() }) : null,
     ].filter(Boolean);
     const content = parts.length ? parts : [h("p", { class: "doc__empty", text: "Write your letter on the left and it appears here." })];
     const body = h("div", { class: "doc__body" }, h("div", { class: "doc__main" }, h("section", { class: "doc__section doc__letter", "data-type": "letter" }, content)));

@@ -14,6 +14,9 @@ export const MIGRATIONS = {
   2: (doc) => ({ ...doc, schemaVersion: 3 }),
   // v4 (Phase 6.1): per-element formatting (colour, font, weight, size, ...) and photo size/nudge in designSettings.
   3: (doc) => ({ ...doc, schemaVersion: 4 }),
+  // v5 (Phase 6.2): designSettings.moves (block offsets in mm). An older app version refuses v5 records
+  // instead of silently dropping the positions.
+  4: (doc) => ({ ...doc, schemaVersion: 5 }),
 };
 
 /** Upgrades and validates a raw stored record. Throws ResumeDataError when it cannot be used

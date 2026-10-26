@@ -62,13 +62,17 @@ test("schema version bump: v3 records migrate untouched, newer are refused", () 
   assert.equal(migrateRecord(l2).schemaVersion, LETTER_SCHEMA_VERSION);
 });
 
-test("switching template reports and clears custom element styles but keeps photo choices", () => {
+test("switching template keeps element styles; only colours that cannot survive a dark/light change are dropped", () => {
   const doc = createBlank();
-  doc.designSettings = { elements: { name: { weight: 900 } }, photoSize: 40, accent: "#ff0000", showPhoto: true, simplified: true };
-  const { dropped } = applyTemplate(doc, "bento");
-  assert.equal(dropped, 3, "elements, photoSize and accent were reset");
-  assert.deepEqual(doc.designSettings, { showPhoto: true, simplified: true });
-  assert.equal(applyTemplate(doc, "orbit").dropped, 0, "nothing custom to lose");
+  doc.designSettings = { elements: { name: { weight: 900, font: "playfair", color: "#aa0000" } }, photoSize: 40, accent: "#ff0000", showPhoto: true, simplified: true };
+  const light = ["summit", "swiss"].find((id) => id !== doc.templateId);
+  assert.equal(applyTemplate(doc, light).dropped, 0, "light to light keeps everything");
+  assert.deepEqual(doc.designSettings.elements.name, { weight: 900, font: "playfair", color: "#aa0000" });
+  assert.equal(doc.designSettings.photoSize, 40);
+  const dark = applyTemplate(doc, "glass");
+  assert.equal(dark.dropped, 1, "only the custom colour is dropped when going light to dark-on-screen");
+  assert.deepEqual(doc.designSettings.elements.name, { weight: 900, font: "playfair" });
+  assert.equal(doc.designSettings.accent, "#ff0000");
 });
 
 test("every bundled font is real: stack, @font-face, file, licence and offline precache", () => {

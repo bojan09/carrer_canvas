@@ -45,11 +45,15 @@ test("resolveDesign gives safe defaults and passes overrides through", () => {
   assert.equal(o.dateAlign, "right");
 });
 
-test("switching template drops colour, opacity and flip overrides but keeps simplified and photo choices", () => {
+test("switching template keeps colour, opacity and flip overrides the new template supports", () => {
   const doc = createBlank();
-  doc.designSettings = { textColor: "#112233", mutedColor: "#445566", fillColor: "#778899", fillOpacity: 0.5, photoOpacity: 0.5, mirror: true, accent: "#ff0000", simplified: true, showPhoto: true, photoShape: "square" };
+  const all = { textColor: "#112233", mutedColor: "#445566", fillColor: "#778899", fillOpacity: 0.5, photoOpacity: 0.5, mirror: true, accent: "#ff0000", simplified: true, showPhoto: true, photoShape: "square" };
+  doc.designSettings = { ...all };
   applyTemplate(doc, "bento");
-  assert.deepEqual(doc.designSettings, { simplified: true, showPhoto: true, photoShape: "square" });
+  assert.deepEqual(doc.designSettings, all, "bento supports mirror and fills");
+  applyTemplate(doc, "swiss");
+  assert.equal(doc.designSettings.fillColor, undefined, "swiss has no decorative fills");
+  assert.equal(doc.designSettings.textColor, "#112233");
 });
 
 test("colour maths: mixing, effective header fill and readable text colour", () => {

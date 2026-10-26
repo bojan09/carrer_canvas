@@ -1,5 +1,5 @@
 import { h } from "../utils/dom.js";
-import { PAPER } from "../templates/design.js";
+import { MM, MOVE_LIMITS, PAPER } from "../templates/design.js";
 import { renderDocument } from "./render.js";
 
 export const ZOOM_MODES = [
@@ -18,7 +18,7 @@ const clamp = (n, a, b) => Math.min(b, Math.max(a, n));
  * Page-break guides are ESTIMATES from the content height; real pagination is decided by the
  * browser's print engine (see docs/PRINT_EXPORT.md in a later phase).
  */
-export function mountPaper(container, { zoom = "fit-width", onInfo = () => {}, onPick = null } = {}) {
+export function mountPaper(container, { zoom = "fit-width", onInfo = () => {}, onPick = null, onMove = null, getMove = () => null } = {}) {
   const sizer = h("div", { class: "stage__sizer" });
   const scroller = h("div", { class: "stage", tabindex: "0", role: "region", "aria-label": "Document preview, scrollable" }, sizer);
   container.replaceChildren(scroller);
@@ -29,14 +29,64 @@ export function mountPaper(container, { zoom = "fit-width", onInfo = () => {}, o
     if (selected) scroller.querySelectorAll(`[data-role="${selected}"]`).forEach((n) => n.setAttribute("data-selected", "true"));
   };
 
+  let scale = 1;
+  let selectedBlock = null;
+  const paintBlock = () => {
+    scroller.querySelectorAll("[data-move-selected]").forEach((n) => n.removeAttribute("data-move-selected"));
+    if (selectedBlock) scroller.querySelectorAll("[data-move]").forEach((n) => n.dataset.move === selectedBlock && n.setAttribute("data-move-selected", "true"));
+  };
+
   // Clicking text in the preview picks it for formatting. Links are inert here so a click never leaves the editor.
+  let suppressClick = false;
   if (onPick) {
     scroller.classList.add("stage--pick");
     scroller.addEventListener("click", (e) => {
+      if (suppressClick) return e.preventDefault();
       const hit = e.target.closest?.("[data-role]");
       if (e.target.closest?.("a")) e.preventDefault();
-      if (hit) onPick(hit.dataset.role);
+      if (hit) onPick(hit.dataset.role, hit.closest("[data-move]")?.dataset.move || null);
     });
+  }
+
+  // Dragging a block (mouse or pen) moves it by a CSS translate. Touch keeps scrolling; phones use the nudge buttons.
+  let drag = null;
+  let dragOn = false;
+  const roundHalf = (n) => Math.round(clamp(n, MOVE_LIMITS.min, MOVE_LIMITS.max) * 2) / 2;
+  if (onMove) {
+    scroller.addEventListener("pointerdown", (e) => {
+      if (!dragOn || e.pointerType === "touch" || e.button !== 0 || e.target.closest?.("a")) return;
+      const node = e.target.closest?.("[data-move]");
+      if (!node) return;
+      drag = { node, id: node.dataset.move, x0: e.clientX, y0: e.clientY, start: getMove(node.dataset.move) || { x: 0, y: 0 }, moved: false, pid: e.pointerId };
+    });
+    scroller.addEventListener("pointermove", (e) => {
+      if (!drag || e.pointerId !== drag.pid) return;
+      const dx = e.clientX - drag.x0;
+      const dy = e.clientY - drag.y0;
+      if (!drag.moved) {
+        if (Math.hypot(dx, dy) < 4) return;
+        drag.moved = true;
+        drag.node.setAttribute("data-dragging", "true");
+        scroller.setPointerCapture?.(e.pointerId);
+      }
+      drag.x = roundHalf(drag.start.x + dx / scale / MM);
+      drag.y = roundHalf(drag.start.y + dy / scale / MM);
+      drag.node.setAttribute("data-moved", "true");
+      drag.node.style.setProperty("--mv-x", `${drag.x}mm`);
+      drag.node.style.setProperty("--mv-y", `${drag.y}mm`);
+    });
+    const finish = (e) => {
+      if (!drag || e.pointerId !== drag.pid) return;
+      const d = drag;
+      drag = null;
+      d.node.removeAttribute("data-dragging");
+      if (!d.moved) return;
+      suppressClick = true;
+      setTimeout(() => (suppressClick = false), 0);
+      onMove(d.id, d.x, d.y);
+    };
+    scroller.addEventListener("pointerup", finish);
+    scroller.addEventListener("pointercancel", finish);
   }
 
   let doc = null;
@@ -55,6 +105,7 @@ export function mountPaper(container, { zoom = "fit-width", onInfo = () => {}, o
     else if (mode === "fit-page") z = Math.min(cw / paper.w, ch / paper.h);
     else z = Number(mode) / 100;
     z = clamp(z, 0.15, 3);
+    scale = z;
 
     current.style.transformOrigin = "0 0";
     current.style.transform = `scale(${z})`;
@@ -93,11 +144,20 @@ export function mountPaper(container, { zoom = "fit-width", onInfo = () => {}, o
       else sizer.prepend(next);
       current = next;
       paintSelection();
+      paintBlock();
       layout();
     },
     setSelection(role) {
       selected = role;
       paintSelection();
+    },
+    setBlock(id) {
+      selectedBlock = id;
+      paintBlock();
+    },
+    setDrag(on) {
+      dragOn = Boolean(on && onMove);
+      scroller.classList.toggle("stage--drag", dragOn);
     },
     setZoom(next) {
       mode = next;

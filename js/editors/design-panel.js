@@ -6,6 +6,7 @@ import { mountThumb } from "../preview/thumb.js";
 import { announce } from "../components/announcer.js";
 import { photoControls } from "./photo-controls.js";
 import { formatCard } from "./format-panel.js";
+import { moveCard } from "./move-panel.js";
 
 let sampleDoc = null;
 const sample = () => (sampleDoc ||= createSample());
@@ -36,12 +37,12 @@ const FORMAT = {
 };
 
 /** Design controls. All values are overrides on the template defaults; undo/redo covers every change. */
-export function designPanel({ session, ctx, sample: sampleFor = sample, role = "body", onRole = () => {}, closed = new Set() }) {
+export function designPanel({ session, ctx, sample: sampleFor = sample, role = "body", onRole = () => {}, block = null, onBlock = () => {}, closed = new Set() }) {
   const doc = session.doc;
   const disposers = [];
   const root = h("div", { class: "design" });
   const jump = h("nav", { class: "design__jump", "aria-label": "Jump to a style group" });
-  for (const [key, label] of [["template", "Template"], ["colour", "Colours"], ["type", "Text and fonts"], ["struct", "Layout"], ["photo", "Photo"]]) {
+  for (const [key, label] of [["template", "Template"], ["colour", "Colours"], ["type", "Text and fonts"], ["struct", "Layout"], ["move", "Move blocks"], ["photo", "Photo"]]) {
     const b = h("button", { type: "button", class: "chip-btn", text: label });
     b.addEventListener("click", () => {
       const target = root.querySelector(`#dg-${key}`);
@@ -78,7 +79,7 @@ export function designPanel({ session, ctx, sample: sampleFor = sample, role = "
       if (t.id === doc.templateId) return;
       let dropped = 0;
       ctx.change(() => (dropped = applyTemplate(doc, t.id).dropped), { structural: true, focusKey: `tpl:${t.id}` });
-      if (dropped) ctx.undoable(`${t.name} applied. Your custom colours and text styles were reset for the new template.`);
+      if (dropped) ctx.undoable(`${t.name} applied. Your styles carried over; ${dropped} option${dropped === 1 ? " doesn't" : "s don't"} fit this template and ${dropped === 1 ? "was" : "were"} removed.`);
       else announce(`${t.name} template applied. Your content is unchanged.`);
     });
     grid.append(btn);
@@ -252,6 +253,11 @@ export function designPanel({ session, ctx, sample: sampleFor = sample, role = "
     segmented("dz-paper", Object.entries(PAPER).map(([k, v]) => [k, v.label.split(" (")[0]]), doc.pageSize, (v) => ctx.change(() => (doc.pageSize = v), { structural: false }), { label: "Paper size" }),
   );
   root.append(struct);
+
+  // ---- move blocks ----
+  const move = group("move", "dz-move", "Move blocks");
+  move.append(moveCard({ doc, ctx, block, onBlock }).el);
+  root.append(move);
 
   // ---- photo ----
   const photo = photoControls({ doc, ctx, headingId: "dz-photo", level: "h3" });

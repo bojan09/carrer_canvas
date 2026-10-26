@@ -103,6 +103,7 @@ await pickTemplate("horizon");
 await page.getByLabel("Background fill colour", { exact: true }).fill("#fde68a");
 await page.waitForTimeout(300);
 check("a pale fill switches header text to dark so it stays readable", (await docVar("--hdr-ink")) === "#111111" && (await css(".doc__name", "color")) === "rgb(17, 17, 17)");
+await page.getByLabel("Background decoration opacity", { exact: true }).fill("1");
 await page.getByLabel("Background fill colour", { exact: true }).fill("#1e293b");
 await page.waitForTimeout(300);
 check("a dark fill keeps header text light", (await docVar("--hdr-ink")) === "#ffffff");
@@ -110,7 +111,7 @@ check("the panel explains that header text adapts automatically", /switches betw
 
 // ---------- templates without fills / dark templates ----------
 await pickTemplate("summit");
-check("switching template drops the colour overrides", (await docVar("--ink")) === "" && (await docVar("--deco-c")) === "" && (await docVar("--hdr-ink")) === "");
+check("switching template keeps the text colour but drops fills the new template does not have", (await docVar("--ink")) === "#222222" && (await docVar("--deco-c")) === "" && (await docVar("--hdr-ink")) === "");
 check("a plain template disables fill controls and says why", (await page.getByLabel("Background fill colour", { exact: true }).isDisabled()) && (await page.getByLabel("Background decoration opacity", { exact: true }).isDisabled()) && /no decorative fills/.test(await page.locator(".design__group", { hasText: "Text colour and transparency" }).innerText()));
 check("text colour still works on a plain template", !(await page.getByLabel("Text colour", { exact: true }).isDisabled()));
 await pickTemplate("slate");
@@ -121,6 +122,8 @@ const HEADER = ["summit", "grid", "slate", "mono", "bento", "glass", "horizon", 
 const flipped = [];
 for (const t of HEADER) {
   await pickTemplate(t);
+  const flipBox = page.getByRole("checkbox", { name: /Flip layout/ });
+  if (await flipBox.isChecked()) { await flipBox.uncheck(); await page.waitForTimeout(250); } // flip now carries over a template switch
   const before = await centreX(".doc__photo");
   await page.getByRole("checkbox", { name: /Flip layout/ }).check();
   await page.waitForTimeout(250);
@@ -133,6 +136,8 @@ const SIDEBAR = ["aurora", "prism", "swiss", "velo"];
 const sideBad = [];
 for (const t of SIDEBAR) {
   await pickTemplate(t);
+  const flipBox = page.getByRole("checkbox", { name: /Flip layout/ });
+  if (await flipBox.isChecked()) { await flipBox.uncheck(); await page.waitForTimeout(250); }
   const before = await centreX(".doc__side");
   await page.getByRole("checkbox", { name: /Flip layout/ }).check();
   await page.waitForTimeout(250);
@@ -162,6 +167,7 @@ check("Reset to template defaults clears colours and flip", (await docVar("--ink
 // ---------- cover letters ----------
 id = await newDoc("letter", "summit");
 await openDoc("letter", id);
+await page.getByLabel("Text colour", { exact: true }).waitFor();
 check("letters get the same controls plus a date-side option", (await page.getByLabel("Text colour", { exact: true }).count()) === 1 && (await page.getByRole("checkbox", { name: /Date on the right/ }).count()) === 1);
 check("letter design hides section-divider (no sections) but keeps the rest", (await page.locator(".design").getByText("Section divider").count()) === 0);
 await page.getByRole("checkbox", { name: /Date on the right/ }).check();

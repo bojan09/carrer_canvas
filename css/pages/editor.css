@@ -1292,3 +1292,24 @@ details.design__group > .design__summary:focus-visible {
 .studio__stylebtn {
   min-width: 0;
 }
+
+/* ---- Move blocks ---- */
+.move {
+  display: grid;
+  gap: var(--space-3, 12px);
+}
+.move__pad {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+.move__arrow {
+  min-height: 44px;
+  font-size: 1.1rem;
+  line-height: 1;
+}
+.move__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}

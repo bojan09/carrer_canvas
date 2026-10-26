@@ -56,8 +56,8 @@ const SYS_MONO = 'ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", m
 /** Bundled open-licence fonts (css/fonts.css) plus system stacks. Non-Latin text falls back to the system font. */
 export const FONT_FAMILIES = {
   inter: { label: "Inter", group: "Sans-serif", stack: `"Inter Variable", ${SYS_SANS}` },
-  "dm-sans": { label: "DM Sans", group: "Sans-serif", stack: `"DM Sans Variable", ${SYS_SANS}` },
-  "space-grotesk": { label: "Space Grotesk", group: "Sans-serif", stack: `"Space Grotesk Variable", ${SYS_SANS}` },
+  "dm-sans": { label: "DM Sans", group: "Sans-serif", stack: `"DM Sans Variable", "Inter Variable", ${SYS_SANS}` },
+  "space-grotesk": { label: "Space Grotesk", group: "Sans-serif", stack: `"Space Grotesk Variable", "Inter Variable", ${SYS_SANS}` },
   "system-sans": { label: "System sans", group: "Sans-serif", stack: SYS_SANS },
   lora: { label: "Lora", group: "Serif", stack: `"Lora Variable", ${SYS_SERIF}` },
   playfair: { label: "Playfair Display", group: "Serif", stack: `"Playfair Display Variable", ${SYS_SERIF}` },
@@ -76,6 +76,23 @@ export const PHOTO_LIMITS = {
   photoX: { min: -30, max: 30, step: 1, label: "Nudge photo sideways" },
   photoY: { min: -30, max: 30, step: 1, label: "Nudge photo up or down" },
 };
+
+/** Blocks that can be nudged away from their place. Offsets are millimetres; the DOM order never changes (a PDF text extractor may still read a moved block last). */
+export const MOVE_LIMITS = { min: -40, max: 40, step: 0.5 };
+const MOVE_ID = /^(identity|contact|date|recipient|subject|greeting|closing|signature|sec:[A-Za-z0-9_-]{1,64})$/;
+const MAX_MOVES = 40;
+
+export function normalizeMoves(raw) {
+  const out = {};
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return out;
+  for (const [id, v] of Object.entries(raw)) {
+    if (Object.keys(out).length >= MAX_MOVES) break;
+    if (!MOVE_ID.test(id) || !v || typeof v !== "object") continue;
+    const [x, y] = ["x", "y"].map((k) => (Number.isFinite(Number(v[k])) && v[k] !== null && v[k] !== "" ? Math.round(clamp(Number(v[k]), MOVE_LIMITS.min, MOVE_LIMITS.max) * 2) / 2 : 0));
+    if (x || y) out[id] = { x, y };
+  }
+  return out;
+}
 
 /** Keeps only valid per-element settings. */
 export function normalizeElements(raw) {
@@ -131,6 +148,8 @@ export function normalizeDesign(raw) {
   }
   const elements = normalizeElements(src.elements);
   if (Object.keys(elements).length) out.elements = elements;
+  const moves = normalizeMoves(src.moves);
+  if (Object.keys(moves).length) out.moves = moves;
   if (src.mirror === true) out.mirror = true;
   if (src.dateAlign === "right") out.dateAlign = "right";
   if (DIVIDERS.includes(src.dividerStyle)) out.dividerStyle = src.dividerStyle;
@@ -153,6 +172,7 @@ export function resolveDesign(doc) {
   d.photoOpacity = o.photoOpacity ?? 1;
   d.mirror = o.mirror === true;
   d.elements = o.elements || {};
+  d.moves = o.moves || {};
   for (const k of Object.keys(PHOTO_LIMITS)) d[k] = o[k];
   d.dateAlign = o.dateAlign === "right" ? "right" : "left";
   if (!tpl.supports.headerAlign) d.headerAlign = tpl.defaults.headerAlign;
@@ -171,13 +191,34 @@ export function photoVisible(doc) {
   return Boolean(doc.photo) && d.showPhoto && !d.simplified && renderTemplateOf(doc).supports.photo;
 }
 
-/** Switching template keeps content and layout-independent choices, and drops visual overrides. */
+/** Switching template keeps content and every style choice the new template can honour.
+ *  Dropped: moved blocks (positions belong to one layout), fill options a template has no fill for, mirror where unsupported, and custom text colours when the
+ *  template changes between a dark-on-screen and a light design (a colour picked for one is unreadable on the other). */
 export function applyTemplate(doc, templateId) {
-  const keep = normalizeDesign(doc.designSettings);
-  const dropped = Object.keys(keep).filter((k) => !["simplified", "showPhoto", "photoShape"].includes(k)).length;
-  doc.templateId = getTemplate(templateId).id;
-  doc.designSettings = {};
-  for (const k of ["simplified", "showPhoto", "photoShape"]) if (keep[k] !== undefined) doc.designSettings[k] = keep[k];
+  const before = normalizeDesign(doc.designSettings);
+  const from = renderTemplateOf(doc);
+  const to = getTemplate(templateId);
+  const next = { ...before };
+  let dropped = 0;
+  const drop = (...keys) => keys.forEach((k) => { if (next[k] !== undefined) { delete next[k]; dropped++; } });
+  drop("moves"); // positions belong to one layout
+  if (!to.supports.mirror) drop("mirror");
+  if (!to.supports.fills) drop("fillColor", "fillOpacity");
+  if (Boolean(from.printsOnWhite) !== Boolean(to.printsOnWhite)) {
+    drop("textColor", "mutedColor");
+    if (next.elements) {
+      const elements = {};
+      for (const [role, props] of Object.entries(next.elements)) {
+        const { color, ...rest } = props;
+        if (color !== undefined) dropped++;
+        if (Object.keys(rest).length) elements[role] = rest;
+      }
+      if (Object.keys(elements).length) next.elements = elements;
+      else delete next.elements;
+    }
+  }
+  doc.templateId = to.id;
+  doc.designSettings = next;
   return { dropped };
 }
 

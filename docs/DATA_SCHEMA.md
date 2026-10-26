@@ -91,4 +91,7 @@ Migration 2→3 (resumes) and 1→2 (letters) only stamp the version: an older a
 
 The renderer tags text with `data-role`, writes `--el-<role>-<prop>` variables and `data-st` tokens on the document, and `css/templates/elements.css` turns each token into one rule. Nothing user-supplied is ever written as CSS text: colours and font ids are validated first, font ids map to fixed stacks. Migration 3->4 (resumes) and 2->3 (letters) only stamp the version.
 
-Switching template clears these (like other visual overrides); the editor says so and offers Undo.
+Switching template keeps these (Phase 6.2); only custom text colours are dropped when moving between a dark-on-screen and a light template, and the editor says how many options were removed and offers Undo.
+
+## Schema v5 / letter v4 (Phase 6.2): moved blocks
+`designSettings.moves` maps a block id to `{ x, y }` offsets in millimetres (-40 to 40, half-millimetre steps; zero offsets are dropped, at most 40 entries). Block ids: `identity` (name and title), `contact`, `sec:<sectionId>` (a whole resume section), and for letters `date`, `recipient`, `subject`, `greeting`, `closing`, `signature`. Unknown ids are discarded. The renderer applies the offset as a CSS `translate`; layout and page breaks do not change. Switching template clears moves (positions belong to one layout); simplified mode ignores them. Migration 4->5 (resumes) and 3->4 (letters) only stamp the version.

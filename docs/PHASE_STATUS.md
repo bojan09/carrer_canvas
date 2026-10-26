@@ -207,3 +207,23 @@ Phase 2: versioned resume schema, IndexedDB repositories + migrations, section e
 **Verified (Chromium only):** 98 unit tests; e2e phases 1-6.1 pass (6.1: 57 checks, 10 real PDFs).
 **Not verified:** Safari, Firefox, iOS, Android (variable-font and `translate` support on older versions), screen readers on the Format panel, Ctrl+P (as opposed to the Export button) with fonts the preview has not yet loaded.
 **Limits:** italics use the browser's slanted version of each font (only upright files are bundled); non-Latin scripts use system fonts; element styles reset when you change template.
+
+## Phase 6.2: the four known limits, fixed (v0.9.0)
+**Why:** the 6.1 report listed four limits. All four are addressed, with the remaining gaps stated below.
+
+**Done**
+- **Styles survive a template switch.** Fonts, weights, sizes, spacing, alignment, accent, photo options, text colours and fills carry over. Dropped (and reported, with Undo): fills on templates that have none, flip where a template cannot flip, custom text colours when going between a dark-on-screen and a light template, and moved blocks.
+- **Real italics.** Each bundled font ships its italic file where the font has one (Inter, DM Sans, Lora, Playfair Display, Source Serif 4, JetBrains Mono).
+- **Non-Latin text.** Latin-extended, Cyrillic (Macedonian, Serbian, Russian, Bulgarian, Ukrainian), Greek and Vietnamese are bundled for the fonts that have them; DM Sans and Space Grotesk fall back to bundled Inter for scripts they lack, so text never drops to a mismatched system font. `scripts/build-fonts.mjs` regenerates `css/fonts.css`, the font files and the precache list.
+- **Move blocks.** Drag the name block, contact line, any section, or any letter part with a mouse or pen; or use the arrow buttons (1 mm, Shift 5 mm) and sliders in the new **Move blocks** group (works on touch too). Blocks keep their place in the page flow (page breaks do not change); moves are validated, undoable, saved, and print where they were put (PDF position checked to within 2 pt). The photo already had size and nudge; text size is the resize for text.
+- Schema v5 (resumes) and v4 (letters). App version 0.9.0.
+
+**Found and fixed while building it:** a block moved past the right edge made Chrome shrink the whole print by about 10 percent; `.doc` now clips horizontal overflow.
+
+**Remaining limits (honest):**
+- **Not free-form layout.** Blocks move by offset; they do not reflow, so a moved block can overlap another and a block moved below the last page can add a page. There is no drag-to-resize of blocks (text and photo have size controls).
+- **Reading order.** Chrome paints moved blocks last, so a PDF text extractor, and therefore resume-scanning software, may read a moved block after the rest. The panel warns about this; Simplified mode ignores moves. Do not move blocks if you will upload to an online application form.
+- **Touch.** Dragging is mouse/pen only so touch scrolling keeps working; on phones use the arrows and sliders.
+- **Gaps in fonts:** Space Grotesk has no italic (browser slant) and no Cyrillic/Greek; scripts beyond Latin, Cyrillic, Greek and Vietnamese (Arabic, Hebrew, Indic, CJK) still use system fonts.
+- **Size:** fonts grew from about 0.3 MB to 1.6 MB in the offline cache (fetched per script, so most users download only Latin).
+**Verified (Chromium only):** 104 unit tests; e2e phases 1-6.2 pass (618 checks in total; 6.2 adds real PDFs for italic, Cyrillic, Greek, Latin-extended and moved blocks, plus 320 and 390 px phone checks). **Not verified:** Safari, Firefox, iOS, Android (`translate`, `overflow: clip`, variable italic fonts on older versions), touch drag behaviour on real devices, screen readers on the Move panel.

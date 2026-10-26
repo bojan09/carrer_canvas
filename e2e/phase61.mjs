@@ -145,10 +145,12 @@ check("formatting survives a reload and is stored as validated data", (await pag
 // ---------- the improved Style panel ----------
 await page.locator('.studio__view input[value="design"]').check({ force: true });
 await page.waitForSelector(".design__jump");
-check("the panel has jump chips to every group", (await page.locator(".design__jump .chip-btn").allInnerTexts()).join("|") === "Template|Colours|Text and fonts|Layout|Photo");
+check("the panel has jump chips to every group", (await page.locator(".design__jump .chip-btn").allInnerTexts()).join("|") === "Template|Colours|Text and fonts|Layout|Move blocks|Photo");
 check("groups are collapsible and named", (await page.locator("details.design__group > summary h3").allInnerTexts()).includes("Text, fonts and spacing"));
 await page.locator("#dg-struct > summary").click();
 await page.locator(".design__jump .chip-btn", { hasText: "Template" }).click();
+await settle();
+await page.locator("#dg-move").getByRole("button", { name: "Move right" }).click(); // a move is the one thing a template switch must drop
 await settle();
 await page.locator('[data-focus-key="tpl:orbit"]').click();
 await settle();
@@ -156,9 +158,9 @@ check("a collapsed group stays collapsed after the panel rebuilds", (await page.
 await page.locator(".design__jump .chip-btn", { hasText: "Layout" }).click();
 await settle();
 check("a jump chip reopens its group", (await page.locator("#dg-struct").evaluate((e) => e.open)) === true);
-await page.waitForSelector(".toast:has-text('custom colours and text styles were reset')", { timeout: 4000 }).catch(() => {});
-const resetToast = await page.locator(".toast:has-text('were reset')").count();
-check("switching template tells you your custom styles were reset and offers Undo", resetToast >= 1);
+await page.waitForSelector(".toast:has-text('carried over')", { timeout: 4000 }).catch(() => {});
+const resetToast = await page.locator(".toast:has-text('carried over')").count();
+check("switching template says what carried over and what was removed, and offers Undo", resetToast >= 1);
 await page.locator(".toast .btn", { hasText: "Undo" }).first().click();
 await settle();
 check("that Undo brings the custom text styles back", (await doc("").getAttribute("data-template")) === "summit" && (await css('[data-role="body"]', "fontFamily")).includes("Lora"));

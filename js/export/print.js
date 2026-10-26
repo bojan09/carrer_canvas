@@ -75,6 +75,9 @@ export async function loadDocFonts(doc) {
 export async function printResume(doc, opts = {}) {
   await loadDocFonts(doc);
   const result = preparePrint(doc, opts);
+  // Laying out the print tree starts the font subsets (Cyrillic, italics...) the text needs. Wait for them too.
+  void document.getElementById("print-root")?.offsetHeight;
+  await document.fonts?.ready?.catch?.(() => {});
   const imgs = [...document.querySelectorAll("#print-root img")];
   await Promise.all(imgs.map((img) => img.decode?.().catch(() => {})));
   window.print();

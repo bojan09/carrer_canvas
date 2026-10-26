@@ -2,7 +2,7 @@
 
 Free, private, offline-capable resume and cover-letter builder. Vanilla HTML, CSS and JavaScript (ES modules). No framework, no build step, no backend, no accounts, no trackers.
 
-**Status:** Phase 6.1 (Style tab, click-to-style, per-element fonts, colours and sizes) and Phase 6 of 7 (interaction polish) on top of Phase 5.1 colour/transparency/layout options and Phase 5 cover letters, plus the Phase 3b template refresh (PWA shell, resume editor with local autosave, fifteen templates with paper preview and design controls, matching cover letters, print-to-PDF, JSON backup and restore, crash recovery). The final quality pass (real devices, accessibility, deployment notes) is next, see docs/ROADMAP.md. See [docs/PHASE_STATUS.md](docs/PHASE_STATUS.md).
+**Status:** Phase 6.2 (styles survive template switches, real italics, Cyrillic/Greek fonts, movable blocks), Phase 6.1 (Style tab, click-to-style, per-element fonts, colours and sizes) and Phase 6 of 7 (interaction polish) on top of Phase 5.1 colour/transparency/layout options and Phase 5 cover letters, plus the Phase 3b template refresh (PWA shell, resume editor with local autosave, fifteen templates with paper preview and design controls, matching cover letters, print-to-PDF, JSON backup and restore, crash recovery). The final quality pass (real devices, accessibility, deployment notes) is next, see docs/ROADMAP.md. See [docs/PHASE_STATUS.md](docs/PHASE_STATUS.md).
 
 ## Run locally
 

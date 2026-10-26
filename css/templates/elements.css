@@ -280,3 +280,25 @@
   outline-offset: 2px;
   border-radius: 2px;
 }
+
+/* Moved blocks (Style > Move blocks). translate leaves layout and page breaks untouched. */
+[data-moved] {
+  translate: var(--mv-x, 0) var(--mv-y, 0);
+}
+/* A block pushed past the right edge must not widen the page: Chrome would shrink the whole print to fit. */
+.doc {
+  overflow-x: clip;
+}
+.stage--drag [data-move] {
+  cursor: grab;
+}
+.stage--drag [data-move][data-dragging] {
+  cursor: grabbing;
+}
+.stage [data-move][data-move-selected] {
+  outline: 2px dashed rgba(34, 211, 238, 0.95);
+  outline-offset: 3px;
+}
+.stage--drag [data-move][data-dragging] {
+  user-select: none;
+}

@@ -20,6 +20,7 @@ const cache = new Map();
 export function templateDefaults(doc, sampleDoc) {
   const design = { ...doc.designSettings };
   delete design.elements;
+  delete design.moves;
   const key = `${doc.kind || "resume"}|${doc.templateId}|${JSON.stringify(design)}`;
   if (cache.has(key)) return cache.get(key);
   const probe = { ...sampleDoc, templateId: doc.templateId, pageSize: doc.pageSize, designSettings: { ...design, showPhoto: false } };

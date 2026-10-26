@@ -96,13 +96,13 @@ test("photo is shown only when stored, explicitly enabled and supported by the r
   assert.equal(photoVisible(doc), true, "Grid shows an explicitly enabled photo");
 });
 
-test("applyTemplate keeps content and layout-independent choices, drops visual overrides", () => {
+test("applyTemplate keeps content and every style choice the new template can honour", () => {
   const doc = createSample();
   doc.designSettings = { accent: "#ff0000", fontPair: "classic", simplified: true, showPhoto: true, photoShape: "square" };
   const before = JSON.stringify([doc.contact, doc.sections, doc.sectionOrder]);
   applyTemplate(doc, "nexus");
   assert.equal(doc.templateId, "nexus");
-  assert.deepEqual(doc.designSettings, { simplified: true, showPhoto: true, photoShape: "square" });
+  assert.deepEqual(doc.designSettings, { accent: "#ff0000", fontPair: "classic", simplified: true, showPhoto: true, photoShape: "square" });
   assert.equal(JSON.stringify([doc.contact, doc.sections, doc.sectionOrder]), before);
   applyTemplate(doc, "nope");
   assert.equal(doc.templateId, "summit", "unknown ids fall back");
@@ -126,7 +126,7 @@ test("photo normalisation accepts only our own JPEG data URLs within the size ca
 });
 
 test("schema v2: v1 records migrate, content and photo survive, templateId and design are repaired", () => {
-  assert.equal(SCHEMA_VERSION, 4);
+  assert.equal(SCHEMA_VERSION, 5);
   const v1 = createSample();
   v1.schemaVersion = 1;
   v1.templateId = "does-not-exist";
