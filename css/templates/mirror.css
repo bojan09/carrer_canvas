@@ -1,0 +1,123 @@
+/* "Flip layout": moves the photo (header templates) or the whole sidebar (two-column templates) to the
+   opposite side. Done with `direction: rtl` on the grid container so DOM order and reading order do not
+   change; every child resets to ltr so text still reads left to right. Loads after all template styles. */
+
+/* ---- header templates: the photo swaps sides ---- */
+.doc[data-mirror="true"]:is([data-template="summit"], [data-template="grid"], [data-template="slate"], [data-template="mono"], [data-template="bento"], [data-template="glass"], [data-template="orbit"], [data-template="horizon"]) .doc__header:has(.doc__photo) {
+  direction: rtl;
+}
+
+.doc[data-mirror="true"]:is([data-template="summit"], [data-template="grid"], [data-template="slate"], [data-template="mono"], [data-template="bento"], [data-template="glass"], [data-template="orbit"], [data-template="horizon"]) .doc__header:has(.doc__photo) > * {
+  direction: ltr;
+}
+
+/* flex headers */
+.doc[data-mirror="true"]:is([data-template="nexus"], [data-template="vertex"]) .doc__photo {
+  order: -1;
+  margin-left: 0;
+}
+
+/* ---- two-column templates: the sidebar swaps sides ---- */
+.doc[data-mirror="true"]:is([data-template="aurora"], [data-template="prism"], [data-template="swiss"])[data-layout="sidebar-left"],
+.doc[data-mirror="true"][data-template="velo"][data-layout="sidebar-right"] {
+  direction: rtl;
+}
+
+.doc[data-mirror="true"][data-layout^="sidebar"] :is(.doc__photo, .doc__id, .doc__contact, .doc__main, .doc__side) {
+  direction: ltr;
+}
+
+/* sidebar decorations */
+.doc[data-mirror="true"][data-template="aurora"][data-layout="sidebar-left"]::before {
+  inset: 0 0 0 auto;
+  border-right: 0;
+  border-left: 1px solid rgba(143, 164, 255, calc(0.22 * var(--fill-o, 1)));
+}
+
+.doc[data-mirror="true"][data-template="prism"][data-layout="sidebar-left"]::before {
+  inset: 0 0 0 auto;
+}
+
+.doc[data-mirror="true"][data-template="swiss"][data-layout="sidebar-left"]::before {
+  inset: 0 30% 0 auto;
+}
+
+/* aurora */
+.doc[data-mirror="true"][data-template="aurora"][data-layout="sidebar-left"] .doc__photo {
+  margin: var(--margin) var(--margin) 0 0;
+}
+
+.doc[data-mirror="true"][data-template="aurora"][data-layout="sidebar-left"] .doc__id {
+  padding: var(--margin) calc(var(--margin) * 0.8) 0 var(--margin);
+}
+
+.doc[data-mirror="true"][data-template="aurora"][data-layout="sidebar-left"] .doc__contact,
+.doc[data-mirror="true"][data-template="aurora"][data-layout="sidebar-left"] .doc__side {
+  padding-left: calc(var(--margin) * 0.6);
+  padding-right: var(--margin);
+}
+
+.doc[data-mirror="true"][data-template="aurora"][data-layout="sidebar-left"] .doc__main {
+  padding: var(--gap) calc(var(--margin) * 0.8) var(--margin) var(--margin);
+}
+
+/* prism */
+.doc[data-mirror="true"][data-template="prism"][data-layout="sidebar-left"] .doc__id {
+  padding: calc(var(--margin) * 1.1) calc(var(--margin) * 0.9) 0 var(--margin);
+}
+
+.doc[data-mirror="true"][data-template="prism"][data-layout="sidebar-left"] .doc__contact,
+.doc[data-mirror="true"][data-template="prism"][data-layout="sidebar-left"] .doc__side {
+  padding-left: calc(var(--margin) * 0.7);
+  padding-right: var(--margin);
+}
+
+.doc[data-mirror="true"][data-template="prism"][data-layout="sidebar-left"] .doc__main {
+  padding: var(--gap) var(--margin) var(--margin) calc(var(--margin) * 0.9);
+}
+
+/* swiss */
+.doc[data-mirror="true"][data-template="swiss"][data-layout="sidebar-left"] .doc__photo {
+  margin: var(--margin) var(--margin) 0 1.2em;
+}
+
+.doc[data-mirror="true"][data-template="swiss"][data-layout="sidebar-left"] .doc__id {
+  padding: var(--margin) 1.6em 0 var(--margin);
+}
+
+.doc[data-mirror="true"][data-template="swiss"][data-layout="sidebar-left"] .doc__contact,
+.doc[data-mirror="true"][data-template="swiss"][data-layout="sidebar-left"] .doc__side {
+  padding-left: 1.2em;
+  padding-right: var(--margin);
+}
+
+.doc[data-mirror="true"][data-template="swiss"][data-layout="sidebar-left"] .doc__main {
+  padding: var(--gap) 1.6em var(--margin) var(--margin);
+}
+
+/* velo (sidebar is on the right by default, so flipping puts it on the left) */
+.doc[data-mirror="true"][data-template="velo"][data-layout="sidebar-right"] .doc__id {
+  margin: var(--margin) var(--margin) 0 0;
+}
+
+.doc[data-mirror="true"][data-template="velo"][data-layout="sidebar-right"] .doc__photo {
+  justify-self: start;
+  margin: var(--margin) 0 0 var(--margin);
+}
+
+.doc[data-mirror="true"][data-template="velo"][data-layout="sidebar-right"] .doc__main {
+  padding: var(--gap) var(--margin) var(--margin) calc(var(--margin) * 0.7);
+}
+
+.doc[data-mirror="true"][data-template="velo"][data-layout="sidebar-right"] .doc__contact,
+.doc[data-mirror="true"][data-template="velo"][data-layout="sidebar-right"] .doc__side {
+  padding-left: var(--margin);
+  padding-right: calc(var(--margin) * 0.7);
+}
+
+@media print {
+  /* sidebar templates print as one column, so a flipped direction would only confuse the flow */
+  .doc[data-mirror="true"][data-layout^="sidebar"] {
+    direction: ltr !important;
+  }
+}

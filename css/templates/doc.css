@@ -184,9 +184,9 @@
 
 .doc__chips li {
   padding: 0.12em 0.7em;
-  border: 1px solid color-mix(in srgb, var(--accent) 50%, transparent);
+  border: 1px solid color-mix(in srgb, var(--deco-c, var(--accent)) calc(50% * var(--fill-o, 1)), transparent);
   border-radius: 99px;
-  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  background: color-mix(in srgb, var(--deco-c, var(--accent)) calc(12% * var(--fill-o, 1)), transparent);
   font-size: 0.9em;
   line-height: 1.5;
 }
@@ -199,6 +199,7 @@
   width: 6.8em;
   height: 6.8em;
   object-fit: cover;
+  opacity: var(--photo-o, 1);
 }
 
 .doc[data-photo="circle"] .doc__photo {

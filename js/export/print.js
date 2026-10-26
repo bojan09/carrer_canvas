@@ -39,7 +39,7 @@ let preparedAt = 0;
 export function preparePrint(doc, { simplified = false } = {}) {
   const root = document.getElementById("print-root");
   const source = simplified ? { ...doc, designSettings: { ...doc.designSettings, simplified: true } } : doc;
-  root.replaceChildren(renderDocument(source));
+  root.replaceChildren(renderDocument(source, { forPrint: true }));
   document.body.dataset.print = "resume";
   preparedAt = Date.now();
   if (savedTitle === null) savedTitle = document.title;

@@ -48,7 +48,7 @@ await page.goto(`${base}/#/cover-letter`);
 await page.getByRole("heading", { name: "Start your cover letter" }).waitFor();
 check("start page offers blank, from-resume and sample letters", (await page.locator(".trust-card").count()) >= 3 && (await page.getByRole("button", { name: "Choose a resume" }).count()) === 1);
 await page.getByRole("button", { name: "Start blank" }).click();
-await page.waitForURL(/#\/cover-letter\/[^/]+$/);
+await page.waitForFunction(() => /#\/cover-letter\/[^/]+$/.test(location.hash));
 await page.waitForSelector(".studio");
 const letterId = page.url().split("/").pop();
 check("blank letter opens in the studio", (await page.locator(".studio[data-doc='letter']").count()) === 1);
@@ -204,10 +204,10 @@ check("copying can be undone", (await previewText()).includes("Casey Writer"));
 
 // ---------- guards between routes ----------
 await page.goto(`${base}/#/resume/${letterId}`);
-await page.waitForURL(new RegExp(`#/cover-letter/${letterId}$`));
+await page.waitForFunction((id) => location.hash === `#/cover-letter/${id}`, letterId);
 check("opening a letter through the resume route redirects to the letter editor", true);
 await page.goto(`${base}/#/cover-letter/${resumeId}`);
-await page.waitForURL(new RegExp(`#/resume/${resumeId}$`));
+await page.waitForFunction((id) => location.hash === `#/resume/${id}`, resumeId);
 check("opening a resume through the letter route redirects to the resume editor", true);
 await page.goto(`${base}/#/cover-letter/does-not-exist`);
 await page.waitForSelector(".empty__title");
@@ -236,7 +236,7 @@ await page.locator("dialog[open]").getByRole("button", { name: "Delete" }).click
 await page.waitForTimeout(500);
 check("delete requires confirmation and removes only that letter", (await page.locator(".doc-card", { hasText: "Letter for Acme (copy)" }).count()) === 0 && (await page.locator(".doc-card", { hasText: "Letter for Acme" }).count()) === 1);
 await page.getByRole("button", { name: "New cover letter" }).first().click();
-await page.waitForURL(/#\/cover-letter\//);
+await page.waitForFunction(() => location.hash.startsWith("#/cover-letter/"));
 check("Saved page can start a new letter", true);
 
 // ---------- newer-version letter is never opened or overwritten ----------

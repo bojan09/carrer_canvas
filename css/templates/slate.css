@@ -28,7 +28,7 @@
 }
 
 .doc[data-template="slate"] .doc__entry-title {
-  color: #fff;
+  color: var(--ink-strong, #fff);
 }
 
 @media print {

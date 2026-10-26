@@ -5,8 +5,8 @@
   grid-template-columns: minmax(0, 1fr);
   margin: calc(var(--margin) * -1) calc(var(--margin) * -1) 0;
   padding: calc(var(--margin) * 1.1) var(--margin) 1.4em;
-  background: linear-gradient(120deg, color-mix(in srgb, var(--accent) 88%, #000), var(--accent) 55%, color-mix(in srgb, var(--accent) 55%, #ff8a3d));
-  color: #fff;
+  background: linear-gradient(120deg, color-mix(in srgb, color-mix(in srgb, var(--deco-c, var(--accent)) 88%, #000) calc(var(--fill-o, 1) * 100%), transparent), color-mix(in srgb, var(--deco-c, var(--accent)) calc(var(--fill-o, 1) * 100%), transparent) 55%, color-mix(in srgb, color-mix(in srgb, var(--deco-c, var(--accent)) 55%, #ff8a3d) calc(var(--fill-o, 1) * 100%), transparent));
+  color: var(--hdr-ink, #fff);
 }
 
 .doc[data-template="horizon"] .doc__header:has(.doc__photo) {
@@ -40,12 +40,12 @@
 }
 
 .doc[data-template="horizon"] .doc__role {
-  color: rgba(255, 255, 255, 0.92);
+  color: color-mix(in srgb, var(--hdr-ink, #fff) 92%, transparent);
   font-weight: 600;
 }
 
 .doc[data-template="horizon"] .doc__contact {
-  color: rgba(255, 255, 255, 0.92);
+  color: color-mix(in srgb, var(--hdr-ink, #fff) 92%, transparent);
 }
 
 .doc[data-template="horizon"] .doc__heading {

@@ -71,3 +71,17 @@ Limits (see `LETTER_FIELD_MAX`): opening 1500, paragraph 3000, address 300, othe
 **Copy from a resume** (`copyDetailsFromResume`) copies name, title, contact fields, links, signature name and the template look once. It never links to the resume, never changes it, and copies the photo only when the user ticks the box.
 
 **Backup:** letters travel in the same `documents` array. The envelope `schemaVersion` still describes resumes; each letter carries its own. An older app version would list letters as invalid items and skip them.
+
+## Schema v3 / letter v2 (Phase 5.1): colour, transparency and layout overrides
+`designSettings` gained optional overrides (all validated in `normalizeDesign`, anything else is dropped):
+
+| Key | Values | Meaning |
+|---|---|---|
+| `textColor`, `mutedColor` | `#rrggbb` | body text and secondary text (dates, locations) |
+| `fillColor` | `#rrggbb` | colour of decorative fills (header card or banner, sidebar, cards, tints, motifs) |
+| `fillOpacity` | 0 to 1 (0.05 steps) | strength of those fills; 1 = the template's own look |
+| `photoOpacity` | 0.2 to 1 | photo transparency (never fully invisible by accident) |
+| `mirror` | `true` | flip the photo side (header templates) or the sidebar side (two-column templates) |
+| `dateAlign` | `"right"` | letters only: date on the right |
+
+Migration 2→3 (resumes) and 1→2 (letters) only stamp the version: an older app version refuses these records instead of silently dropping the settings. Switching template, or "Reset to template defaults", clears all of them (simplified, photo on/off and photo shape are kept).

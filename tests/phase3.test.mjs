@@ -126,22 +126,22 @@ test("photo normalisation accepts only our own JPEG data URLs within the size ca
 });
 
 test("schema v2: v1 records migrate, content and photo survive, templateId and design are repaired", () => {
-  assert.equal(SCHEMA_VERSION, 2);
+  assert.equal(SCHEMA_VERSION, 3);
   const v1 = createSample();
   v1.schemaVersion = 1;
   v1.templateId = "does-not-exist";
   v1.designSettings = { accent: "#123456", junk: 1 };
   v1.photo = { data: "data:image/jpeg;base64,/9j/4AAQ", width: 320, height: 320 };
   const out = migrateRecord(v1);
-  assert.equal(out.schemaVersion, 2);
+  assert.equal(out.schemaVersion, 3);
   assert.equal(out.templateId, "summit");
   assert.deepEqual(out.designSettings, { accent: "#123456" });
   assert.ok(out.photo);
   assert.deepEqual(out.sections.experience, v1.sections.experience);
 });
 
-test("v3-style future records are still refused", () => {
-  assert.throws(() => migrateRecord({ ...createBlank(), schemaVersion: 3 }), (e) => e instanceof ResumeDataError && e.code === "newer-version");
+test("future-version records are still refused", () => {
+  assert.throws(() => migrateRecord({ ...createBlank(), schemaVersion: SCHEMA_VERSION + 1 }), (e) => e instanceof ResumeDataError && e.code === "newer-version");
 });
 
 test("normalize round-trips a styled document unchanged", () => {

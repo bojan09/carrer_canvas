@@ -58,14 +58,14 @@
   flex-direction: column;
   margin: var(--gap) 0 0;
   padding: var(--gap) var(--margin) 0 calc(var(--margin) * 0.7);
-  background: color-mix(in srgb, var(--accent) 8%, #fff);
+  background: color-mix(in srgb, color-mix(in srgb, var(--deco-c, var(--accent)) 8%, #fff) calc(var(--fill-o, 1) * 100%), transparent);
   border-left: 3px solid var(--accent);
 }
 
 .doc[data-template="velo"][data-layout="sidebar-right"] .doc__side {
   grid-area: side;
   padding: var(--gap) var(--margin) var(--margin) calc(var(--margin) * 0.7);
-  background: color-mix(in srgb, var(--accent) 8%, #fff);
+  background: color-mix(in srgb, color-mix(in srgb, var(--deco-c, var(--accent)) 8%, #fff) calc(var(--fill-o, 1) * 100%), transparent);
   border-left: 3px solid var(--accent);
 }
 
@@ -78,8 +78,8 @@
 
 .doc[data-template="velo"] .doc__chips li {
   border-radius: 0.35em;
-  border-color: color-mix(in srgb, var(--accent) 45%, transparent);
-  background: #fff;
+  border-color: color-mix(in srgb, var(--deco-c, var(--accent)) calc(45% * var(--fill-o, 1)), transparent);
+  background: color-mix(in srgb, #fff calc(var(--fill-o, 1) * 100%), transparent);
   font-family: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
   font-size: 0.8em;
 }
@@ -108,13 +108,13 @@
 .doc[data-template="velo"] .doc__photo {
   width: 7em;
   height: 7em;
-  box-shadow: 0.35em 0.35em 0 color-mix(in srgb, var(--accent) 35%, transparent);
+  box-shadow: 0.35em 0.35em 0 color-mix(in srgb, var(--deco-c, var(--accent)) calc(35% * var(--fill-o, 1)), transparent);
 }
 
 .doc[data-template="velo"][data-layout="sidebar-right"] .doc__contact,
 .doc[data-template="velo"][data-layout="sidebar-right"] .doc__side {
   border-left: 0;
-  background: color-mix(in srgb, var(--accent) 7%, #f5f7fc);
+  background: color-mix(in srgb, color-mix(in srgb, var(--deco-c, var(--accent)) 7%, #f5f7fc) calc(var(--fill-o, 1) * 100%), transparent);
 }
 
 .doc[data-template="velo"][data-layout="sidebar-right"] .doc__contact {

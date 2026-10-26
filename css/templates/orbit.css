@@ -1,14 +1,14 @@
 /* Orbit: light and airy. Soft header card, centred portrait, rounded section labels and a timeline
    for experience, education and projects. All decoration is CSS only (no content is generated). */
 .doc[data-template="orbit"] {
-  --tint: color-mix(in srgb, var(--accent) 12%, #ffffff);
-  --line: color-mix(in srgb, var(--accent) 32%, #ffffff);
+  --tint: color-mix(in srgb, color-mix(in srgb, var(--deco-c, var(--accent)) 12%, #ffffff) calc(var(--fill-o, 1) * 100%), transparent);
+  --line: color-mix(in srgb, color-mix(in srgb, var(--deco-c, var(--accent)) 32%, #ffffff) calc(var(--fill-o, 1) * 100%), transparent);
 }
 
 .doc[data-template="orbit"] .doc__header {
   padding: 1.3em 1.5em;
   border-radius: 1.2em;
-  background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 16%, #fff), color-mix(in srgb, var(--accent) 4%, #fff));
+  background: linear-gradient(135deg, color-mix(in srgb, color-mix(in srgb, var(--deco-c, var(--accent)) 16%, #fff) calc(var(--fill-o, 1) * 100%), transparent), color-mix(in srgb, color-mix(in srgb, var(--deco-c, var(--accent)) 4%, #fff) calc(var(--fill-o, 1) * 100%), transparent));
 }
 
 .doc[data-template="orbit"] .doc__header:has(.doc__photo) {

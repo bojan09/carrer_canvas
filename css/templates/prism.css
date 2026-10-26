@@ -1,9 +1,9 @@
 /* Prism: solid colour sidebar (portrait, contact, skills) beside a crisp main column.
    Two columns on screen; prints as one column on white (see css/print.css) to save ink. */
 .doc[data-template="prism"] {
-  --side-bg: color-mix(in srgb, var(--accent) 68%, #0b1020);
-  --side-ink: #ffffff;
-  --side-ink-2: rgba(255, 255, 255, 0.82);
+  --side-bg: color-mix(in srgb, var(--deco-c, var(--accent)) 68%, #0b1020);
+  --side-ink: var(--hdr-ink, #ffffff);
+  --side-ink-2: color-mix(in srgb, var(--hdr-ink, #ffffff) 82%, transparent);
 }
 
 .doc[data-template="prism"] .doc__name {
@@ -55,7 +55,7 @@
   position: absolute;
   inset: 0 auto 0 0;
   width: 33%;
-  background: linear-gradient(180deg, var(--side-bg), color-mix(in srgb, var(--side-bg) 82%, #000));
+  background: linear-gradient(180deg, color-mix(in srgb, var(--side-bg) calc(var(--fill-o, 1) * 100%), transparent), color-mix(in srgb, color-mix(in srgb, var(--side-bg) 82%, #000) calc(var(--fill-o, 1) * 100%), transparent));
   pointer-events: none;
 }
 
@@ -107,7 +107,7 @@
 }
 
 .doc[data-template="prism"] .doc__side .doc__heading::after {
-  background: rgba(255, 255, 255, 0.3);
+  background: color-mix(in srgb, var(--side-ink) 30%, transparent);
 }
 
 .doc[data-template="prism"] .doc__side .doc__entry-sub,
@@ -116,8 +116,8 @@
 }
 
 .doc[data-template="prism"] .doc__side .doc__chips li {
-  border-color: rgba(255, 255, 255, 0.4);
-  background: rgba(255, 255, 255, 0.14);
+  border-color: color-mix(in srgb, var(--side-ink) 40%, transparent);
+  background: color-mix(in srgb, var(--side-ink) 14%, transparent);
   color: var(--side-ink);
 }
 

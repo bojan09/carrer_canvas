@@ -21,6 +21,12 @@ export const LIMITS = {
   margins: { min: 10, max: 30, step: 1, label: "Page margins" },
 };
 
+/** Transparency controls (0 = fully transparent, 1 = the template's own look). */
+export const OPACITY_LIMITS = {
+  fillOpacity: { min: 0, max: 1, step: 0.05, label: "Background decoration" },
+  photoOpacity: { min: 0.2, max: 1, step: 0.05, label: "Photo" },
+};
+
 export const ACCENT_SWATCHES = ["#1f2a44", "#1f64e0", "#3f55e6", "#6d3fd6", "#c0397b", "#d63b25", "#c9791a", "#2a8a64", "#55733f", "#111111"];
 
 export const PAPER = { A4: { w: 794, h: 1123, label: "A4 (210 × 297 mm)" }, Letter: { w: 816, h: 1056, label: "US Letter (8.5 × 11 in)" } };
@@ -40,6 +46,13 @@ export function normalizeDesign(raw) {
     const n = Number(src[key]);
     if (src[key] !== undefined && Number.isFinite(n)) out[key] = clamp(n, LIMITS[key].min, LIMITS[key].max);
   }
+  for (const key of ["textColor", "mutedColor", "fillColor"]) if (typeof src[key] === "string" && HEX.test(src[key])) out[key] = src[key].toLowerCase();
+  for (const key of Object.keys(OPACITY_LIMITS)) {
+    const n = Number(src[key]);
+    if (src[key] !== undefined && src[key] !== null && Number.isFinite(n)) out[key] = Math.round(clamp(n, OPACITY_LIMITS[key].min, OPACITY_LIMITS[key].max) * 100) / 100;
+  }
+  if (src.mirror === true) out.mirror = true;
+  if (src.dateAlign === "right") out.dateAlign = "right";
   if (DIVIDERS.includes(src.dividerStyle)) out.dividerStyle = src.dividerStyle;
   if (ALIGNS.includes(src.headerAlign)) out.headerAlign = src.headerAlign;
   if (src.simplified === true) out.simplified = true;
@@ -56,6 +69,10 @@ export function resolveDesign(doc) {
   d.simplified = Boolean(o.simplified) && !tpl.atsConscious;
   d.showPhoto = Boolean(o.showPhoto);
   d.photoShape = o.photoShape || "circle";
+  d.fillOpacity = o.fillOpacity ?? 1;
+  d.photoOpacity = o.photoOpacity ?? 1;
+  d.mirror = o.mirror === true;
+  d.dateAlign = o.dateAlign === "right" ? "right" : "left";
   if (!tpl.supports.headerAlign) d.headerAlign = tpl.defaults.headerAlign;
   return d;
 }
@@ -92,4 +109,26 @@ function luminance(hex) {
 export function contrastRatio(a, b) {
   const [l1, l2] = [luminance(a), luminance(b)].sort((x, y) => y - x);
   return (l1 + 0.05) / (l2 + 0.05);
+}
+
+// ---------- text colour that stays readable on a header fill ----------
+const toRgb = (hex) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
+const toHex = (rgb) => `#${rgb.map((c) => Math.round(Math.min(255, Math.max(0, c))).toString(16).padStart(2, "0")).join("")}`;
+
+/** `fraction` of `a` plus the rest of `b`. */
+export function mixHex(a, b, fraction) {
+  const [x, y] = [toRgb(a), toRgb(b)];
+  return toHex(x.map((c, i) => c * fraction + y[i] * (1 - fraction)));
+}
+
+/** The solid colour a template's header/panel fill effectively has, so text on it can be checked. */
+export function effectiveFill(tpl, design) {
+  const base = design.fillColor || tpl.fillDefault || design.accent;
+  return tpl.id === "prism" ? mixHex(base, "#0b1020", 0.68) : base;
+}
+
+/** White or near-black, whichever reads better on `fill` shown at `opacity` over `paper`. */
+export function readableInk(fill, opacity, paper) {
+  const shown = mixHex(fill, paper, opacity);
+  return contrastRatio("#ffffff", shown) >= contrastRatio("#111111", shown) ? "#ffffff" : "#111111";
 }

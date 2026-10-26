@@ -79,3 +79,7 @@
     widows: 3;
   }
 }
+
+.doc[data-kind="letter"][data-date-align="right"] .doc__date {
+  text-align: right;
+}

@@ -3,7 +3,7 @@ import { safeUrl } from "../utils/sanitization.js";
 import { isEmpty, titleOf } from "../editors/hints.js";
 import { getTemplate } from "../templates/registry.js";
 import { formatLetterDate, isLetter } from "../models/cover-letter.js";
-import { BASE_FONT_PX, FONT_PAIRS, MM, PAPER, photoVisible, renderTemplateOf, resolveDesign } from "../templates/design.js";
+import { BASE_FONT_PX, FONT_PAIRS, MM, PAPER, effectiveFill, photoVisible, readableInk, renderTemplateOf, resolveDesign } from "../templates/design.js";
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
@@ -128,6 +128,8 @@ function frame(doc, opts, kind, makeBody) {
     "data-align": design.headerAlign,
     "data-photo": showPhoto ? design.photoShape : "none",
     "data-simplified": design.simplified ? "true" : "false",
+    "data-mirror": design.mirror && tpl.supports.mirror ? "true" : "false",
+    "data-date-align": design.dateAlign,
   });
   const font = FONT_PAIRS[design.fontPair];
   const vars = {
@@ -142,6 +144,20 @@ function frame(doc, opts, kind, makeBody) {
     "--font-head": font.head,
     "--font-body": font.body,
   };
+  // User colour and transparency overrides. A template that prints on white (dark on screen) keeps its own
+  // text colours on paper, because light text chosen for a dark screen would vanish on white.
+  const keepTextColours = opts.forPrint && tpl.printsOnWhite;
+  if (design.textColor && !keepTextColours) {
+    vars["--ink"] = design.textColor;
+    vars["--ink-strong"] = design.textColor;
+  }
+  if (design.mutedColor && !keepTextColours) vars["--ink-2"] = design.mutedColor;
+  if (tpl.supports.fills) {
+    if (design.fillColor) vars["--deco-c"] = design.fillColor;
+    if (design.fillOpacity !== 1) vars["--fill-o"] = String(design.fillOpacity);
+    if (tpl.headerInk && (design.fillColor || design.fillOpacity !== 1)) vars["--hdr-ink"] = readableInk(effectiveFill(tpl, design), design.fillOpacity, tpl.printsOnWhite && opts.forPrint ? "#ffffff" : tpl.paperBg);
+  }
+  if (design.photoOpacity !== 1) vars["--photo-o"] = String(design.photoOpacity);
   for (const [k, v] of Object.entries(vars)) root.style.setProperty(k, v);
   root.append(header, body);
   return root;

@@ -6,9 +6,9 @@
   gap: 0.5em 1.4em;
   margin: calc(var(--margin) * -1) calc(var(--margin) * -1) 0;
   padding: var(--margin);
-  background: #15151d;
+  background: color-mix(in srgb, var(--deco-c, #15151d) calc(var(--fill-o, 1) * 100%), transparent);
   border-bottom: 8px solid var(--accent);
-  color: #fff;
+  color: var(--hdr-ink, #fff);
 }
 
 .doc[data-template="vertex"] .doc__photo {
@@ -29,7 +29,7 @@
 }
 
 .doc[data-template="vertex"] .doc__role {
-  color: color-mix(in srgb, var(--accent) 55%, #fff);
+  color: var(--hdr-ink, color-mix(in srgb, var(--accent) 55%, #fff));
   font-weight: 700;
 }
 
@@ -37,7 +37,7 @@
   flex: 1 1 100%;
   order: 4;
   margin-top: 0.2em;
-  color: #cfd3e4;
+  color: color-mix(in srgb, var(--hdr-ink, #cfd3e4) 88%, transparent);
 }
 
 .doc[data-template="vertex"] .doc__section {

@@ -7,7 +7,7 @@
 .doc[data-template="nexus"] .doc__section {
   padding: 1em 1.2em;
   border-radius: 0.8em;
-  background: #fff;
+  background: color-mix(in srgb, #fff calc(var(--fill-o, 1) * 100%), transparent);
   box-shadow: 0 0 0 1px rgba(20, 26, 46, 0.08);
 }
 
@@ -75,15 +75,15 @@
 /* Phase 3b modernisation */
 .doc[data-template="nexus"] .doc__header {
   border-top: 0;
-  background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 55%, #8b5cf6));
-  color: #fff;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--deco-c, var(--accent)) calc(var(--fill-o, 1) * 100%), transparent), color-mix(in srgb, color-mix(in srgb, var(--deco-c, var(--accent)) 55%, #8b5cf6) calc(var(--fill-o, 1) * 100%), transparent));
+  color: var(--hdr-ink, #fff);
   padding: 1.3em 1.5em;
-  box-shadow: 0 10px 24px color-mix(in srgb, var(--accent) 28%, transparent);
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--deco-c, var(--accent)) calc(28% * var(--fill-o, 1)), transparent);
 }
 
 .doc[data-template="nexus"] .doc__header .doc__role,
 .doc[data-template="nexus"] .doc__header .doc__contact {
-  color: rgba(255, 255, 255, 0.9);
+  color: color-mix(in srgb, var(--hdr-ink, #fff) 90%, transparent);
 }
 
 .doc[data-template="nexus"] .doc__photo {
@@ -94,11 +94,11 @@
 
 .doc[data-template="nexus"] .doc__section {
   border-top: 0;
-  border-left: 4px solid var(--accent);
+  border-left: 4px solid color-mix(in srgb, var(--deco-c, var(--accent)) calc(var(--fill-o, 1) * 100%), transparent);
 }
 
 .doc[data-template="nexus"] .doc__chips li {
-  background: color-mix(in srgb, var(--accent) 10%, #fff);
+  background: color-mix(in srgb, color-mix(in srgb, var(--deco-c, var(--accent)) 10%, #fff) calc(var(--fill-o, 1) * 100%), transparent);
 }
 
 @media print {

@@ -24,3 +24,9 @@
 
 ## Verification
 `e2e/phase4.mjs` generates real PDFs for all eight templates with Chromium (`page.pdf`, backgrounds off) and checks with poppler: page count and A4/Letter size, selectable text for every section, no UI text in the PDF, minimum margins on **every** page (word bounding boxes), no stranded headings, dark templates printing on white, sidebar content present after the main content, photo present/absent rules, and US Letter with custom margins.
+
+## Custom colours in print (Phase 5.1)
+- Text and secondary colours chosen by the user print as chosen on light templates.
+- **Dark-on-screen templates (Aurora, Slate, Glass) print on white with their own dark text.** A light text colour picked for the dark screen would vanish on paper, so on those templates the custom text colours apply on screen only. The design panel says so.
+- Header fills are replaced by an outlined white header in print (Horizon, Nexus, Vertex) and sidebars print as one column on white (Prism, Aurora, Swiss, Velo), so fill colour and opacity are screen-only there. Fills on light templates (Orbit, Bento, Bloom motif) print as shown.
+- A flipped header prints flipped; a flipped sidebar template prints as one ordinary column.

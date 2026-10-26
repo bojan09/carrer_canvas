@@ -5,7 +5,7 @@ import { DEFAULT_TEMPLATE_ID, TEMPLATE_IDS } from "../templates/registry.js";
 import { normalizeDesign } from "../templates/design.js";
 import { SAMPLE_PHOTO } from "./sample-photo.js";
 
-export const SCHEMA_VERSION = 2;
+export const SCHEMA_VERSION = 3;
 export const PHOTO_MAX_CHARS = 150_000; // data-URL length cap (~110 KB of image data)
 export const LIMITS = { entries: 50, bullets: 30, tags: 60, links: 10, customSections: 20 };
 export const PAGE_SIZES = ["A4", "Letter"];

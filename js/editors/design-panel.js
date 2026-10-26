@@ -1,7 +1,7 @@
 import { h } from "../utils/dom.js";
 import { createSample } from "../models/resume.js";
-import { TEMPLATES, getTemplate } from "../templates/registry.js";
-import { ACCENT_SWATCHES, DIVIDERS, FONT_PAIRS, LIMITS, PAPER, applyTemplate, contrastRatio, renderTemplateOf, resolveDesign } from "../templates/design.js";
+import { DEFAULT_INK, DEFAULT_INK2, TEMPLATES, getTemplate } from "../templates/registry.js";
+import { ACCENT_SWATCHES, DIVIDERS, FONT_PAIRS, LIMITS, OPACITY_LIMITS, PAPER, applyTemplate, contrastRatio, renderTemplateOf, resolveDesign } from "../templates/design.js";
 import { mountThumb } from "../preview/thumb.js";
 import { announce } from "../components/announcer.js";
 import { photoControls } from "./photo-controls.js";
@@ -30,6 +30,8 @@ const FORMAT = {
   lineHeight: (v) => v.toFixed(2),
   sectionGap: (v) => `${Math.round(v)} px`,
   margins: (v) => `${Math.round(v)} mm`,
+  fillOpacity: (v) => `${Math.round(v * 100)}%`,
+  photoOpacity: (v) => `${Math.round(v * 100)}%`,
 };
 
 /** Design controls. All values are overrides on the template defaults; undo/redo covers every change. */
@@ -107,6 +109,62 @@ export function designPanel({ session, ctx, sample: sampleFor = sample }) {
   colour.append(swatches, contrast);
   root.append(colour);
 
+  // ---- text colours, fills and transparency ----
+  const tone = h("section", { class: "design__group", "aria-labelledby": "dz-tone" }, h("h3", { id: "dz-tone", text: "Text colour and transparency" }));
+  const clear = (key, focusKey) => ctx.change(() => delete doc.designSettings[key], { structural: true, focusKey });
+
+  /** A colour picker with a reset button and an optional readability hint. */
+  const colourControl = ({ key, label, fallback, disabled = false, hint, readable }) => {
+    const id = nid("clr");
+    const value = design[key] || fallback;
+    const input = h("input", { type: "color", id, class: "colour__input", value, disabled });
+    input.dataset.focusKey = `design:${key}`;
+    const note = h("p", { class: "field__hint", role: "status" });
+    const paint = (hex) => {
+      if (!readable) return (note.textContent = hint || "");
+      const ratio = contrastRatio(hex, rendered.paperBg);
+      note.textContent = `${hint ? `${hint} ` : ""}Contrast against the page: ${ratio.toFixed(1)}:1.${ratio < 4.5 ? " That is low, so the text may be hard to read." : ""}`;
+      note.classList.toggle("is-warn", ratio < 4.5);
+    };
+    const reset = h("button", { type: "button", class: "btn btn--ghost btn--sm", text: "Use template colour", disabled: disabled || design[key] === undefined });
+    reset.setAttribute("aria-label", `Reset ${label.toLowerCase()} to the template colour`);
+    input.addEventListener("input", () => {
+      set(key, input.value.toLowerCase());
+      reset.disabled = false;
+      paint(input.value);
+    });
+    reset.addEventListener("click", () => clear(key, `design:${key}`));
+    paint(value);
+    return h("div", { class: "colour" }, h("label", { class: "field__label", for: id, text: label }), h("div", { class: "colour__row" }, input, reset), note);
+  };
+
+  const opacityControl = ({ key, disabled = false }) => {
+    const lim = OPACITY_LIMITS[key];
+    const id = nid("rng");
+    const out = h("output", { for: id, text: FORMAT[key](design[key]) });
+    const input = h("input", { type: "range", id, class: "range", min: String(lim.min), max: String(lim.max), step: String(lim.step), disabled });
+    input.value = String(design[key]);
+    input.setAttribute("aria-valuetext", FORMAT[key](design[key]));
+    input.addEventListener("input", () => {
+      const v = Number(input.value);
+      out.textContent = FORMAT[key](v);
+      input.setAttribute("aria-valuetext", FORMAT[key](v));
+      set(key, v);
+    });
+    return h("div", { class: "slider" }, h("label", { for: id, text: `${lim.label} opacity` }), out, input);
+  };
+
+  const textIsLight = rendered.printsOnWhite;
+  tone.append(
+    colourControl({ key: "textColor", label: "Text colour", fallback: rendered.ink || DEFAULT_INK, readable: true, hint: textIsLight ? `${rendered.name} prints on white with its own dark text, so this colour is for the screen only.` : "" }),
+    colourControl({ key: "mutedColor", label: "Secondary text colour", fallback: rendered.ink2 || DEFAULT_INK2, readable: true, hint: "Dates, locations and similar details." }),
+    colourControl({ key: "fillColor", label: "Background fill colour", fallback: rendered.fillDefault || design.accent, disabled: !rendered.supports.fills, hint: rendered.supports.fills ? (rendered.headerInk ? "Header text switches between light and dark automatically so it stays readable." : "") : `${rendered.name} has no decorative fills to colour.` }),
+    opacityControl({ key: "fillOpacity", disabled: !rendered.supports.fills }),
+    opacityControl({ key: "photoOpacity" }),
+    h("p", { class: "field__hint", text: "Lower the opacity to fade backgrounds, cards and tints, or the photo. Text stays fully readable." }),
+  );
+  root.append(tone);
+
   // ---- type & spacing ----
   const type = h("section", { class: "design__group", "aria-labelledby": "dz-type" }, h("h3", { id: "dz-type", text: "Type and spacing" }));
   type.append(
@@ -144,6 +202,25 @@ export function designPanel({ session, ctx, sample: sampleFor = sample }) {
     segmented("dz-align", [["left", "Left"], ["center", "Centre"]], design.headerAlign, (v) => set("headerAlign", v), { disabled: !rendered.supports.headerAlign, label: "Header alignment" }),
   );
   if (!rendered.supports.headerAlign) struct.append(h("p", { class: "field__hint", text: `${rendered.name} fixes the header alignment as part of its design.` }));
+  const letter = doc.kind === "cover-letter";
+  const sidebarOnly = letter && rendered.layout !== "single";
+  const flip = h("label", { class: "check design__flip" });
+  const flipInput = h("input", { type: "checkbox", class: "check__input" });
+  flipInput.checked = design.mirror;
+  flipInput.disabled = !rendered.supports.mirror || sidebarOnly;
+  flipInput.dataset.focusKey = "design:mirror";
+  flipInput.addEventListener("change", () => ctx.change(() => (flipInput.checked ? (doc.designSettings.mirror = true) : delete doc.designSettings.mirror), { structural: true, focusKey: "design:mirror" }));
+  flip.append(flipInput, h("span", {}, h("strong", { text: "Flip layout" }), h("small", { text: !rendered.supports.mirror ? `${rendered.name} keeps its photo and decoration in a fixed place.` : sidebarOnly ? `A letter in ${rendered.name} is a single column, so there is nothing to flip.` : "Moves the photo, or the sidebar in two-column templates, to the opposite side. Reading order does not change." })));
+  struct.append(flip);
+  if (letter) {
+    const date = h("label", { class: "check design__flip" });
+    const dateInput = h("input", { type: "checkbox", class: "check__input" });
+    dateInput.checked = design.dateAlign === "right";
+    dateInput.dataset.focusKey = "design:dateAlign";
+    dateInput.addEventListener("change", () => ctx.change(() => (dateInput.checked ? (doc.designSettings.dateAlign = "right") : delete doc.designSettings.dateAlign), { structural: true, focusKey: "design:dateAlign" }));
+    date.append(dateInput, h("span", {}, h("strong", { text: "Date on the right" }), h("small", { text: "Aligns the date to the right edge, as in many business letters." })));
+    struct.append(date);
+  }
   struct.append(
     h("p", { class: "field__label", text: "Paper size" }),
     segmented("dz-paper", Object.entries(PAPER).map(([k, v]) => [k, v.label.split(" (")[0]]), doc.pageSize, (v) => ctx.change(() => (doc.pageSize = v), { structural: false }), { label: "Paper size" }),

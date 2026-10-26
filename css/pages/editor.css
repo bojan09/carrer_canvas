@@ -995,3 +995,36 @@ textarea.input {
   gap: var(--space-1);
   margin-top: var(--space-1);
 }
+
+.colour {
+  margin-bottom: var(--space-3);
+}
+
+.colour__row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.colour__input {
+  flex: none;
+}
+
+.design__flip {
+  margin-top: var(--space-3);
+}
+
+input.colour__input {
+  width: 3.25rem;
+  height: 2.5rem;
+  padding: 2px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  cursor: pointer;
+}
+
+input.colour__input:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}

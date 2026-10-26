@@ -159,3 +159,17 @@ Phase 2: versioned resume schema, IndexedDB repositories + migrations, section e
 **Verified (Chromium only):** 73 unit tests; e2e phases 1-5 pass (phase 5: 142 checks incl. 30 real PDFs, 15 templates x short and long letter).
 **Not verified:** Safari, Firefox, iOS, Android; screen readers on the letter editor; very long single paragraphs near the 3000-character cap in every template.
 **Known limits:** a letter has no section reordering or custom sections by design; the greeting is not auto-generated; copying details from a resume is a one-time copy (later resume edits do not flow into the letter).
+
+## Phase 5.1: colour, transparency and layout options (v0.6.1)
+**Done**
+- Design panel group "Text colour and transparency": text colour, secondary text colour, background fill colour, decoration opacity, photo opacity. Per-control reset, undo/redo, contrast guidance (ratio against the page, warning under 4.5:1), disabled with a reason where a template has no fills.
+- Header text adapts: on templates with a coloured header (Horizon, Nexus, Vertex, Prism sidebar) the text switches between light and dark from the fill colour and opacity, so a pale or faded fill stays readable.
+- "Flip layout": photo side for 8 header templates plus Nexus and Vertex, sidebar side for Aurora, Prism, Swiss, Velo. Reading order and DOM order do not change. Bloom cannot flip (its motif sits where the photo would go). Letters: photo flips, and "Date on the right".
+- Schema v3 (resumes) and v2 (letters) so older app versions refuse rather than drop the new settings.
+- Defaults are pixel-identical to before for 10 of 15 templates; the other five differ by sub-pixel anti-aliasing only (checked by image diff).
+
+**Not built, on purpose: free drag-and-drop of arbitrary elements.** Absolute positions break pagination and print, break the text order that applicant systems and screen readers rely on, and are fiddly on phones. What exists instead: section reordering (resumes), photo/sidebar flip, header alignment, date side. Revisit only as a separate opt-in "free layout" mode with its own PDF checks.
+
+**Verified (Chromium only):** 81 unit tests; e2e phases 1-5 and 5.1 pass (5.1: 43 checks incl. real PDFs).
+**Not verified:** Safari/Firefox support for `color-mix()` with `calc()` percentages and CSS `mask` (Bloom motif) on older versions; iOS/Android; screen readers on the colour controls; very long names with a flipped header.
+**Limits:** colour pickers are the browser's native control (look differs per browser); transparency scales decorative fills only, text is never made transparent.

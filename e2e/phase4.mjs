@@ -260,7 +260,7 @@ let [dl] = await Promise.all([page.waitForEvent("download"), page.getByRole("but
 const noPhotoFile = `${outDir}/backup-nophoto.json`;
 await dl.saveAs(noPhotoFile);
 const bk = JSON.parse(readFileSync(noPhotoFile, "utf8"));
-check("backup file is versioned, dated and omits photos by default", bk.kind === "backup" && bk.format === 1 && bk.schemaVersion === 2 && /^careercanvas-backup-\d{4}-\d{2}-\d{2}\.json$/.test(dl.suggestedFilename()) && bk.documents.length >= 1 && bk.documents.every((d) => d.photo === null) && bk.includesPhotos === false);
+check("backup file is versioned, dated and omits photos by default", bk.kind === "backup" && bk.format === 1 && bk.schemaVersion === 3 && /^careercanvas-backup-\d{4}-\d{2}-\d{2}\.json$/.test(dl.suggestedFilename()) && bk.documents.length >= 1 && bk.documents.every((d) => d.photo === null) && bk.includesPhotos === false);
 await page.getByRole("button", { name: "Back up all" }).click();
 await page.locator("#bk-photos").check();
 [dl] = await Promise.all([page.waitForEvent("download"), page.getByRole("button", { name: "Download backup" }).click()]);

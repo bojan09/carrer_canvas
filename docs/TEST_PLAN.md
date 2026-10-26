@@ -13,3 +13,7 @@ Phase 4 adds `tests/phase4.test.mjs` (57 unit/structure tests in total) and `e2e
 ## Phase 5 (cover letters)
 - `tests/phase5.test.mjs`: model, normalisation and hostile input, migrate routing, consent-based copy, checklist logic, backup/import/shadow with letters, file names.
 - `e2e/phase5.mjs`: create, edit every part, reload, undo/redo, checklist, all 15 templates render a letter, photo, copy from resume (resume unchanged, undoable), route guards, Saved list (filter, rename, duplicate, delete), newer-version record, backup wipe and restore, real PDFs for all 15 templates (one-page and multi-page letters: no clipped text, margins, no stranded date/subject/greeting/closing, closing with signature), dark template prints on white, export dialog, 320/390px overflow.
+
+## Phase 5.1 (colour, transparency, layout)
+- `tests/phase51.test.mjs`: override validation (hostile values), defaults, template-switch clearing, colour maths (`readableInk`, `effectiveFill`), registry flag consistency, schema bump migrations, round trips for resumes and letters.
+- `e2e/phase51.mjs`: real design panel on resumes and letters (live preview, reset, undo, reload persistence, contrast warning, header text adapting to a fill, disabled controls with reasons), flip layout geometry for all 13 flippable templates (photo or sidebar crosses the page centre, no overflow, same reading order), real PDFs (custom colour prints; dark templates print dark on white; flipped header and sidebar print correctly; right-aligned date; faded fills), 320/390px.

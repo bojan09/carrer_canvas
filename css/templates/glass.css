@@ -4,12 +4,12 @@
   --ink: #eef1ff;
   --ink-2: #b4bde6;
   --rule: rgba(255, 255, 255, 0.18);
-  --card: rgba(255, 255, 255, 0.07);
-  --card-line: rgba(255, 255, 255, 0.17);
+  --card: rgba(255, 255, 255, calc(0.07 * var(--fill-o, 1)));
+  --card-line: rgba(255, 255, 255, calc(0.17 * var(--fill-o, 1)));
   background:
-    radial-gradient(60% 22% at 90% 2%, color-mix(in srgb, var(--accent) 55%, transparent), transparent 70%),
-    radial-gradient(55% 26% at 0% 55%, rgba(34, 211, 238, 0.22), transparent 70%),
-    radial-gradient(60% 24% at 100% 100%, rgba(176, 108, 242, 0.3), transparent 70%),
+    radial-gradient(60% 22% at 90% 2%, color-mix(in srgb, var(--deco-c, var(--accent)) calc(55% * var(--fill-o, 1)), transparent), transparent 70%),
+    radial-gradient(55% 26% at 0% 55%, rgba(34, 211, 238, calc(0.22 * var(--fill-o, 1))), transparent 70%),
+    radial-gradient(60% 24% at 100% 100%, rgba(176, 108, 242, calc(0.3 * var(--fill-o, 1))), transparent 70%),
     #0b1026;
 }
 
@@ -23,7 +23,7 @@
 
 .doc[data-template="glass"] .doc__header {
   padding: 1.3em 1.5em;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.13), rgba(255, 255, 255, 0.04));
+  background: linear-gradient(135deg, rgba(255, 255, 255, calc(0.13 * var(--fill-o, 1))), rgba(255, 255, 255, calc(0.04 * var(--fill-o, 1))));
 }
 
 .doc[data-template="glass"] .doc__header:has(.doc__photo) {
@@ -76,12 +76,12 @@
 }
 
 .doc[data-template="glass"] .doc__entry-title {
-  color: #fff;
+  color: var(--ink-strong, #fff);
 }
 
 .doc[data-template="glass"] .doc__chips li {
-  border-color: rgba(255, 255, 255, 0.28);
-  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, calc(0.28 * var(--fill-o, 1)));
+  background: rgba(255, 255, 255, calc(0.1 * var(--fill-o, 1)));
   color: var(--ink);
 }
 
