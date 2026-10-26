@@ -455,6 +455,10 @@ textarea.input {
     grid-template-columns: 310px minmax(0, 1fr) minmax(420px, 500px);
   }
 
+  .studio[data-doc="letter"] .studio__grid {
+    grid-template-columns: minmax(0, 1fr) minmax(420px, 500px);
+  }
+
   .studio__rail {
     display: block;
     position: sticky;
@@ -984,4 +988,10 @@ textarea.input {
 .restore__option small {
   color: var(--text-2);
   font-size: 0.8125rem;
+}
+
+.field__tools {
+  display: flex;
+  gap: var(--space-1);
+  margin-top: var(--space-1);
 }

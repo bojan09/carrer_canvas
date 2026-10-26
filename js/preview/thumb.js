@@ -1,12 +1,12 @@
 import { h } from "../utils/dom.js";
 import { PAPER } from "../templates/design.js";
-import { renderResume } from "./render.js";
+import { renderDocument } from "./render.js";
 
 /** Real, locally rendered miniature of a template. Returns a cleanup function. */
 export function mountThumb(frame, doc, templateId) {
   frame.classList.add("thumb");
   const page = h("div", { class: "thumb__page" });
-  const el = renderResume(doc, { templateId });
+  const el = renderDocument(doc, { templateId });
   el.removeAttribute("aria-label");
   page.inert = true;
   page.setAttribute("aria-hidden", "true");

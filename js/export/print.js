@@ -1,4 +1,5 @@
-import { renderResume } from "../preview/render.js";
+import { renderDocument } from "../preview/render.js";
+import { isLetter } from "../models/cover-letter.js";
 import { resolveDesign } from "../templates/design.js";
 import { cleanText } from "../utils/sanitization.js";
 
@@ -12,7 +13,7 @@ export const pdfFileName = (doc) => {
     .replace(/[\\/:*?"<>|\u0000-\u001f]+/g, " ")
     .replace(/\s+/g, " ")
     .trim();
-  return `${base || "Resume"} - Resume`;
+  return isLetter(doc) ? `${base || "Cover letter"} - Cover Letter` : `${base || "Resume"} - Resume`;
 };
 
 export const pageRuleText = (doc) => `@page { size: ${doc.pageSize === "Letter" ? "letter" : "A4"}; margin: ${resolveDesign(doc).margins}mm; }`;
@@ -38,7 +39,7 @@ let preparedAt = 0;
 export function preparePrint(doc, { simplified = false } = {}) {
   const root = document.getElementById("print-root");
   const source = simplified ? { ...doc, designSettings: { ...doc.designSettings, simplified: true } } : doc;
-  root.replaceChildren(renderResume(source));
+  root.replaceChildren(renderDocument(source));
   document.body.dataset.print = "resume";
   preparedAt = Date.now();
   if (savedTitle === null) savedTitle = document.title;
@@ -57,7 +58,7 @@ export function cleanupPrint() {
   }
 }
 
-/** Opens the browser print dialog for this resume. Resolves after the dialog call returns. */
+/** Opens the browser print dialog for this document. Resolves after the dialog call returns. */
 export async function printResume(doc, opts = {}) {
   const result = preparePrint(doc, opts);
   const imgs = [...document.querySelectorAll("#print-root img")];

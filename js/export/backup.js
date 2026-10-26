@@ -14,7 +14,7 @@ export function backupFileName(date = new Date(), single = null) {
   const day = date.toISOString().slice(0, 10);
   if (single) {
     const base = cleanText(single, 60).replace(/[^\p{L}\p{N}]+/gu, "-").replace(/^-+|-+$/g, "").toLowerCase();
-    return `careercanvas-${base || "resume"}-${day}.json`;
+    return `careercanvas-${base || "document"}-${day}.json`;
   }
   return `careercanvas-backup-${day}.json`;
 }
@@ -40,7 +40,7 @@ export function buildBackup(docs, { includePhotos = false, now = new Date() } = 
 
 const REASONS = {
   "newer-version": "was created by a newer version of CareerCanvas (update the app first)",
-  invalid: "is not a valid CareerCanvas resume",
+  invalid: "is not a valid CareerCanvas document",
   duplicate: "has the same id as another document in this file",
 };
 
@@ -67,7 +67,7 @@ export function parseBackup(text) {
     if (!Array.isArray(data.documents)) return { ok: false, error: "The backup contains no document list." };
     list = data.documents;
     meta = { exportedAt: typeof data.exportedAt === "string" ? data.exportedAt : null, includesPhotos: data.includesPhotos === true, appVersion: cleanText(data.appVersion, 20) || null };
-  } else if (data && typeof data === "object" && typeof data.id === "string" && data.sections) list = [data];
+  } else if (data && typeof data === "object" && typeof data.id === "string" && (data.sections || data.kind === "cover-letter")) list = [data];
   else return { ok: false, error: "This file is not a CareerCanvas backup." };
 
   if (list.length > MAX_DOCUMENTS) return { ok: false, error: `The file lists more than ${MAX_DOCUMENTS} documents.` };

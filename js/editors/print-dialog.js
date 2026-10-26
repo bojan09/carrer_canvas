@@ -15,10 +15,10 @@ const BROWSERS = [
 
 /** Pre-print review: facts about the PDF, what to double-check, and accurate browser steps.
  *  @returns {Promise<{print: true, simplified: boolean} | null>} */
-export async function openPrintDialog({ doc, pages }) {
+export async function openPrintDialog({ doc, pages, issues: given }) {
   const design = resolveDesign(doc);
   const tpl = getTemplate(doc.templateId);
-  const issues = analyze(doc).filter((c) => !c.ok);
+  const issues = (given || analyze(doc)).filter((c) => !c.ok);
   const canSimplify = !tpl.atsConscious && !design.simplified;
   const paper = doc.pageSize === "Letter" ? "US Letter" : "A4";
 

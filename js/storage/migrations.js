@@ -1,4 +1,5 @@
 import { ResumeDataError, SCHEMA_VERSION, normalizeResume } from "../models/resume.js";
+import { LETTER_KIND, migrateLetter } from "../models/cover-letter.js";
 
 /** One function per version step: MIGRATIONS[n] upgrades a record from n to n+1.
  *  Add a step whenever SCHEMA_VERSION is bumped, and never edit old steps. */
@@ -14,6 +15,7 @@ export const MIGRATIONS = {
  *  (including records written by a newer app version, which must never be overwritten). */
 export function migrateRecord(raw) {
   if (!raw || typeof raw !== "object") throw new ResumeDataError("invalid", "Not a CareerCanvas resume.");
+  if (raw.kind === LETTER_KIND) return migrateLetter(raw); // cover letters have their own schema version
   let version = Number.isInteger(raw.schemaVersion) ? raw.schemaVersion : 0;
   if (version > SCHEMA_VERSION) {
     throw new ResumeDataError("newer-version", "This document was created by a newer version of CareerCanvas.");

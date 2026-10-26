@@ -1,8 +1,7 @@
 import { h, icon } from "../utils/dom.js";
-import { SECTION_DEFS } from "../models/section-defs.js";
 import { cleanText } from "../utils/sanitization.js";
 import { announce } from "../components/announcer.js";
-import { confirmDialog, openDialog } from "../components/dialog.js";
+import { openDialog } from "../components/dialog.js";
 import { mountPaper, ZOOM_MODES } from "../preview/paper.js";
 import { getTemplate } from "../templates/registry.js";
 import { PAPER } from "../templates/design.js";
@@ -11,10 +10,8 @@ import { designPanel } from "./design-panel.js";
 import { openPrintDialog, shouldReview } from "./print-dialog.js";
 import { printResume } from "../export/print.js";
 import { toast } from "../components/toast.js";
-import { analyze, openIssues, titleOf } from "./hints.js";
-import { checkboxField } from "./fields.js";
-import { contactBody, sectionBody } from "./section-forms.js";
 import { sectionsList } from "./sections-rail.js";
+import { resumeAdapter } from "./resume-adapter.js";
 
 const isTextEntry = (el) => el && el.closest && el.closest("input, textarea, select, [contenteditable='true']");
 
@@ -27,7 +24,8 @@ function toolButton({ name, label, text, onClick }) {
 }
 
 /** The editing studio for one open document. Returns a cleanup function. */
-export function mountStudio(root, session, { persistent }) {
+export function mountStudio(root, session, { persistent, adapter = resumeAdapter }) {
+  const Noun = adapter.noun[0].toUpperCase() + adapter.noun.slice(1);
   const expanded = new Set(["contact"]);
   const ctx = {
     change: (mutator, opts) => session.change(mutator, opts),
@@ -43,8 +41,8 @@ export function mountStudio(root, session, { persistent }) {
 
   const undoBtn = toolButton({ name: "undo", label: "Undo", text: "Undo", onClick: () => doUndo() });
   const redoBtn = toolButton({ name: "redo", label: "Redo", text: "Redo", onClick: () => doRedo() });
-  const sectionsBtn = toolButton({ name: "layers", label: "Manage sections", text: "Sections", onClick: () => openSectionsDialog() });
-  sectionsBtn.classList.add("studio__sections-btn");
+  const sectionsBtn = adapter.hasRail ? toolButton({ name: "layers", label: "Manage sections", text: "Sections", onClick: () => openSectionsDialog() }) : null;
+  sectionsBtn?.classList.add("studio__sections-btn");
   const exportBtn = h("button", { type: "button", class: "btn btn--primary btn--sm btn--tool studio__export" });
   exportBtn.innerHTML = `${icon("printer")}<span class="tool-label">Export PDF</span>`;
   exportBtn.setAttribute("aria-label", "Export as PDF (opens the print dialog)");
@@ -96,7 +94,7 @@ export function mountStudio(root, session, { persistent }) {
     { class: "studio__preview", "aria-label": "Preview" },
     h("div", { class: "studio__previewhead" }, h("h2", { text: "Preview" }), tplBadge, h("div", { class: "studio__zoom" }, zoomSelect)),
     previewScroll,
-    h("p", { class: "studio__previewnote" }, pageInfo, document.createTextNode(" Page-break guides are estimates. PDF export arrives in the next phase.")),
+    h("p", { class: "studio__previewnote" }, pageInfo, document.createTextNode(" Page-break guides are estimates. The saved PDF is what counts.")),
   );
   const paper = mountPaper(previewScroll, {
     zoom: getSettings().previewZoom,
@@ -115,10 +113,10 @@ export function mountStudio(root, session, { persistent }) {
 
   const studio = h(
     "div",
-    { class: "studio", "data-view": "edit" },
+    { class: "studio", "data-view": "edit", "data-doc": adapter.kind },
     bar,
     banners,
-    h("div", { class: "studio__grid" }, railHost, h("section", { class: "studio__editorwrap", "aria-label": "Resume content" }, editor, designHost), preview),
+    h("div", { class: "studio__grid" }, adapter.hasRail ? railHost : null, h("section", { class: "studio__editorwrap", "aria-label": `${Noun} content` }, editor, designHost), preview),
   );
   bar.append(viewGroup);
 
@@ -131,67 +129,30 @@ export function mountStudio(root, session, { persistent }) {
   function ensureDesign() {
     if (!designStale) return;
     designApi?.destroy();
-    designApi = designPanel({ session, ctx });
+    designApi = designPanel({ session, ctx, sample: adapter.sample });
     designHost.replaceChildren(designApi.el);
     designStale = false;
   }
   root.replaceChildren(studio);
 
   // ---- rendering ----
-  function sectionMeta(section) {
-    if (section.id === "contact") return "";
-    if (!section.visible) return "Hidden";
-    if (section.items) return `${section.items.length} ${section.items.length === 1 ? "entry" : "entries"}`;
-    return "";
-  }
-
-  function buildCard({ id, label, iconName, section, isContact }) {
+  function buildCard(desc) {
+    const { id, label, iconName, meta = "", hidden = false, fill } = desc;
     const bodyId = `sec-${id}-body`;
     const toggle = h("button", { type: "button", class: "sec__toggle", "aria-controls": bodyId, "data-focus-key": `sec:${id}` });
     toggle.innerHTML = `${icon(iconName)}<span class="sec__label"></span><span class="sec__meta"></span>${icon("chevron-down", "sec__chev")}`;
     toggle.querySelector(".sec__label").textContent = label;
-    toggle.querySelector(".sec__meta").textContent = isContact ? "" : sectionMeta(section);
+    toggle.querySelector(".sec__meta").textContent = meta;
 
     const body = h("div", { class: "sec__body", id: bodyId });
-    const card = h("section", { class: `sec${section && !section.visible ? " is-hidden" : ""}`, id: `sec-${id}`, "data-section-id": id }, h("h3", { class: "sec__title" }, toggle), body);
-
-    const fill = () => {
-      body.replaceChildren();
-      if (!isContact) {
-        const tools = h("div", { class: "sec__tools" });
-        const vis = checkboxField({
-          label: "Show this section on my resume",
-          checked: section.visible,
-          onChange: (v) => ctx.change(() => (section.visible = v), { structural: true, focusKey: `sec:${id}` }),
-        });
-        tools.append(vis.root);
-        if (section.type === "custom") {
-          const del = h("button", { type: "button", class: "btn btn--ghost btn--sm btn--danger-text", text: "Delete section" });
-          del.addEventListener("click", async () => {
-            const ok = await confirmDialog({ title: `Delete “${titleOf(section)}”?`, message: "This section and its content will be removed. You can bring it back with Undo.", confirmLabel: "Delete", danger: true });
-            if (!ok) return;
-            ctx.change(
-              () => {
-                delete session.doc.sections[id];
-                session.doc.sectionOrder = session.doc.sectionOrder.filter((x) => x !== id);
-              },
-              { structural: true, focusKey: "rail:add" },
-            );
-            announce("Section deleted. You can undo.");
-          });
-          tools.append(del);
-        }
-        body.append(tools);
-      }
-      body.append(isContact ? contactBody(session.doc, ctx) : sectionBody(section, ctx));
-    };
+    const card = h("section", { class: `sec${hidden ? " is-hidden" : ""}`, id: `sec-${id}`, "data-section-id": id }, h("h3", { class: "sec__title" }, toggle), body);
 
     const apply = () => {
       const open = expanded.has(id);
       toggle.setAttribute("aria-expanded", String(open));
       body.hidden = !open;
       card.classList.toggle("is-open", open);
-      if (open && !body.childElementCount) fill();
+      if (open && !body.childElementCount) fill(body);
     };
     toggle.addEventListener("click", () => {
       if (expanded.has(id)) expanded.delete(id);
@@ -203,16 +164,12 @@ export function mountStudio(root, session, { persistent }) {
   }
 
   function renderEditor() {
-    const doc = session.doc;
-    editor.replaceChildren(buildCard({ id: "contact", label: "Personal Info", iconName: "user", isContact: true }));
-    for (const id of doc.sectionOrder) {
-      const section = doc.sections[id];
-      editor.append(buildCard({ id, label: titleOf(section), iconName: SECTION_DEFS[section.type].icon, section }));
-    }
+    editor.replaceChildren(...adapter.cards(session, ctx).map(buildCard));
   }
 
   const railHosts = new Set([railHost]);
   function renderRails() {
+    if (!adapter.hasRail) return;
     for (const host of railHosts) host.replaceChildren(sectionsList({ session, ctx, onNavigate: (id) => navigateTo(id, host) }));
   }
 
@@ -238,7 +195,7 @@ export function mountStudio(root, session, { persistent }) {
   }
 
   function openChecklist() {
-    const checks = analyze(session.doc);
+    const checks = adapter.analyze(session.doc);
     const todo = checks.filter((c) => !c.ok);
     const list = h(
       "ul",
@@ -256,7 +213,7 @@ export function mountStudio(root, session, { persistent }) {
         return li;
       }),
     );
-    const body = h("div", {}, h("p", { text: todo.length ? `${todo.length} thing${todo.length === 1 ? "" : "s"} to look at. This is friendly guidance, not a score, and no checklist can predict how any employer's system reads your resume.` : "Everything on this list looks good. Still read the preview carefully before sharing." }), list);
+    const body = h("div", {}, h("p", { text: todo.length ? `${todo.length} thing${todo.length === 1 ? "" : "s"} to look at. This is friendly guidance, not a score, and no checklist can predict how any employer's system reads your ${adapter.noun}.` : "Everything on this list looks good. Still read the preview carefully before sharing." }), list);
     openDialog({ title: "Writing checklist", body, actions: [{ label: "Close", value: true, variant: "primary" }] });
   }
 
@@ -271,7 +228,7 @@ export function mountStudio(root, session, { persistent }) {
     if (session.doc.metadata.isSample) {
       const btn = h("button", { type: "button", class: "btn btn--outline btn--sm", text: "I've replaced the sample content" });
       btn.addEventListener("click", () => ctx.change(() => (session.doc.metadata.isSample = false), { structural: false }));
-      banners.append(h("div", { class: "notice notice--warn", role: "note" }, h("span", { text: "This is fictional sample content. Replace it with your own details before using this resume." }), btn));
+      banners.append(h("div", { class: "notice notice--warn", role: "note" }, h("span", { text: `This is fictional sample content. Replace it with your own details before using this ${adapter.noun}.` }), btn));
     }
   }
 
@@ -307,7 +264,7 @@ export function mountStudio(root, session, { persistent }) {
   function renderPreview() {
     paper.update(session.doc);
     tplBadge.textContent = `${getTemplate(session.doc.templateId).name}${session.doc.designSettings.simplified ? " · simplified" : ""}`;
-    const n = openIssues(session.doc);
+    const n = adapter.openIssues(session.doc);
     checklistBadge.hidden = n === 0;
     checklistBadge.textContent = String(n);
     checklistBtn.setAttribute("aria-label", n ? `Writing checklist, ${n} to review` : "Writing checklist");
@@ -322,7 +279,7 @@ export function mountStudio(root, session, { persistent }) {
     await session.flush();
     let options = { simplified: false };
     if (shouldReview()) {
-      const choice = await openPrintDialog({ doc: session.doc, pages: lastPages });
+      const choice = await openPrintDialog({ doc: session.doc, pages: lastPages, issues: adapter.analyze(session.doc) });
       if (!choice) return;
       options = choice;
     }
@@ -375,8 +332,8 @@ export function mountStudio(root, session, { persistent }) {
   title.addEventListener("input", () => session.change(() => (session.doc.title = cleanText(title.value, 120)), { group: "title" }));
   title.addEventListener("blur", () => {
     if (!title.value.trim()) {
-      title.value = "Untitled resume";
-      session.change(() => (session.doc.title = "Untitled resume"), { group: "title" });
+      title.value = adapter.untitled;
+      session.change(() => (session.doc.title = adapter.untitled), { group: "title" });
     }
   });
 
@@ -401,7 +358,7 @@ export function mountStudio(root, session, { persistent }) {
     const when = new Date(recovered.savedAt).toLocaleString([], { dateStyle: "medium", timeStyle: "short" });
     openDialog({
       title: "Recover unsaved changes?",
-      body: `This resume has newer changes from ${when} that were not fully saved because the page closed first. Restore them, or keep the last saved version.`,
+      body: `This ${adapter.noun} has newer changes from ${when} that were not fully saved because the page closed first. Restore them, or keep the last saved version.`,
       actions: [
         { label: "Keep saved version", value: false, variant: "outline" },
         { label: "Restore changes", value: true, variant: "primary" },

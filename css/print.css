@@ -82,6 +82,26 @@
     break-inside: avoid;
   }
 
+  /* cover letters: keep the greeting with the first paragraph and the sign-off together */
+  #print-root .doc__greeting,
+  #print-root .doc__subject,
+  #print-root .doc__date {
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
+  #print-root .doc__recipient,
+  #print-root .doc__closing,
+  #print-root .doc__signature {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  #print-root .doc__closing {
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
   /* ---- two-column layouts print as one content-complete column ---- */
   #print-root .doc[data-layout^="sidebar"],
   #print-root .doc[data-layout^="sidebar"] .doc__header,

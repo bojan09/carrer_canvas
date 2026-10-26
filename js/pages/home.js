@@ -127,7 +127,7 @@ export default function home(root) {
 
   <section class="section" aria-label="Project status">
     <div class="container">
-      <div class="status-strip">${icon("info")}<p><strong>Early build.</strong> The offline app, resume editor, fifteen templates, design controls, print-to-PDF and backup are live. Cover letters are still being built.</p></div>
+      <div class="status-strip">${icon("info")}<p><strong>Early build.</strong> The offline app, resume editor, fifteen templates, design controls, print-to-PDF, backup and matching cover letters are live.</p></div>
     </div>
   </section>
 

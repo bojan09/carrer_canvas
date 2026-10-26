@@ -3,6 +3,8 @@ import { h, icon } from "../utils/dom.js";
 import { getRepository } from "../storage/repository.js";
 import { settleSaves } from "../state/resume-store.js";
 import { createBlank, createSample, duplicateResume } from "../models/resume.js";
+import { createBlankLetter, createLetterSample, duplicateLetter, isLetter } from "../models/cover-letter.js";
+import { getTemplate } from "../templates/registry.js";
 import { cleanText } from "../utils/sanitization.js";
 import { confirmDialog, openDialog } from "../components/dialog.js";
 import { toast } from "../components/toast.js";
@@ -11,8 +13,17 @@ import { backupFlow, lastBackupText, restoreFlow } from "../export/backup-ui.js"
 
 const fmt = (iso) => new Date(iso).toLocaleString([], { dateStyle: "medium", timeStyle: "short" });
 
+const noun = (doc) => (isLetter(doc) ? "cover letter" : "resume");
+const route = (doc) => (isLetter(doc) ? `#/cover-letter/${doc.id}` : `#/resume/${doc.id}`);
+const FILTERS = [
+  ["all", "All"],
+  ["resume", "Resumes"],
+  ["letter", "Cover letters"],
+];
+
 export default function saved(root) {
   let disposed = false;
+  let filter = "all";
   root.replaceChildren(h("p", { class: "page-loading container", role: "status", text: "Loading your documents…" }));
 
   async function load() {
@@ -33,48 +44,48 @@ export default function saved(root) {
     try {
       const repo = await getRepository();
       await repo.put(doc);
-      await repo.setLastResumeId(doc.id);
-      location.hash = `#/resume/${doc.id}`;
+      await (isLetter(doc) ? repo.setLastLetterId(doc.id) : repo.setLastResumeId(doc.id));
+      location.hash = route(doc);
     } catch (err) {
-      fail("create the resume", err);
+      fail(`create the ${noun(doc)}`, err);
     }
   }
 
   async function rename(repo, doc) {
     const input = h("input", { class: "input", id: "rename-input", type: "text", maxlength: "120", value: doc.title });
     const next = await openDialog({
-      title: "Rename resume",
+      title: `Rename ${noun(doc)}`,
       body: h("div", { class: "fields" }, h("label", { class: "field__label", for: "rename-input", text: "Name" }), input),
       initialFocus: "#rename-input",
       actions: [
         { label: "Cancel", value: null, variant: "outline" },
-        { label: "Rename", value: () => cleanText(input.value, 120).trim() || "Untitled resume", variant: "primary" },
+        { label: "Rename", value: () => cleanText(input.value, 120).trim() || (isLetter(doc) ? "Untitled cover letter" : "Untitled resume"), variant: "primary" },
       ],
     });
     if (!next) return;
     try {
       await repo.put({ ...doc, title: next, updatedAt: new Date().toISOString() });
-      announce("Resume renamed.");
+      announce(`${noun(doc)[0].toUpperCase()}${noun(doc).slice(1)} renamed.`);
       load();
     } catch (err) {
-      fail("rename the resume", err);
+      fail(`rename the ${noun(doc)}`, err);
     }
   }
 
   async function duplicate(repo, doc) {
     try {
-      await repo.put(duplicateResume(doc));
-      toast({ message: "Resume duplicated.", tone: "ok" });
+      await repo.put(isLetter(doc) ? duplicateLetter(doc) : duplicateResume(doc));
+      toast({ message: `${noun(doc)[0].toUpperCase()}${noun(doc).slice(1)} duplicated.`, tone: "ok" });
       load();
     } catch (err) {
-      fail("duplicate the resume", err);
+      fail(`duplicate the ${noun(doc)}`, err);
     }
   }
 
   async function remove(repo, doc) {
     const ok = await confirmDialog({
       title: `Delete “${doc.title}”?`,
-      message: "This permanently deletes the resume from this device. It cannot be undone. Nothing is stored anywhere else.",
+      message: `This permanently deletes the ${noun(doc)} from this device. It cannot be undone. Nothing is stored anywhere else.`,
       confirmLabel: "Delete",
       danger: true,
     });
@@ -82,11 +93,12 @@ export default function saved(root) {
     try {
       await repo.remove(doc.id);
       if ((await repo.getLastResumeId()) === doc.id) await repo.setLastResumeId(null);
-      announce("Resume deleted.");
-      toast({ message: "Resume deleted.", tone: "ok" });
+      if ((await repo.getLastLetterId()) === doc.id) await repo.setLastLetterId(null);
+      announce(`${noun(doc)[0].toUpperCase()}${noun(doc).slice(1)} deleted.`);
+      toast({ message: `${noun(doc)[0].toUpperCase()}${noun(doc).slice(1)} deleted.`, tone: "ok" });
       load();
     } catch (err) {
-      fail("delete the resume", err);
+      fail(`delete the ${noun(doc)}`, err);
     }
   }
 
@@ -100,13 +112,13 @@ export default function saved(root) {
     return h(
       "article",
       { class: "doc-card" },
-      h("div", { class: "doc-card__badges" }, h("span", { class: "badge", text: "Resume" }), doc.metadata.isSample ? h("span", { class: "badge badge--warn", text: "Sample content" }) : null, h("span", { class: "badge badge--muted", text: doc.pageSize === "Letter" ? "US Letter" : "A4" })),
-      h("h2", { class: "doc-card__title" }, h("a", { href: `#/resume/${doc.id}`, text: doc.title })),
+      h("div", { class: "doc-card__badges" }, h("span", { class: "badge", text: isLetter(doc) ? "Cover letter" : "Resume" }), h("span", { class: "badge badge--muted", text: getTemplate(doc.templateId).name }), doc.metadata.isSample ? h("span", { class: "badge badge--warn", text: "Sample content" }) : null, h("span", { class: "badge badge--muted", text: doc.pageSize === "Letter" ? "US Letter" : "A4" })),
+      h("h2", { class: "doc-card__title" }, h("a", { href: route(doc), text: doc.title })),
       h("p", { class: "doc-card__meta" }, "Last edited ", h("time", { datetime: doc.updatedAt, text: fmt(doc.updatedAt) })),
       h(
         "div",
         { class: "doc-card__actions" },
-        h("a", { class: "btn btn--outline btn--sm", href: `#/resume/${doc.id}`, "aria-label": `Open ${doc.title}`, text: "Open" }),
+        h("a", { class: "btn btn--outline btn--sm", href: route(doc), "aria-label": `Open ${doc.title}`, text: "Open" }),
         act("pencil", "Rename", () => rename(repo, doc)),
         act("download", "Export", () => backupFlow({ docIds: [doc.id] })),
         act("copy", "Duplicate", () => duplicate(repo, doc)),
@@ -120,7 +132,9 @@ export default function saved(root) {
       "div",
       { class: "empty__actions" },
       h("button", { type: "button", class: "btn btn--primary", text: "New blank resume", onclick: () => create(createBlank("Untitled resume", getSettings().pageSize)) }),
+      h("button", { type: "button", class: "btn btn--outline", text: "New cover letter", onclick: () => create(createBlankLetter("Untitled cover letter", getSettings().pageSize)) }),
       h("button", { type: "button", class: "btn btn--outline", text: "New fictional sample", onclick: () => create(createSample(getSettings().pageSize)) }),
+      h("button", { type: "button", class: "btn btn--outline", text: "Sample cover letter", onclick: () => create(createLetterSample(getSettings().pageSize)) }),
     );
 
     const notices = [];
@@ -130,14 +144,30 @@ export default function saved(root) {
       notices.push(h("p", { class: "notice notice--warn", text: `${unreadable.length} stored document${unreadable.length === 1 ? "" : "s"} could not be read${newer ? " (saved by a newer version of the app, so reload to update)" : ""}. ${unreadable.length === 1 ? "It has" : "They have"} not been changed or deleted.` }));
     }
 
+    const shown = items.filter((d) => filter === "all" || (filter === "letter") === isLetter(d));
+    const filterBar = items.some(isLetter) && items.some((d) => !isLetter(d))
+      ? h(
+          "div",
+          { class: "segmented saved__filter", role: "radiogroup", "aria-label": "Show" },
+          FILTERS.map(([value, label]) => {
+            const input = h("input", { type: "radio", name: "saved-filter", value });
+            input.checked = filter === value;
+            input.addEventListener("change", () => {
+              filter = value;
+              paint(repo, items, unreadable);
+            });
+            return h("label", { class: "segmented__option" }, input, h("span", { class: "segmented__label", text: label }));
+          }),
+        )
+      : null;
     const body = items.length
-      ? h("div", { class: "doc-grid" }, items.map((d) => cardFor(repo, d)))
+      ? h("div", { class: "doc-grid" }, shown.map((d) => cardFor(repo, d)))
       : h(
           "section",
           { class: "empty" },
           h("span", { class: "empty__icon", html: undefined }),
           h("h2", { class: "empty__title", text: "No documents yet" }),
-          h("p", { class: "empty__lead", text: "Create a resume to get started. Documents are stored only in this browser, so back up regularly once backup arrives in a later update." }),
+          h("p", { class: "empty__lead", text: "Create a resume or a cover letter to get started. Documents are stored only in this browser, so download a backup now and then." }),
           newButtons,
         );
     const art = body.querySelector?.(".empty__icon");
@@ -161,6 +191,7 @@ export default function saved(root) {
           h("button", { type: "button", class: "btn btn--outline btn--sm", text: "Restore from backup", onclick: async () => { if (await restoreFlow()) load(); } }),
         ),
         ...notices,
+        filterBar,
         body,
       ),
     );

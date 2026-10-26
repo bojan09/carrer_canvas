@@ -2,6 +2,7 @@ import { h } from "../utils/dom.js";
 import { safeUrl } from "../utils/sanitization.js";
 import { isEmpty, titleOf } from "../editors/hints.js";
 import { getTemplate } from "../templates/registry.js";
+import { formatLetterDate, isLetter } from "../models/cover-letter.js";
 import { BASE_FONT_PX, FONT_PAIRS, MM, PAPER, photoVisible, renderTemplateOf, resolveDesign } from "../templates/design.js";
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -86,14 +87,9 @@ function renderSection(s, skillsStyle) {
   return h("section", { class: "doc__section", "data-type": s.type }, h("h2", { class: "doc__heading", text: titleOf(s) }), sectionBody(s, skillsStyle));
 }
 
-/**
- * Canonical resume tree. All templates share this markup; they differ only by CSS
- * (css/templates/*.css) and, for two-column layouts, by which sections go to the sidebar.
- * Reading order in the DOM is always: header, main sections, sidebar sections.
- * @param {object} doc the resume
- * @param {{templateId?: string}} [opts] templateId overrides doc.templateId (used by the gallery)
- */
-export function renderResume(doc, opts = {}) {
+/** Shared document frame: header (photo, name, role, contact) plus a body built by `makeBody`.
+ *  Templates style this one structure, so resumes and cover letters match. */
+function frame(doc, opts, kind, makeBody) {
   const source = opts.templateId ? { ...doc, templateId: opts.templateId } : doc;
   const design = resolveDesign(source);
   const tpl = renderTemplateOf(source);
@@ -119,22 +115,15 @@ export function renderResume(doc, opts = {}) {
     contactBits.length ? h("ul", { class: "doc__contact" }, contactBits.map((n) => h("li", {}, n))) : null,
   );
 
-  const visible = doc.sectionOrder.map((id) => doc.sections[id]).filter((s) => s.visible && !isEmpty(s));
-  const skillsStyle = tpl.skills;
-  const twoCol = tpl.layout !== "single";
-  const main = visible.filter((s) => !(twoCol && tpl.side.includes(s.type)));
-  const side = twoCol ? visible.filter((s) => tpl.side.includes(s.type)) : [];
-
-  const empty = h("p", { class: "doc__empty", text: "Add content on the left and it appears here." });
-  const body = h("div", { class: "doc__body" }, h("div", { class: "doc__main" }, main.length || side.length ? main.map((s) => renderSection(s, skillsStyle)) : empty));
-  if (side.length) body.append(h("aside", { class: "doc__side", "aria-label": "Additional details" }, side.map((s) => renderSection(s, skillsStyle))));
+  const { body, hasSide } = makeBody(tpl);
 
   const root = h("article", {
     class: "doc",
-    "aria-label": "Resume preview",
+    "aria-label": kind === "letter" ? "Cover letter preview" : "Resume preview",
+    "data-kind": kind,
     "data-template": tpl.id,
     "data-chosen": chosen.id,
-    "data-layout": side.length ? tpl.layout : "single",
+    "data-layout": hasSide ? tpl.layout : "single",
     "data-divider": design.dividerStyle,
     "data-align": design.headerAlign,
     "data-photo": showPhoto ? design.photoShape : "none",
@@ -157,3 +146,54 @@ export function renderResume(doc, opts = {}) {
   root.append(header, body);
   return root;
 }
+
+/**
+ * Canonical resume tree. All templates share this markup; they differ only by CSS
+ * (css/templates/*.css) and, for two-column layouts, by which sections go to the sidebar.
+ * Reading order in the DOM is always: header, main sections, sidebar sections.
+ * @param {object} doc the resume
+ * @param {{templateId?: string}} [opts] templateId overrides doc.templateId (used by the gallery)
+ */
+export function renderResume(doc, opts = {}) {
+  return frame(doc, opts, "resume", (tpl) => {
+    const visible = doc.sectionOrder.map((id) => doc.sections[id]).filter((s) => s.visible && !isEmpty(s));
+    const skillsStyle = tpl.skills;
+    const twoCol = tpl.layout !== "single";
+    const main = visible.filter((s) => !(twoCol && tpl.side.includes(s.type)));
+    const side = twoCol ? visible.filter((s) => tpl.side.includes(s.type)) : [];
+
+    const empty = h("p", { class: "doc__empty", text: "Add content on the left and it appears here." });
+    const body = h("div", { class: "doc__body" }, h("div", { class: "doc__main" }, main.length || side.length ? main.map((s) => renderSection(s, skillsStyle)) : empty));
+    if (side.length) body.append(h("aside", { class: "doc__side", "aria-label": "Additional details" }, side.map((s) => renderSection(s, skillsStyle))));
+    return { body, hasSide: side.length > 0 };
+  });
+}
+
+const lines = (text) => text.split("\n").map((l) => l.trim()).filter(Boolean);
+const paras = (text, cls) => text.split(/\n{2,}/).map((p) => p.trim()).filter(Boolean).map((p) => h("p", { class: cls, text: p }));
+
+/** Cover letter tree: the same header as the resume, then one borderless block of letter parts.
+ *  Layout is always single column (a letter has no sidebar content). */
+export function renderLetter(doc, opts = {}) {
+  return frame(doc, opts, "letter", () => {
+    const r = doc.recipient;
+    const date = formatLetterDate(doc.date);
+    const recipientLines = [r.name, r.title, r.company, ...lines(r.address)].filter(Boolean);
+    const parts = [
+      date ? h("p", { class: "doc__date", text: date }) : null,
+      recipientLines.length ? h("address", { class: "doc__recipient" }, recipientLines.map((l) => h("span", { text: l }))) : null,
+      doc.role.trim() ? h("p", { class: "doc__subject", text: `Re: ${doc.role.trim()}` }) : null,
+      doc.greeting.trim() ? h("p", { class: "doc__greeting", text: doc.greeting.trim() }) : null,
+      ...paras(doc.opening, "doc__para"),
+      ...doc.body.flatMap((p) => paras(p.text, "doc__para")),
+      doc.closing.trim() ? h("p", { class: "doc__closing", text: doc.closing.trim() }) : null,
+      doc.signature.trim() ? h("p", { class: "doc__signature", text: doc.signature.trim() }) : null,
+    ].filter(Boolean);
+    const content = parts.length ? parts : [h("p", { class: "doc__empty", text: "Write your letter on the left and it appears here." })];
+    const body = h("div", { class: "doc__body" }, h("div", { class: "doc__main" }, h("section", { class: "doc__section doc__letter", "data-type": "letter" }, content)));
+    return { body, hasSide: false };
+  });
+}
+
+/** Renders whichever kind of document this is. */
+export const renderDocument = (doc, opts = {}) => (isLetter(doc) ? renderLetter(doc, opts) : renderResume(doc, opts));

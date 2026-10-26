@@ -145,3 +145,17 @@ Phase 2: versioned resume schema, IndexedDB repositories + migrations, section e
 
 **Fixes after user review:** the editor preview pane no longer outgrows short windows (paper bottom was unreachable; the stage now scrolls inside the pane). Adding a photo now shows it immediately instead of requiring a separate "Show photo" tick.
 **Verified (Chromium only):** 57 unit tests; e2e phases 1-4 pass, phase 4 = 150 checks incl. real PDFs for all 15 templates.
+
+## Phase 5: matching cover letters (v0.6.0)
+**Done**
+- Cover letter model (`js/models/cover-letter.js`, letter schema v1) stored beside resumes with a `kind` field. Works with no resume. Newer-version letters are never opened or overwritten.
+- Editor reuses the resume studio shell through adapters (`resume-adapter.js`, `letter-adapter.js`): autosave, undo/redo, crash recovery, Edit/Preview/Design tabs, paper preview, all 15 templates, design panel, photo, print dialog. Sections: Your details, Recipient and role, Greeting and opening, Body (1-3 paragraphs), Closing and signature.
+- Letters match the resume's template identity: the same header, fonts and accent. Two-column resume templates render a single column for a letter. Simplified layout works.
+- **Copy details from a resume** is explicit: a dialog says exactly what is copied, lists your resumes, makes the photo a separate choice, never changes the resume, and can be undone.
+- Structure prompts per part (tone-independent guidance, not generated text) and a local checklist (organisation named and mentioned, role, greeting, opening, body, closing, placeholders, length). No AI, no ATS or score claims, no company facts.
+- Saved page lists both kinds with badges, template name and a filter; rename, duplicate, delete, export per document. Backup and restore carry letters. Route guards redirect a letter opened via `/resume/:id` and vice versa.
+- Print: same print pipeline; letters keep date/subject/greeting with the first paragraph and closing with signature.
+
+**Verified (Chromium only):** 73 unit tests; e2e phases 1-5 pass (phase 5: 142 checks incl. 30 real PDFs, 15 templates x short and long letter).
+**Not verified:** Safari, Firefox, iOS, Android; screen readers on the letter editor; very long single paragraphs near the 3000-character cap in every template.
+**Known limits:** a letter has no section reordering or custom sections by design; the greeting is not auto-generated; copying details from a resume is a one-time copy (later resume edits do not flow into the letter).

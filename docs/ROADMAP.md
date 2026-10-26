@@ -1,7 +1,7 @@
 # Roadmap and backlog
 
-## Next: Phase 5, cover letters
-Phase 3b (template refresh) is done, see PHASE_STATUS.md.
+## Next: Phase 6, polish
+Phases 3b (template refresh) and 5 (cover letters) are done, see PHASE_STATUS.md.
 
 ## Later
 - Phase 5: cover letters (reuse template identity, print and backup support).

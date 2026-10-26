@@ -45,7 +45,7 @@ test("backup file names are safe and dated", () => {
   const day = new Date("2026-03-04T10:00:00Z");
   assert.equal(backupFileName(day), "careercanvas-backup-2026-03-04.json");
   assert.equal(backupFileName(day, 'My "CV"/final: v2?'), "careercanvas-my-cv-final-v2-2026-03-04.json");
-  assert.equal(backupFileName(day, "///"), "careercanvas-resume-2026-03-04.json");
+  assert.equal(backupFileName(day, "///"), "careercanvas-document-2026-03-04.json");
 });
 
 test("parseBackup rejects non-json, empty, foreign and newer-format files", () => {

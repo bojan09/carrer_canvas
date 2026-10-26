@@ -33,7 +33,7 @@ const FORMAT = {
 };
 
 /** Design controls. All values are overrides on the template defaults; undo/redo covers every change. */
-export function designPanel({ session, ctx }) {
+export function designPanel({ session, ctx, sample: sampleFor = sample }) {
   const doc = session.doc;
   const disposers = [];
   const root = h("div", { class: "design" });
@@ -49,7 +49,7 @@ export function designPanel({ session, ctx }) {
     const frame = h("div", {});
     const btn = h("button", { type: "button", class: "design__tpl", "aria-pressed": String(t.id === chosen.id), "data-focus-key": `tpl:${t.id}` }, frame, h("span", { class: "design__tplname", text: t.name }));
     if (t.atsConscious) btn.append(h("span", { class: "badge badge--ok", text: "ATS-conscious" }));
-    disposers.push(mountThumb(frame, sample(), t.id));
+    disposers.push(mountThumb(frame, sampleFor(), t.id));
     btn.addEventListener("click", () => {
       if (t.id === doc.templateId) return;
       ctx.change(() => applyTemplate(doc, t.id), { structural: true, focusKey: `tpl:${t.id}` });
@@ -133,9 +133,13 @@ export function designPanel({ session, ctx }) {
 
   // ---- structure ----
   const struct = h("section", { class: "design__group", "aria-labelledby": "dz-struct" }, h("h3", { id: "dz-struct", text: "Structure" }));
+  if (doc.kind !== "cover-letter") {
+    struct.append(
+      h("p", { class: "field__label", text: "Section divider" }),
+      segmented("dz-div", DIVIDERS.map((d) => [d, { none: "None", line: "Line", thick: "Thick", dotted: "Dotted" }[d]]), design.dividerStyle, (v) => set("dividerStyle", v), { label: "Section divider" }),
+    );
+  }
   struct.append(
-    h("p", { class: "field__label", text: "Section divider" }),
-    segmented("dz-div", DIVIDERS.map((d) => [d, { none: "None", line: "Line", thick: "Thick", dotted: "Dotted" }[d]]), design.dividerStyle, (v) => set("dividerStyle", v), { label: "Section divider" }),
     h("p", { class: "field__label", text: "Header alignment" }),
     segmented("dz-align", [["left", "Left"], ["center", "Centre"]], design.headerAlign, (v) => set("headerAlign", v), { disabled: !rendered.supports.headerAlign, label: "Header alignment" }),
   );

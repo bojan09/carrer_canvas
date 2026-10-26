@@ -53,8 +53,11 @@ async function build() {
     clear: async () => {
       await store.clear();
       await store.setMeta("lastResumeId", null);
+      await store.setMeta("lastLetterId", null);
     },
     getLastResumeId: () => store.getMeta("lastResumeId"),
     setLastResumeId: (id) => store.setMeta("lastResumeId", id),
+    getLastLetterId: () => store.getMeta("lastLetterId"),
+    setLastLetterId: (id) => store.setMeta("lastLetterId", id),
   };
 }

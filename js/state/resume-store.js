@@ -119,7 +119,7 @@ export async function openSession(id) {
   const doc = await repo.get(id); // may throw ResumeDataError
   if (!doc) return null;
   current = new ResumeSession(doc, repo);
-  await repo.setLastResumeId(id).catch(() => {});
+  await (doc.kind === "cover-letter" ? repo.setLastLetterId(id) : repo.setLastResumeId(id)).catch(() => {});
   return current;
 }
 

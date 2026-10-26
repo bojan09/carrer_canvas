@@ -38,6 +38,10 @@ function editorPage(root, id) {
     try {
       const session = await openSession(id);
       if (disposed) return closeSession();
+      if (session?.doc.kind === "cover-letter") {
+        await closeSession();
+        return location.replace(`#/cover-letter/${id}`);
+      }
       if (!session) return message(root, { title: "Resume not found", lead: "This resume does not exist on this device. It may have been deleted, or it was created in another browser.", actions: [savedLink()] });
       const repo = await getRepository();
       cleanup = mountStudio(root, session, { persistent: repo.persistent });

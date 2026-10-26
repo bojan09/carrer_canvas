@@ -48,7 +48,7 @@ export default function settings(root) {
           <div role="group" aria-labelledby="motion-label">${radioGroup("motion", "Motion", [["system", "System"], ["reduced", "Reduced"]], s.motion)}</div>
         </div>
         <div class="setting-row">
-          <div class="setting-row__label"><label for="zoom-default"><strong>Default preview zoom</strong></label><span>Used when you open the resume preview.</span></div>
+          <div class="setting-row__label"><label for="zoom-default"><strong>Default preview zoom</strong></label><span>Used when you open the document preview.</span></div>
           <select id="zoom-default" class="input input--select">${[["fit-width", "Fit width"], ["fit-page", "Fit page"], ["75", "75%"], ["100", "100%"], ["125", "125%"]].map(([v, l]) => `<option value="${v}"${v === s.previewZoom ? " selected" : ""}>${l}</option>`).join("")}</select>
         </div>
       </section>
@@ -102,7 +102,7 @@ export default function settings(root) {
           <dt>Protected from cleanup</dt><dd id="kv-persist">Checking…</dd>
         </dl>
         <div class="setting-row">
-          <div class="setting-row__label"><strong>Delete all documents</strong><span>Permanently removes every resume from this device. Cannot be undone.</span></div>
+          <div class="setting-row__label"><strong>Delete all documents</strong><span>Permanently removes every resume and cover letter from this device. Cannot be undone.</span></div>
           <button type="button" class="btn btn--outline btn--sm btn--danger-text" id="wipe">Delete all…</button>
         </div>
         <div class="setting-row" id="persist-row" hidden>
@@ -220,7 +220,7 @@ export default function settings(root) {
   $("#wipe").addEventListener("click", async () => {
     const first = await confirmDialog({
       title: "Delete all documents?",
-      message: "Every resume stored in this browser will be permanently deleted. There is no backup and no cloud copy.",
+      message: "Every resume and cover letter stored in this browser will be permanently deleted. There is no backup and no cloud copy.",
       confirmLabel: "Continue",
       danger: true,
     });

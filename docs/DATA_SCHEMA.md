@@ -52,3 +52,22 @@ Dates are `YYYY-MM` strings. Limits: 50 entries per section, 30 bullets per list
 
 ## Crash-recovery shadow copy
 `localStorage["cc.shadow.<id>"] = { savedAt, doc }` is written **synchronously** when the tab is hidden/closed while a save is still pending, and removed when the real save succeeds. On the next open, a shadow that validates and is newer than the stored record is *offered* (restore is undoable; keeping the saved version deletes it). Corrupt or foreign shadows are discarded.
+
+## Cover letters (Phase 5, letter schema v1)
+Letters are stored in the same `resumes` object store and are told apart by `kind: "cover-letter"` (resumes have no `kind`). `migrateRecord` routes by kind, so shadow copies, backups and the Saved list handle both. A letter has its **own** `schemaVersion` (currently 1); a record with a higher version is refused and left untouched, exactly like resumes.
+
+```
+{ id, kind: "cover-letter", schemaVersion: 1, title, createdAt, updatedAt,
+  templateId, pageSize, designSettings,        // same meaning as on resumes
+  contact, links, photo,                       // sender block, same shape and rules as resumes
+  recipient: { name, title, company, address },
+  role, date ("YYYY-MM-DD" or ""), greeting, opening,
+  body: [{ id, text }]                         // 1 to 3 paragraphs
+  closing, signature,
+  metadata: { isSample, createdWith, copiedFromResume } }
+```
+Limits (see `LETTER_FIELD_MAX`): opening 1500, paragraph 3000, address 300, other fields 120-160 characters. All text is cleaned with `cleanText` and is only ever rendered with `textContent`.
+
+**Copy from a resume** (`copyDetailsFromResume`) copies name, title, contact fields, links, signature name and the template look once. It never links to the resume, never changes it, and copies the photo only when the user ticks the box.
+
+**Backup:** letters travel in the same `documents` array. The envelope `schemaVersion` still describes resumes; each letter carries its own. An older app version would list letters as invalid items and skip them.

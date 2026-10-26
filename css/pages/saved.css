@@ -89,3 +89,8 @@
 .backup-bar__text {
   margin-right: auto;
 }
+
+.saved__filter {
+  margin-bottom: var(--space-4);
+  max-width: 420px;
+}

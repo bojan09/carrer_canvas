@@ -1,0 +1,81 @@
+/* Cover letters reuse every resume template: same header, same fonts and colours. This file only
+   flattens the resume-specific section layouts (sidebar grids, heading gutters) for the single
+   letter block, so it must load after all template stylesheets. */
+.doc[data-kind="letter"] .doc__main {
+  display: block;
+}
+
+.doc[data-kind="letter"] .doc__section {
+  display: block;
+  margin-top: 0;
+  border-top-width: 0;
+}
+
+.doc[data-kind="letter"] .doc__letter {
+  display: block;
+}
+
+.doc[data-kind="letter"] .doc__body {
+  margin-top: calc(var(--gap) * 1.4);
+}
+
+.doc[data-kind="letter"] .doc__date,
+.doc[data-kind="letter"] .doc__recipient,
+.doc[data-kind="letter"] .doc__subject,
+.doc[data-kind="letter"] .doc__greeting,
+.doc[data-kind="letter"] .doc__para,
+.doc[data-kind="letter"] .doc__closing {
+  margin: 0 0 1em;
+  white-space: pre-line;
+}
+
+.doc[data-kind="letter"] .doc__recipient {
+  display: block;
+  font-style: normal;
+}
+
+.doc[data-kind="letter"] .doc__recipient span {
+  display: block;
+}
+
+.doc[data-kind="letter"] .doc__date {
+  color: var(--ink-2);
+}
+
+.doc[data-kind="letter"] .doc__subject {
+  font-weight: 700;
+}
+
+.doc[data-kind="letter"] .doc__para {
+  text-align: left;
+  line-height: calc(var(--lh) + 0.05);
+}
+
+.doc[data-kind="letter"] .doc__closing {
+  margin-bottom: 2.4em;
+}
+
+.doc[data-kind="letter"] .doc__signature {
+  margin: 0;
+  font-family: var(--font-head);
+  font-weight: 700;
+}
+
+/* Templates that put headings or content in a gutter: keep the letter in one plain column. */
+.doc[data-kind="letter"][data-template="vertex"] .doc__section,
+.doc[data-kind="letter"][data-template="mono"] .doc__section {
+  display: block;
+  padding-top: 0;
+  border-top: 0;
+}
+
+.doc[data-kind="letter"] .doc__section > :not(.doc__heading) {
+  grid-column: auto;
+}
+
+@media print {
+  .doc[data-kind="letter"] .doc__para {
+    orphans: 3;
+    widows: 3;
+  }
+}

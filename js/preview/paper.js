@@ -1,6 +1,6 @@
 import { h } from "../utils/dom.js";
 import { PAPER } from "../templates/design.js";
-import { renderResume } from "./render.js";
+import { renderDocument } from "./render.js";
 
 export const ZOOM_MODES = [
   ["fit-width", "Fit width"],
@@ -20,7 +20,7 @@ const clamp = (n, a, b) => Math.min(b, Math.max(a, n));
  */
 export function mountPaper(container, { zoom = "fit-width", onInfo = () => {} } = {}) {
   const sizer = h("div", { class: "stage__sizer" });
-  const scroller = h("div", { class: "stage", tabindex: "0", role: "region", "aria-label": "Resume preview, scrollable" }, sizer);
+  const scroller = h("div", { class: "stage", tabindex: "0", role: "region", "aria-label": "Document preview, scrollable" }, sizer);
   container.replaceChildren(scroller);
 
   let doc = null;
@@ -67,7 +67,7 @@ export function mountPaper(container, { zoom = "fit-width", onInfo = () => {} } 
   return {
     update(nextDoc) {
       doc = nextDoc;
-      const next = renderResume(doc);
+      const next = renderDocument(doc);
       const sig = `${doc.templateId}|${next.dataset.template}|${doc.pageSize}`;
       if (current && sig !== signature) next.style.animation = "doc-in 260ms var(--ease) both";
       signature = sig;
