@@ -44,3 +44,30 @@
     color: #000;
   }
 }
+
+.doc[data-template="slate"] .doc__header:has(.doc__photo) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas: "id photo" "contact contact";
+  align-items: center;
+  column-gap: 1.2em;
+}
+
+.doc[data-template="slate"] .doc__header:has(.doc__photo) .doc__id {
+  grid-area: id;
+}
+
+.doc[data-template="slate"] .doc__header:has(.doc__photo) .doc__photo {
+  grid-area: photo;
+  box-shadow: 0 0 0 2px var(--accent);
+}
+
+.doc[data-template="slate"] .doc__header:has(.doc__photo) .doc__contact {
+  grid-area: contact;
+}
+
+.doc[data-template="slate"][data-align="center"] .doc__header:has(.doc__photo) {
+  grid-template-columns: 1fr;
+  grid-template-areas: "photo" "id" "contact";
+  justify-items: center;
+}

@@ -6,6 +6,7 @@ import { cleanText } from "../utils/sanitization.js";
 import { confirmDialog } from "../components/dialog.js";
 import { checkboxField, iconButton, textField } from "./fields.js";
 import { bulletsEditor } from "./bullets.js";
+import { photoControls } from "./photo-controls.js";
 import { makeSortable } from "./sortable.js";
 
 const move = (arr, from, to) => {
@@ -84,7 +85,7 @@ export function contactBody(doc, ctx) {
       }),
     );
   }
-  return h("div", {}, grid, links);
+  return h("div", {}, photoControls({ doc, ctx, headingId: "pi-photo", level: "h4" }), grid, links);
 }
 
 export function summaryBody(section, def, ctx) {

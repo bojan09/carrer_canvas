@@ -40,6 +40,7 @@ const PRECACHE = [
   "css/templates/nexus.css",
   "js/editors/design-panel.js",
   "js/editors/photo.js",
+  "js/editors/photo-controls.js",
   "js/preview/paper.js",
   "js/preview/thumb.js",
   "js/templates/registry.js",

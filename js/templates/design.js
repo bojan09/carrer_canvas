@@ -69,7 +69,7 @@ export function renderTemplateOf(doc) {
 
 export function photoVisible(doc) {
   const d = resolveDesign(doc);
-  return Boolean(doc.photo) && d.showPhoto && renderTemplateOf(doc).supports.photo;
+  return Boolean(doc.photo) && d.showPhoto && !d.simplified && renderTemplateOf(doc).supports.photo;
 }
 
 /** Switching template keeps content and layout-independent choices, and drops visual overrides. */

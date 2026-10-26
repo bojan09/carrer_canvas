@@ -35,6 +35,16 @@ const page = await context.newPage();
 page.on("console", (m) => m.type() === "error" && errors.push(m.text()));
 page.on("pageerror", (e) => errors.push(String(e)));
 
+// Radios are visually hidden under their labels; the busy main thread after heavy renders can swallow a click, so retry.
+async function pick(labelText) {
+  const input = page.locator(`label:has-text("${labelText}") input`).last();
+  for (let i = 0; i < 4; i++) {
+    await input.click({ force: true });
+    await page.waitForTimeout(120);
+    if (await input.isChecked()) return;
+  }
+  throw new Error(`could not select ${labelText}`);
+}
 const design = () => page.check('input[name="studio-view"][value="design"]');
 const edit = () => page.check('input[name="studio-view"][value="edit"]');
 
@@ -131,10 +141,10 @@ await page.getByRole("button", { name: /^Accent #d63b25/ }).click();
 await page.waitForTimeout(150);
 const vars = await page.locator(".stage__sizer > .doc").evaluate((d) => ({ a: d.style.getPropertyValue("--accent"), m: d.style.getPropertyValue("--margin"), lh: d.style.getPropertyValue("--lh"), g: d.style.getPropertyValue("--gap") }));
 check("accent, margin, line height and gap apply together", vars.a === "#d63b25" && parseFloat(vars.m) > 100 && vars.lh === "1.75" && vars.g === "34px", JSON.stringify(vars));
-await page.locator('label:has-text("Classic Serif") input').check({ force: true });
+await pick("Classic Serif");
 await page.waitForTimeout(250);
 check("font pairing changes the document font", (await page.locator(".stage__sizer > .doc").evaluate((d) => getComputedStyle(d.querySelector(".doc__name")).fontFamily)).includes("Georgia"));
-await page.locator('label:has-text("Dotted") input').check({ force: true });
+await pick("Dotted");
 await page.waitForTimeout(250);
 check("divider style applies", (await page.locator(".stage__sizer > .doc").getAttribute("data-divider")) === "dotted");
 
@@ -183,28 +193,35 @@ for (const id of ["summit", "grid"]) {
   await page.locator(`[data-focus-key="tpl:${id}"]`).click();
   await page.waitForTimeout(250);
   const s = await page.locator(".stage__sizer > .doc").evaluate((d) => ({ side: d.querySelectorAll(".doc__side").length, img: d.querySelectorAll("img,svg,canvas").length, order: [...d.querySelectorAll("h1,h2")].map((h) => h.tagName), pseudo: [...d.querySelectorAll("*")].some((e) => ["::before", "::after"].some((p) => { const c = getComputedStyle(e, p).content; return c && c !== "none" && c !== "normal" && c !== '""'; })) }));
-  check(`${id}: single column, no icons/images, real headings, no content in pseudo-elements`, s.side === 0 && s.img === 0 && s.order[0] === "H1" && s.order.slice(1).every((t) => t === "H2") && !s.pseudo, JSON.stringify(s));
+  check(`${id}: single column, no icons/images by default, real headings, no content in pseudo-elements`, s.side === 0 && s.img === 0 && s.order[0] === "H1" && s.order.slice(1).every((t) => t === "H2") && !s.pseudo, JSON.stringify(s));
 }
 
 // ---------- photo ----------
 await page.locator(`[data-focus-key="tpl:aurora"]`).click();
 await page.getByLabel(/Simplified layout/).uncheck();
 await page.locator(`[data-focus-key="tpl:velo"]`).click();
-await page.setInputFiles('input[type="file"]', { name: "me.png", mimeType: "image/png", buffer: PNG });
-await page.waitForSelector(".design__photo");
+await page.setInputFiles('.design input[type="file"]', { name: "me.png", mimeType: "image/png", buffer: PNG });
+await page.waitForSelector(".design .design__photo");
 check("photo uploads but is NOT shown until enabled", (await page.locator(".stage__sizer .doc__photo").count()) === 0);
-const stored = await page.evaluate(() => document.querySelector(".design__photo").src);
+const stored = await page.evaluate(() => document.querySelector(".design .design__photo").src);
 check("photo is stored as a small re-encoded JPEG data URL", stored.startsWith("data:image/jpeg;base64,") && stored.length < 150000, `${stored.length} chars`);
-await page.getByLabel("Show photo on resume").check();
+await page.locator(".design").getByLabel("Show photo on resume").check();
 await page.waitForTimeout(200);
 check("photo appears in a layout that supports it once enabled", (await page.locator(".stage__sizer .doc__photo").count()) === 1);
+await page.locator(`[data-focus-key="tpl:grid"]`).click();
+await page.waitForTimeout(250);
+check("Grid never shows the photo and explains why", (await page.locator(".stage__sizer .doc__photo").count()) === 0 && (await page.textContent(".design .photo .notice")).includes("does not show photos"));
 await page.locator(`[data-focus-key="tpl:summit"]`).click();
 await page.waitForTimeout(250);
-check("ATS-conscious layouts omit the photo and explain why", (await page.locator(".stage__sizer .doc__photo").count()) === 0);
+check("Summit shows an explicitly enabled photo", (await page.locator(".stage__sizer .doc__photo").count()) === 1);
+await edit();
+check("photo controls are also in Personal Info", (await page.locator("#sec-contact .photo").count()) === 1);
+await design();
 await page.locator(`[data-focus-key="tpl:nexus"]`).click();
-await page.getByRole("button", { name: "Remove photo" }).click();
-check("photo can be removed", (await page.locator(".design__photo").count()) === 0 && (await page.locator(".stage__sizer .doc__photo").count()) === 0);
-await page.setInputFiles('input[type="file"]', { name: "x.txt", mimeType: "text/plain", buffer: Buffer.from("not an image") });
+await page.locator(".design").getByRole("button", { name: "Remove photo" }).click();
+await page.waitForTimeout(300);
+check("photo can be removed", (await page.locator(".design .design__photo").count()) === 0 && (await page.locator(".stage__sizer .doc__photo").count()) === 0);
+await page.setInputFiles('.design input[type="file"]', { name: "x.txt", mimeType: "text/plain", buffer: Buffer.from("not an image") });
 await page.waitForSelector('.toast:has-text("JPEG, PNG or WebP")');
 check("non-image upload is rejected with a clear message", true);
 
@@ -219,7 +236,7 @@ check("fit page keeps the paper inside the pane", fp);
 await page.selectOption("#zoom-select", "fit-width");
 
 // paper size
-await page.locator('label:has-text("US Letter") input').check({ force: true });
+await pick("US Letter");
 await page.waitForTimeout(200);
 check("US Letter changes the paper size", (await page.locator(".stage__sizer > .doc").evaluate((d) => d.style.getPropertyValue("--paper-w"))) === "816px");
 

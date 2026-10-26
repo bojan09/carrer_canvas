@@ -18,12 +18,14 @@ test("eight distinct templates with the required identities", () => {
   assert.equal(new Set(TEMPLATES.map((t) => t.id)).size, 8);
 });
 
-test("Summit and Grid are single-column, ATS-conscious, no photo, plain skills", () => {
+test("Summit and Grid are single-column, ATS-conscious, plain skills; only Grid never shows a photo", () => {
+  assert.equal(getTemplate("grid").supports.photo, false);
+  assert.equal(getTemplate("summit").supports.photo, true, "opt-in photo is allowed, with a warning");
+  assert.ok(getTemplate("summit").warnings.length > 0);
   for (const id of ["summit", "grid"]) {
     const t = getTemplate(id);
     assert.equal(t.layout, "single");
     assert.equal(t.atsConscious, true);
-    assert.equal(t.supports.photo, false);
     assert.equal(t.skills, "text");
     assert.deepEqual(t.side, []);
   }
@@ -84,7 +86,13 @@ test("photo is shown only when stored, explicitly enabled and supported by the r
   assert.equal(photoVisible(doc), false, "simplified layout has no photo");
   doc.designSettings = { showPhoto: true };
   doc.templateId = "summit";
-  assert.equal(photoVisible(doc), false, "ATS templates omit photos");
+  assert.equal(photoVisible(doc), true, "Summit shows an explicitly enabled photo");
+  doc.designSettings = { showPhoto: true, simplified: true };
+  doc.templateId = "velo";
+  assert.equal(photoVisible(doc), false, "simplified never shows a photo");
+  doc.designSettings = { showPhoto: true };
+  doc.templateId = "grid";
+  assert.equal(photoVisible(doc), false, "Grid never shows a photo");
 });
 
 test("applyTemplate keeps content and layout-independent choices, drops visual overrides", () => {

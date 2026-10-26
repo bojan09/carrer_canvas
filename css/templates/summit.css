@@ -25,3 +25,29 @@
 .doc[data-template="summit"] .doc__entry-title {
   font-family: var(--font-head);
 }
+
+.doc[data-template="summit"] .doc__header:has(.doc__photo) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas: "id photo" "contact contact";
+  align-items: center;
+  column-gap: 1.2em;
+}
+
+.doc[data-template="summit"] .doc__header:has(.doc__photo) .doc__id {
+  grid-area: id;
+}
+
+.doc[data-template="summit"] .doc__header:has(.doc__photo) .doc__photo {
+  grid-area: photo;
+}
+
+.doc[data-template="summit"] .doc__header:has(.doc__photo) .doc__contact {
+  grid-area: contact;
+}
+
+.doc[data-template="summit"][data-align="center"] .doc__header:has(.doc__photo) {
+  grid-template-columns: 1fr;
+  grid-template-areas: "photo" "id" "contact";
+  justify-items: center;
+}

@@ -9,6 +9,7 @@ Latest: **Phase 3 implemented** (below). Earlier phases follow.
 - Gallery with real, locally rendered thumbnails, category filters, preview dialog (layout notes), and **Use template** that applies to the last-opened resume without touching content (or starts a new blank resume).
 - Editor Design tab: template picker, Simplified (ATS-conscious) layout, accent swatches + custom colour with contrast warning, four font pairings, name/text size, line spacing, section spacing, margins, divider style, header alignment (locked where a template fixes it, with an explanation), paper size, reset to template defaults. Every change is undoable and persists.
 - Paper preview at real A4/Letter size with Fit width / Fit page / 75–125% zoom (default stored in Settings), estimated page-break guides and page count, template-switch crossfade.
+- Photo controls live in **Personal Info** (and the Design tab). Summit and Slate can show an opt-in photo (Summit warns it is less plain for applicant systems); Grid and the Simplified layout never do.
 - Optional photo: opt-in, centre-cropped and re-encoded to a small JPEG (EXIF dropped), stored locally, hidden until "Show photo" is on, never shown by ATS/executive layouts or Simplified layout, clear warning copy.
 - Schema v2 with migration; older app versions refuse v2 records instead of dropping photos.
 - Mobile: Edit / Preview / Design bottom tabs; Design panel and gallery verified at 390px.

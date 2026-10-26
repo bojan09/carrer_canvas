@@ -4,8 +4,7 @@ import { TEMPLATES, getTemplate } from "../templates/registry.js";
 import { ACCENT_SWATCHES, DIVIDERS, FONT_PAIRS, LIMITS, PAPER, applyTemplate, contrastRatio, renderTemplateOf, resolveDesign } from "../templates/design.js";
 import { mountThumb } from "../preview/thumb.js";
 import { announce } from "../components/announcer.js";
-import { toast } from "../components/toast.js";
-import { compressPhoto, PHOTO_ERRORS, PHOTO_TYPES } from "./photo.js";
+import { photoControls } from "./photo-controls.js";
 
 let sampleDoc = null;
 const sample = () => (sampleDoc ||= createSample());
@@ -148,48 +147,7 @@ export function designPanel({ session, ctx }) {
   root.append(struct);
 
   // ---- photo ----
-  const photo = h("section", { class: "design__group", "aria-labelledby": "dz-photo" }, h("h3", { id: "dz-photo", text: "Photo (optional)" }));
-  photo.append(h("p", { class: "field__hint", text: "Photos are never required. Some regions, employers and applicant systems discourage or ignore them. Your photo stays on this device and is shown on the resume only while “Show photo” is on." }));
-  const fileInput = h("input", { type: "file", class: "sr-only", accept: PHOTO_TYPES.join(","), id: nid("file"), tabindex: "-1" });
-  const choose = h("button", { type: "button", class: "btn btn--outline btn--sm", text: doc.photo ? "Replace photo…" : "Choose photo…" });
-  choose.addEventListener("click", () => fileInput.click());
-  fileInput.addEventListener("change", async () => {
-    const file = fileInput.files?.[0];
-    fileInput.value = "";
-    if (!file) return;
-    try {
-      const result = await compressPhoto(file);
-      ctx.change(() => (doc.photo = result), { structural: true, focusKey: "design:photo-show" });
-      toast({ message: "Photo added. Turn on “Show photo” to include it.", tone: "ok" });
-    } catch (err) {
-      toast({ message: PHOTO_ERRORS[err.message] || "Could not use that photo.", tone: "warn", duration: 7000 });
-    }
-  });
-  photo.append(choose, fileInput);
-  if (doc.photo) {
-    const preview = h("img", { class: "design__photo", src: doc.photo.data, alt: "Your photo (preview)", width: "56", height: "56" });
-    const show = h("label", { class: "check" });
-    const showInput = h("input", { type: "checkbox", class: "check__input" });
-    showInput.checked = design.showPhoto;
-    showInput.dataset.focusKey = "design:photo-show";
-    showInput.addEventListener("change", () => ctx.change(() => (doc.designSettings.showPhoto = showInput.checked), { structural: true, focusKey: "design:photo-show" }));
-    show.append(showInput, h("span", { text: "Show photo on resume" }));
-    const remove = h("button", { type: "button", class: "btn btn--ghost btn--sm btn--danger-text", text: "Remove photo" });
-    remove.addEventListener("click", () => {
-      ctx.change(() => {
-        doc.photo = null;
-        delete doc.designSettings.showPhoto;
-      }, { structural: true, focusKey: "design:photo-choose" });
-      announce("Photo removed. You can undo.");
-    });
-    choose.dataset.focusKey = "design:photo-choose";
-    photo.append(h("div", { class: "design__photorow" }, preview, show, remove));
-    photo.append(segmented("dz-shape", [["circle", "Round"], ["square", "Square"]], design.photoShape, (v) => set("photoShape", v), { label: "Photo shape" }));
-    if (design.showPhoto && !rendered.supports.photo) {
-      photo.append(h("p", { class: "notice", text: `${rendered.name} does not show photos, so the photo is hidden in this layout.` }));
-    }
-  }
-  root.append(photo);
+  root.append(photoControls({ doc, ctx, headingId: "dz-photo", level: "h3" }));
 
   // ---- reset ----
   const reset = h("button", { type: "button", class: "btn btn--outline", text: "Reset to template defaults" });
