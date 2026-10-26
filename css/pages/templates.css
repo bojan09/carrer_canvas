@@ -27,6 +27,21 @@
     border-color: var(--accent-text);
     box-shadow: var(--shadow-md);
   }
+
+  .template-card:hover .thumb__page {
+    filter: brightness(1.03);
+  }
+}
+
+.template-card:focus-within {
+  border-color: var(--accent-text);
+  box-shadow: var(--shadow-md), 0 0 0 2px color-mix(in srgb, var(--accent-text) 35%, transparent);
+}
+
+a.template-card:active,
+.template-card:has(.btn:active) {
+  transform: translateY(-1px) scale(0.99);
+  transition-duration: 90ms;
 }
 
 .template-card__meta {

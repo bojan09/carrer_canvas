@@ -31,6 +31,7 @@ const PNG = makePng(40, 24);
 const browser = await chromium.launch();
 const errors = [];
 const context = await browser.newContext({ viewport: { width: 1500, height: 950 }, locale: "en-GB" });
+await context.addInitScript(() => { try { if (!localStorage.getItem("cc.settings.v1")) localStorage.setItem("cc.settings.v1", JSON.stringify({ tourSeen: true })); } catch {} }); // the first-run tour has its own tests (phase6)
 const page = await context.newPage();
 page.on("console", (m) => m.type() === "error" && errors.push(m.text()));
 page.on("pageerror", (e) => errors.push(String(e)));
@@ -170,7 +171,7 @@ check("reset restores template defaults", (await page.locator(".stage__sizer > .
 
 // undo of a template switch
 await page.locator(`[data-focus-key="tpl:bloom"]`).click();
-await page.getByRole("button", { name: "Undo" }).click();
+await page.locator('button[aria-label="Undo"]').click();
 await page.waitForTimeout(200);
 check("undo reverts a template switch", (await page.locator(".stage__sizer > .doc").getAttribute("data-chosen")) === "nexus");
 

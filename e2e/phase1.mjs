@@ -16,6 +16,7 @@ const check = (name, ok, detail = "") => {
 
 const browser = await chromium.launch();
 const context = await browser.newContext({ viewport: { width: 1440, height: 900 }, serviceWorkers: "allow" });
+await context.addInitScript(() => { try { if (!localStorage.getItem("cc.settings.v1")) localStorage.setItem("cc.settings.v1", JSON.stringify({ tourSeen: true })); } catch {} }); // the first-run tour has its own tests (phase6)
 const page = await context.newPage();
 
 const errors = [];

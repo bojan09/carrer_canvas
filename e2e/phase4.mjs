@@ -40,6 +40,7 @@ function words(pdf) {
 const browser = await chromium.launch();
 const errors = [];
 const context = await browser.newContext({ viewport: { width: 1400, height: 900 }, acceptDownloads: true });
+await context.addInitScript(() => { try { if (!localStorage.getItem("cc.settings.v1")) localStorage.setItem("cc.settings.v1", JSON.stringify({ tourSeen: true })); } catch {} }); // the first-run tour has its own tests (phase6)
 const page = await context.newPage();
 page.on("console", (m) => m.type() === "error" && errors.push(m.text()));
 page.on("pageerror", (e) => errors.push(String(e)));
@@ -372,7 +373,7 @@ await page.screenshot({ path: "e2e/screenshots/p4-recover-dialog.png" });
 await page.getByRole("button", { name: "Restore changes" }).click();
 await page.waitForTimeout(300);
 check("restoring recovers the text", (await page.getByLabel("Full name").inputValue()) === "Recovered after crash");
-await page.getByRole("button", { name: "Undo" }).click();
+await page.locator('button[aria-label="Undo"]').click();
 await page.waitForTimeout(200);
 check("recovery is undoable", (await page.getByLabel("Full name").inputValue()) !== "Recovered after crash");
 await page.evaluate(async (id) => {

@@ -32,6 +32,11 @@
   transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease), transform var(--dur) var(--ease);
 }
 
+.doc-card:active {
+  transform: scale(0.995);
+  transition-duration: 90ms;
+}
+
 @media (hover: hover) {
   .doc-card:hover {
     transform: translateY(-2px);

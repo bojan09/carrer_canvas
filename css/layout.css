@@ -166,12 +166,22 @@ main {
   gap: var(--space-2) var(--space-5);
 }
 
-.site-footer__links a {
+.site-footer__links a,
+.site-footer__links .linklike {
   color: var(--text-2);
   text-decoration: none;
 }
 
-.site-footer__links a:hover {
+.site-footer__links .linklike {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  cursor: pointer;
+}
+
+.site-footer__links a:hover,
+.site-footer__links .linklike:hover {
   color: var(--text);
   text-decoration: underline;
 }

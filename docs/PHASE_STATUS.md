@@ -173,3 +173,20 @@ Phase 2: versioned resume schema, IndexedDB repositories + migrations, section e
 **Verified (Chromium only):** 81 unit tests; e2e phases 1-5 and 5.1 pass (5.1: 43 checks incl. real PDFs).
 **Not verified:** Safari/Firefox support for `color-mix()` with `calc()` percentages and CSS `mask` (Bloom motif) on older versions; iOS/Android; screen readers on the colour controls; very long names with a flipped header.
 **Limits:** colour pickers are the browser's native control (look differs per browser); transparency scales decorative fills only, text is never made transparent.
+
+## Phase 6: interaction polish (v0.7.0)
+**Done**
+- **Transitions that mean something:** reordering sections, entries, bullets, links and letter paragraphs slides the affected items to their new place, and a newly added item eases in. Transform and opacity only (`js/utils/flip.js`), so layout never shifts. Gallery and saved cards press and focus-lift; template switches keep their soft preview fade.
+- **Undo feedback:** deleting an entry, bullet, link, section, letter paragraph or photo, and copying details into a letter, now shows a notification with an **Undo** button (plus the screen-reader announcement).
+- **Guided first-run tour** (`js/components/tour.js`): 5 steps (saving, Edit/Preview/Design, undo, checklist, PDF), skippable with Esc or Skip, non-modal, keyboard friendly, shown once, replayable from Settings. It never opens over another dialog and always fits the screen in portrait and landscape.
+- **Keyboard shortcuts:** `?` opens the list (also in the footer and in Settings), Alt+1/2/3 switch tabs, Ctrl/Cmd+S confirms the autosave instead of opening the browser's Save dialog. One list is the source for the dialog and Settings, and a test checks every listed shortcut exists in the code.
+- **Contextual checklist:** each section card shows "N to check" for the checklist items that point at it, and clears as you fix them.
+- **Skeletons only when slow:** the Saved list and the editors show a layout-matched skeleton only if loading takes over 180 ms. Fast loads never flash one and nothing waits on purpose.
+- **Offline and update messaging:** clearer offline notice ("your documents stay saved on this device"), update notice says work is saved before the reload, Settings shows the update state.
+- **Settings:** Help and accessibility card (tour, shortcuts, an honest statement of what has and has not been checked); Reset now keeps records (last backup date, tour flag) and only resets preferences; stale text about backups being "planned" fixed.
+- **Reduced-motion parity:** the OS setting and the in-app Motion option both stop transitions, the tour fade and the skeleton shimmer (tested for each).
+- **Microcopy:** spell-checked all UI text and docs with codespell (no findings); British spelling is consistent.
+
+**Verified (Chromium only):** 88 unit tests; e2e phases 1-6 pass (phase 6: 43 checks across 9 viewport sizes including landscape phones).
+**Not verified:** Safari, Firefox, real phones and tablets; screen readers (the tour and shortcut dialog use standard roles but have not been heard); Web Animations support on older Safari (transitions simply do not play there).
+**Known limits:** drag-and-drop reordering still has no animation of the dragged item itself (the drop result animates); Alt+number shortcuts are ignored while typing in a field so they never swallow characters on Mac keyboards.

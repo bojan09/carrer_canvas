@@ -11,6 +11,8 @@ import { openPrintDialog, shouldReview } from "./print-dialog.js";
 import { printResume } from "../export/print.js";
 import { toast } from "../components/toast.js";
 import { sectionsList } from "./sections-rail.js";
+import { startTour, tourPending } from "../components/tour.js";
+import { captureFlip, playFlip } from "../utils/flip.js";
 import { resumeAdapter } from "./resume-adapter.js";
 
 const isTextEntry = (el) => el && el.closest && el.closest("input, textarea, select, [contenteditable='true']");
@@ -30,6 +32,11 @@ export function mountStudio(root, session, { persistent, adapter = resumeAdapter
   const ctx = {
     change: (mutator, opts) => session.change(mutator, opts),
     announce,
+    /** Announces a change and offers Undo right where the user is looking. */
+    undoable: (message) => {
+      announce(`${message} You can undo.`);
+      toast({ message, tone: "ok", duration: 7000, action: { label: "Undo", onClick: () => doUndo() } });
+    },
   };
 
   // ---- skeleton ----
@@ -40,6 +47,7 @@ export function mountStudio(root, session, { persistent, adapter = resumeAdapter
   const retry = h("button", { type: "button", class: "btn btn--ghost btn--sm", text: "Retry", hidden: true, onclick: () => session.retrySave() });
 
   const undoBtn = toolButton({ name: "undo", label: "Undo", text: "Undo", onClick: () => doUndo() });
+  undoBtn.dataset.tour = "undo";
   const redoBtn = toolButton({ name: "redo", label: "Redo", text: "Redo", onClick: () => doRedo() });
   const sectionsBtn = adapter.hasRail ? toolButton({ name: "layers", label: "Manage sections", text: "Sections", onClick: () => openSectionsDialog() }) : null;
   sectionsBtn?.classList.add("studio__sections-btn");
@@ -50,6 +58,8 @@ export function mountStudio(root, session, { persistent, adapter = resumeAdapter
   const checklistBadge = h("span", { class: "badge badge--warn studio__badge", hidden: true });
   const checklistBtn = toolButton({ name: "list-check", label: "Writing checklist", text: "Checklist", onClick: () => openChecklist() });
   checklistBtn.append(checklistBadge);
+  checklistBtn.dataset.tour = "checklist";
+  exportBtn.dataset.tour = "export";
 
   const bar = h(
     "div",
@@ -60,13 +70,13 @@ export function mountStudio(root, session, { persistent, adapter = resumeAdapter
       { class: "studio__titlewrap" },
       h("label", { class: "sr-only", for: "doc-title", text: "Document title" }),
       title,
-      h("div", { class: "studio__statusrow" }, statusVisual, retry, statusLive),
+      h("div", { class: "studio__statusrow", "data-tour": "status" }, statusVisual, retry, statusLive),
     ),
     h("div", { class: "studio__actions" }, undoBtn, redoBtn, sectionsBtn, checklistBtn, exportBtn),
   );
   bar.querySelector(".studio__back").innerHTML = icon("arrow-left") + '<span class="tool-label">Saved</span>';
 
-  const viewGroup = h("fieldset", { class: "studio__view" }, h("legend", { class: "sr-only", text: "Show" }));
+  const viewGroup = h("fieldset", { class: "studio__view", "data-tour": "view" }, h("legend", { class: "sr-only", text: "Show" }));
   const seg = h("div", { class: "segmented" });
   [
     ["edit", "Edit"],
@@ -140,12 +150,12 @@ export function mountStudio(root, session, { persistent, adapter = resumeAdapter
     const { id, label, iconName, meta = "", hidden = false, fill } = desc;
     const bodyId = `sec-${id}-body`;
     const toggle = h("button", { type: "button", class: "sec__toggle", "aria-controls": bodyId, "data-focus-key": `sec:${id}` });
-    toggle.innerHTML = `${icon(iconName)}<span class="sec__label"></span><span class="sec__meta"></span>${icon("chevron-down", "sec__chev")}`;
+    toggle.innerHTML = `${icon(iconName)}<span class="sec__label"></span><span class="sec__meta"></span><span class="sec__issues badge badge--warn" hidden></span>${icon("chevron-down", "sec__chev")}`;
     toggle.querySelector(".sec__label").textContent = label;
     toggle.querySelector(".sec__meta").textContent = meta;
 
     const body = h("div", { class: "sec__body", id: bodyId });
-    const card = h("section", { class: `sec${hidden ? " is-hidden" : ""}`, id: `sec-${id}`, "data-section-id": id }, h("h3", { class: "sec__title" }, toggle), body);
+    const card = h("section", { class: `sec${hidden ? " is-hidden" : ""}`, id: `sec-${id}`, "data-section-id": id, "data-flip-key": `card:${id}` }, h("h3", { class: "sec__title" }, toggle), body);
 
     const apply = () => {
       const open = expanded.has(id);
@@ -260,11 +270,25 @@ export function mountStudio(root, session, { persistent, adapter = resumeAdapter
     redoBtn.setAttribute("aria-disabled", String(!session.history.canRedo));
   }
 
+  /** Contextual checklist: each section card shows how many checklist items point at it. */
+  function paintIssues(checks) {
+    const counts = {};
+    for (const c of checks) if (!c.ok && c.section) counts[c.section] = (counts[c.section] || 0) + 1;
+    editor.querySelectorAll(".sec").forEach((card) => {
+      const badge = card.querySelector(".sec__issues");
+      const n = counts[card.dataset.sectionId] || 0;
+      badge.hidden = n === 0;
+      badge.textContent = n ? `${n} to check` : "";
+    });
+  }
+
   let previewTimer;
   function renderPreview() {
     paper.update(session.doc);
     tplBadge.textContent = `${getTemplate(session.doc.templateId).name}${session.doc.designSettings.simplified ? " · simplified" : ""}`;
-    const n = adapter.openIssues(session.doc);
+    const checks = adapter.analyze(session.doc);
+    paintIssues(checks);
+    const n = checks.filter((c) => !c.ok).length;
     checklistBadge.hidden = n === 0;
     checklistBadge.textContent = String(n);
     checklistBtn.setAttribute("aria-label", n ? `Writing checklist, ${n} to review` : "Writing checklist");
@@ -314,14 +338,17 @@ export function mountStudio(root, session, { persistent, adapter = resumeAdapter
     // change
     if (event.structural) {
       const y = window.scrollY;
+      const flipBefore = event.restored ? new Map() : captureFlip(studio);
       if (event.expand) expanded.add(event.expand);
       if (document.activeElement !== title) title.value = session.doc.title;
       renderEditor();
+      paintIssues(adapter.analyze(session.doc));
       renderRails();
       designStale = true;
       if (studio.dataset.view === "design") ensureDesign();
       window.scrollTo(0, y);
       focusKey(event.focusKey);
+      playFlip(studio, flipBefore);
     }
     renderBanners();
     renderHistoryButtons();
@@ -337,8 +364,26 @@ export function mountStudio(root, session, { persistent, adapter = resumeAdapter
     }
   });
 
+  const switchView = (value) => {
+    const input = viewGroup.querySelector(`input[value="${value}"]`);
+    if (!input || !input.getClientRects().length) return; // Preview tab is hidden on wide screens
+    input.checked = true;
+    setView(value);
+  };
+
   const onKey = (e) => {
-    if (!(e.ctrlKey || e.metaKey) || e.altKey || isTextEntry(e.target)) return;
+    const mod = e.ctrlKey || e.metaKey;
+    if (mod && !e.altKey && !e.shiftKey && e.key.toLowerCase() === "s") {
+      e.preventDefault(); // the browser's "save page" dialog is not wanted here: the document saves itself
+      session.flush().finally(() => toast({ message: persistent ? "Your work is saved on this device. It also saves automatically as you type." : "Storage is unavailable in this browser, so this tab cannot save your work.", tone: persistent ? "ok" : "warn", duration: 3000 }));
+      return;
+    }
+    if (e.altKey && !mod && !e.shiftKey && ["1", "2", "3"].includes(e.key) && !isTextEntry(e.target)) {
+      e.preventDefault();
+      switchView({ 1: "edit", 2: "preview", 3: "design" }[e.key]);
+      return;
+    }
+    if (!mod || e.altKey || isTextEntry(e.target)) return;
     const k = e.key.toLowerCase();
     if (k === "z" && !e.shiftKey) (e.preventDefault(), doUndo());
     else if ((k === "z" && e.shiftKey) || k === "y") (e.preventDefault(), doRedo());
@@ -366,12 +411,20 @@ export function mountStudio(root, session, { persistent, adapter = resumeAdapter
     }).then((restore) => {
       if (restore) {
         session.adoptRecovered(recovered.doc);
-        announce("Unsaved changes restored. You can undo.");
+        ctx.undoable("Unsaved changes restored.");
       } else session.discardRecovered();
     });
   }
 
+  // First-run tour: once, never over another dialog, and only after the layout has settled
+  let tour = null;
+  const tourTimer = setTimeout(() => {
+    if (tourPending() && !document.querySelector("dialog[open]")) tour = startTour({ root: studio });
+  }, 700);
+
   return () => {
+    clearTimeout(tourTimer);
+    tour?.stop();
     clearTimeout(previewTimer);
     paper.destroy();
     designApi?.destroy();

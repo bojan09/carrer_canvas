@@ -130,3 +130,8 @@
   color: var(--text-2);
   font-size: 0.9375rem;
 }
+
+.setting-card__sub {
+  margin: var(--space-5) 0 var(--space-2);
+  font-size: 0.9375rem;
+}

@@ -4,7 +4,8 @@ import { getSettings, updateSettings, resetSettings, subscribe } from "../state/
 import { mountInstallCard } from "../components/install-card.js";
 import { confirmDialog } from "../components/dialog.js";
 import { toast } from "../components/toast.js";
-import { checkForUpdates, getOfflineState, onOfflineState } from "../pwa/register.js";
+import { checkForUpdates, getOfflineState, isUpdateReady, onOfflineState } from "../pwa/register.js";
+import { shortcutList } from "../components/shortcuts.js";
 import { isStandalone } from "../utils/platform.js";
 import { getRepository } from "../storage/repository.js";
 import { closeSession, settleSaves } from "../state/resume-store.js";
@@ -85,6 +86,7 @@ export default function settings(root) {
           <dt>Offline support</dt><dd id="kv-offline"></dd>
           <dt>Running as</dt><dd id="kv-mode"></dd>
           <dt>Version</dt><dd>${APP_VERSION}</dd>
+          <dt>Update</dt><dd id="kv-update">Checking…</dd>
         </dl>
         <div class="setting-row">
           <div class="setting-row__label"><strong>Updates</strong><span id="update-status" role="status">Updates are checked automatically. Nothing reloads without your say-so.</span></div>
@@ -94,7 +96,7 @@ export default function settings(root) {
 
       <section class="setting-card" aria-labelledby="s-storage">
         <h2 id="s-storage">Storage</h2>
-        <p class="setting-card__lead">Documents will be stored only in this browser. Clearing site data, private browsing or browser storage pressure can remove them, so regular JSON backups are planned.</p>
+        <p class="setting-card__lead">Documents are stored only in this browser. Clearing site data, private browsing or browser storage pressure can remove them, so download a JSON backup regularly.</p>
         <dl class="kv">
           <dt>Storage engine</dt><dd id="kv-engine">Checking…</dd>
           <dt>Documents</dt><dd id="kv-docs">Checking…</dd>
@@ -111,6 +113,23 @@ export default function settings(root) {
         </div>
       </section>
 
+      <section class="setting-card" aria-labelledby="s-help">
+        <h2 id="s-help">Help and accessibility</h2>
+        <div class="setting-row">
+          <div class="setting-row__label"><strong>Welcome tour</strong><span>A short walk through the editor. It shows once, the first time you open a document.</span></div>
+          <button type="button" class="btn btn--outline btn--sm" id="replay-tour">Show it again</button>
+        </div>
+        <h3 class="setting-card__sub">Keyboard shortcuts</h3>
+        <div id="shortcuts-mount"></div>
+        <h3 class="setting-card__sub">What has and has not been checked</h3>
+        <ul class="prose-list">
+          <li>Every control can be used with the keyboard, focus is always visible, and reordering has up and down buttons as well as dragging.</li>
+          <li>Motion follows your device setting, and the Motion option above turns it off completely.</li>
+          <li>Colour contrast is checked while you design: the design panel warns when text may be hard to read.</li>
+          <li>Testing so far was done in Chromium. Screen readers, Safari, Firefox and real phones have not been tested yet, so please tell us what you find.</li>
+        </ul>
+      </section>
+
       <section class="setting-card" aria-labelledby="s-privacy">
         <h2 id="s-privacy">Privacy</h2>
         <ul class="prose-list">
@@ -119,7 +138,7 @@ export default function settings(root) {
           <li><strong>Documents and preferences are saved in this browser only.</strong> There is no sync, so clearing site data or switching browsers means starting over.</li>
         </ul>
         <div class="setting-row">
-          <div class="setting-row__label"><strong>Reset settings</strong><span>Restores theme and motion to their defaults.</span></div>
+          <div class="setting-row__label"><strong>Reset settings</strong><span>Restores theme, motion, paper size and the other preferences above. Your documents and backup date are not touched.</span></div>
           <button type="button" class="btn btn--outline btn--sm" id="reset">Reset</button>
         </div>
       </section>
@@ -152,6 +171,12 @@ export default function settings(root) {
   });
   root.querySelector("#zoom-default").addEventListener("change", (e) => updateSettings({ previewZoom: e.target.value }));
 
+  $("#shortcuts-mount").append(shortcutList());
+  $("#replay-tour").addEventListener("click", () => {
+    updateSettings({ tourSeen: false });
+    toast({ message: "The tour will show the next time you open a document.", tone: "ok" });
+  });
+
   // Install
   const unsubInstall = mountInstallCard($("#install-mount"));
 
@@ -164,6 +189,7 @@ export default function settings(root) {
   window.addEventListener("online", paintConn);
   window.addEventListener("offline", paintConn);
   const unsubOffline = onOfflineState(paintOffline);
+  $("#kv-update").textContent = isUpdateReady() ? "A new version is ready. Use Reload in the notification." : "None waiting";
 
   $("#check-updates").addEventListener("click", async (e) => {
     const btn = e.currentTarget;

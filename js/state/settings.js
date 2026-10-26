@@ -1,7 +1,7 @@
 import { SETTINGS_KEY, THEME_COLORS } from "../config.js";
 
 const localePaper = () => (/^(en-(US|CA|PH)|es-(US|MX)|fr-CA)/i.test(navigator.language || "") ? "Letter" : "A4");
-const DEFAULTS = { theme: "dark", motion: "system", previewZoom: "fit-width", pageSize: localePaper(), printReview: true, lastBackupAt: null, offlineToastShown: false };
+const DEFAULTS = { theme: "dark", motion: "system", previewZoom: "fit-width", pageSize: localePaper(), printReview: true, lastBackupAt: null, offlineToastShown: false, tourSeen: false };
 const ZOOMS = ["fit-width", "fit-page", "75", "100", "125"];
 const THEMES = ["light", "dark", "system"];
 const MOTIONS = ["system", "reduced"];
@@ -20,6 +20,7 @@ function load() {
       printReview: raw.printReview !== false,
       lastBackupAt: typeof raw.lastBackupAt === "string" && !Number.isNaN(Date.parse(raw.lastBackupAt)) ? raw.lastBackupAt : null,
       offlineToastShown: raw.offlineToastShown === true,
+      tourSeen: raw.tourSeen === true,
     };
   } catch {
     return { ...DEFAULTS };
@@ -60,8 +61,9 @@ export function updateSettings(patch) {
   return saved;
 }
 
+/** Restores preferences only. The last-backup date and one-time flags are records, not preferences, so they stay. */
 export function resetSettings() {
-  return updateSettings({ ...DEFAULTS });
+  return updateSettings({ ...DEFAULTS, lastBackupAt: state.lastBackupAt, offlineToastShown: state.offlineToastShown, tourSeen: state.tourSeen });
 }
 
 export function subscribe(fn) {

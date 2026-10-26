@@ -56,7 +56,7 @@ export function contactBody(doc, ctx) {
     links.append(
       h(
         "div",
-        { class: "link-row" },
+        { class: "link-row", "data-flip-key": `link:${link.id}` },
         label.root,
         url.root,
         iconButton({
@@ -64,7 +64,7 @@ export function contactBody(doc, ctx) {
           label: `Remove link ${i + 1}`,
           onClick: () => {
             ctx.change(() => doc.links.splice(i, 1), { structural: true, focusKey: "links:add" });
-            ctx.announce("Link removed. You can undo.");
+            ctx.undoable("Link removed.");
           },
         }),
       ),
@@ -181,7 +181,7 @@ function entryCard(section, def, item, index, ctx) {
 
   const li = h(
     "li",
-    { class: "entry", "data-entry-id": item.id },
+    { class: "entry", "data-entry-id": item.id, "data-flip-key": `entry:${item.id}` },
     h(
       "div",
       { class: "entry__head" },
@@ -215,7 +215,7 @@ function entryCard(section, def, item, index, ctx) {
             });
             if (!ok) return;
             ctx.change(() => list.splice(index, 1), { structural: true, focusKey: `${section.id}:add` });
-            ctx.announce(`${def.itemLabel} deleted. You can undo.`);
+            ctx.undoable(`${def.itemLabel[0].toUpperCase()}${def.itemLabel.slice(1)} deleted.`);
           },
         }),
       ),

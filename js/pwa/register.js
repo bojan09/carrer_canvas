@@ -7,10 +7,14 @@ let swState = canUseServiceWorker() ? "pending" : "unsupported";
 let registration = null;
 let userRequestedReload = false;
 let updateAnnounced = false;
+let updateReady = false;
 const stateListeners = new Set();
 const beforeUpdateHooks = [];
 
 export const getOfflineState = () => swState;
+
+/** True once a newer version has been downloaded and is waiting for the user to reload. */
+export const isUpdateReady = () => updateReady;
 
 export function onOfflineState(fn) {
   stateListeners.add(fn);
@@ -39,10 +43,11 @@ async function applyUpdate(worker) {
 }
 
 function announceUpdate(worker) {
+  updateReady = true;
   if (updateAnnounced) return;
   updateAnnounced = true;
   toast({
-    message: "A new version of CareerCanvas is ready.",
+    message: "A new version of CareerCanvas is ready. Your work is saved first, then the page reloads.",
     tone: "ok",
     duration: 0,
     action: { label: "Reload", onClick: () => applyUpdate(worker) },

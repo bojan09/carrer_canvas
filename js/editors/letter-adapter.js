@@ -4,7 +4,6 @@ import { LETTER_FIELD_MAX as MAX, LETTER_LIMITS, copyDetailsFromResume, createLe
 import { getRepository } from "../storage/repository.js";
 import { openDialog } from "../components/dialog.js";
 import { toast } from "../components/toast.js";
-import { announce } from "../components/announcer.js";
 import { iconButton, textField } from "./fields.js";
 import { contactBody } from "./section-forms.js";
 import { LETTER_PROMPTS, analyzeLetter, openLetterIssues } from "./letter-hints.js";
@@ -73,7 +72,7 @@ function contactCard(doc, ctx) {
         }
         if (!choice) return;
         ctx.change(() => copyDetailsFromResume(doc, choice.resume, { includePhoto: choice.includePhoto }), { structural: true, focusKey: "letter:copy", expand: "contact" });
-        announce("Details copied from your resume. You can undo.");
+        ctx.undoable("Details copied from your resume.");
       },
     });
     body.append(h("div", { class: "sec__tools" }, copy), contactBody(doc, ctx));
@@ -144,11 +143,12 @@ function bodyCard(doc, ctx) {
           disabled: doc.body.length <= 1,
           onClick: () => {
             ctx.change(() => doc.body.splice(i, 1), { structural: true, focusKey: "letter:add" });
-            announce("Paragraph removed. You can undo.");
+            ctx.undoable("Paragraph removed.");
           },
         }),
       );
       f.root.append(tools);
+      f.root.dataset.flipKey = `para:${p.id}`;
       list.append(f.root);
     });
     body.append(list);

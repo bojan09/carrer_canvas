@@ -10,6 +10,7 @@ import { confirmDialog, openDialog } from "../components/dialog.js";
 import { toast } from "../components/toast.js";
 import { announce } from "../components/announcer.js";
 import { backupFlow, lastBackupText, restoreFlow } from "../export/backup-ui.js";
+import { docCardsSkeleton, whenSlow } from "../components/skeleton.js";
 
 const fmt = (iso) => new Date(iso).toLocaleString([], { dateStyle: "medium", timeStyle: "short" });
 
@@ -24,12 +25,15 @@ const FILTERS = [
 export default function saved(root) {
   let disposed = false;
   let filter = "all";
+  let loaded = false;
   root.replaceChildren(h("p", { class: "page-loading container", role: "status", text: "Loading your documents…" }));
+  const cancelSkeleton = whenSlow(root, docCardsSkeleton, () => loaded || disposed);
 
   async function load() {
     await settleSaves();
     const repo = await getRepository();
     const { items, unreadable } = await repo.list();
+    loaded = true;
     if (!disposed) paint(repo, items, unreadable);
   }
 
@@ -202,5 +206,6 @@ export default function saved(root) {
   });
   return () => {
     disposed = true;
+    cancelSkeleton();
   };
 }

@@ -41,7 +41,7 @@ export function bulletsEditor({ field, bullets, ctx, ownerId }) {
     list.append(
       h(
         "li",
-        { class: "bullets__item" },
+        { class: "bullets__item", "data-flip-key": `bullet:${bullet.id}` },
         area,
         h(
           "div",
@@ -56,7 +56,7 @@ export function bulletsEditor({ field, bullets, ctx, ownerId }) {
                 structural: true,
                 focusKey: bullets[index + 1] ? keyFor(bullets[index + 1], "text") : `${ownerId}:add-bullet`,
               });
-              ctx.announce("Item removed. You can undo.");
+              ctx.undoable("Item removed.");
             },
           }),
         ),

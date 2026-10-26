@@ -1,5 +1,4 @@
 import { h } from "../utils/dom.js";
-import { announce } from "../components/announcer.js";
 import { toast } from "../components/toast.js";
 import { photoVisible, renderTemplateOf, resolveDesign } from "../templates/design.js";
 import { compressPhoto, PHOTO_ERRORS, PHOTO_TYPES } from "./photo.js";
@@ -59,7 +58,7 @@ export function photoControls({ doc, ctx, headingId = "photo-h", level = "h3" })
         },
         { structural: true, focusKey: "design:photo-choose" },
       );
-      announce("Photo removed. You can undo.");
+      ctx.undoable("Photo removed.");
     });
     section.append(h("div", { class: "design__photorow" }, preview, show, remove));
 

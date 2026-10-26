@@ -1,6 +1,5 @@
 import { SECTION_DEFS } from "../models/section-defs.js";
 import { createSample } from "../models/resume.js";
-import { announce } from "../components/announcer.js";
 import { confirmDialog } from "../components/dialog.js";
 import { analyze, openIssues, titleOf } from "./hints.js";
 import { checkboxField } from "./fields.js";
@@ -72,7 +71,7 @@ function checkboxToolbar(section, id, session, ctx) {
         },
         { structural: true, focusKey: "rail:add" },
       );
-      announce("Section deleted. You can undo.");
+      ctx.undoable("Section deleted.");
     });
     tools.append(del);
   }

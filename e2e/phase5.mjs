@@ -25,6 +25,7 @@ function words(pdf) {
 const browser = await chromium.launch();
 const errors = [];
 const context = await browser.newContext({ viewport: { width: 1440, height: 900 }, acceptDownloads: true, locale: "en-GB" });
+await context.addInitScript(() => { try { if (!localStorage.getItem("cc.settings.v1")) localStorage.setItem("cc.settings.v1", JSON.stringify({ tourSeen: true })); } catch {} }); // the first-run tour has its own tests (phase6)
 const page = await context.newPage();
 page.on("console", (m) => m.type() === "error" && errors.push(m.text()));
 page.on("pageerror", (e) => errors.push(String(e)));
@@ -107,7 +108,7 @@ check("title and URL remain the same letter", page.url().endsWith(letterId));
 await open("opening");
 await page.getByLabel("Greeting").fill("Hello team,");
 await page.waitForTimeout(300);
-await page.getByRole("button", { name: "Undo" }).click();
+await page.locator('button[aria-label="Undo"]').click();
 await page.waitForTimeout(300);
 check("undo restores the previous greeting", (await previewText()).includes("Dear Robin Reader,"));
 await page.getByRole("button", { name: "Redo" }).click();
@@ -198,7 +199,7 @@ const unchanged = await page.evaluate(async (id) => {
   return JSON.stringify(await (await getRepository()).get(id)) === window.__resumeBefore;
 }, resumeId);
 check("the source resume was not modified", unchanged);
-await page.getByRole("button", { name: "Undo" }).click();
+await page.locator('button[aria-label="Undo"]').click();
 await page.waitForTimeout(300);
 check("copying can be undone", (await previewText()).includes("Casey Writer"));
 

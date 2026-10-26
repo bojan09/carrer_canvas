@@ -6,6 +6,7 @@ import { copyDetailsFromResume, createBlankLetter, createLetterSample } from "..
 import { mountStudio } from "../editors/studio.js";
 import { letterAdapter, chooseResume } from "../editors/letter-adapter.js";
 import { toast } from "../components/toast.js";
+import { studioSkeleton, whenSlow } from "../components/skeleton.js";
 
 async function createAndOpen(doc) {
   try {
@@ -29,7 +30,9 @@ const savedLink = () => h("a", { class: "btn btn--primary", href: "#/saved", tex
 function editorPage(root, id) {
   let disposed = false;
   let cleanup = null;
+  let ready = false;
   root.replaceChildren(h("p", { class: "page-loading container", role: "status", text: "Opening your cover letter…" }));
+  const cancelSkeleton = whenSlow(root, studioSkeleton, () => ready || disposed);
 
   (async () => {
     try {
@@ -41,6 +44,7 @@ function editorPage(root, id) {
       }
       if (!session) return message(root, { title: "Cover letter not found", lead: "This cover letter does not exist on this device. It may have been deleted, or it was created in another browser.", actions: [savedLink()] });
       const repo = await getRepository();
+      ready = true;
       cleanup = mountStudio(root, session, { persistent: repo.persistent, adapter: letterAdapter });
     } catch (err) {
       if (disposed) return;
@@ -54,6 +58,7 @@ function editorPage(root, id) {
 
   return () => {
     disposed = true;
+    cancelSkeleton();
     cleanup?.();
     closeSession();
   };

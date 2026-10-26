@@ -14,6 +14,7 @@ const run = (cmd, args) => execFileSync(cmd, args, { encoding: "utf8", maxBuffer
 const browser = await chromium.launch();
 const errors = [];
 const context = await browser.newContext({ viewport: { width: 1440, height: 1000 }, locale: "en-GB" });
+await context.addInitScript(() => { try { if (!localStorage.getItem("cc.settings.v1")) localStorage.setItem("cc.settings.v1", JSON.stringify({ tourSeen: true })); } catch {} }); // the first-run tour has its own tests (phase6)
 const page = await context.newPage();
 page.on("console", (m) => m.type() === "error" && errors.push(m.text()));
 page.on("pageerror", (e) => errors.push(String(e)));
@@ -77,7 +78,7 @@ check("text content is unaffected by styling changes", textNow.includes("Senior 
 await page.getByRole("button", { name: "Reset text colour to the template colour" }).click();
 await page.waitForTimeout(300);
 check("a single colour can be reset to the template colour", (await docVar("--ink")) === "" && (await css(".doc__entry-title", "color")) === inkBefore && (await docVar("--deco-c")) === "#0f766e");
-await page.getByRole("button", { name: "Undo" }).click();
+await page.locator('button[aria-label="Undo"]').click();
 await page.waitForTimeout(300);
 check("undo brings the colour back", (await css(".doc__entry-title", "color")) === "rgb(170, 0, 0)");
 await page.waitForFunction(() => /Saved on this device/.test(document.querySelector(".studio__status")?.textContent || ""));

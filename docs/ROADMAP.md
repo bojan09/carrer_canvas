@@ -1,7 +1,7 @@
 # Roadmap and backlog
 
-## Next: Phase 6, polish
-Phases 3b (template refresh) and 5 (cover letters) are done, see PHASE_STATUS.md.
+## Next: Phase 7, quality gate and shipping
+Phases 3b, 5, 5.1 and 6 are done, see PHASE_STATUS.md. Needs real devices: Safari, Firefox, iOS, Android, screen readers, Lighthouse.
 
 ## Later
 - Phase 5: cover letters (reuse template identity, print and backup support).

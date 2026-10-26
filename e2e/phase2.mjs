@@ -23,6 +23,7 @@ const watch = (page) => {
 
 async function newPage(opts = {}) {
   const context = await browser.newContext({ viewport: { width: 1440, height: 900 }, ...opts });
+  await context.addInitScript(() => { try { if (!localStorage.getItem("cc.settings.v1")) localStorage.setItem("cc.settings.v1", JSON.stringify({ tourSeen: true })); } catch {} }); // tour has its own tests (phase6)
   const page = await context.newPage();
   watch(page);
   return { context, page };
@@ -94,10 +95,10 @@ const openSection = async (page, id) => {
   await page.getByRole("button", { name: "Add another item" }).click();
   await page.getByLabel(/item 3 of 3/).fill("Third bullet");
   await page.waitForTimeout(150);
-  await page.getByRole("button", { name: "Undo" }).click();
+  await page.locator('button[aria-label="Undo"]').click();
   await page.waitForTimeout(150);
   check("undo reverts the last edit", !(await page.locator(".doc").textContent()).includes("Third bullet"));
-  while ((await page.getByRole("button", { name: "Undo" }).getAttribute("aria-disabled")) === "false") await page.getByRole("button", { name: "Undo" }).click();
+  while ((await page.locator('button[aria-label="Undo"]').getAttribute("aria-disabled")) === "false") await page.locator('button[aria-label="Undo"]').click();
   check("undo to the start of the session keeps earlier saved content", (await page.textContent(".doc")).includes("Engineer") && !(await page.textContent(".doc")).includes("Third bullet"));
   while ((await page.getByRole("button", { name: "Redo" }).getAttribute("aria-disabled")) === "false") await page.getByRole("button", { name: "Redo" }).click();
   await page.waitForTimeout(300);

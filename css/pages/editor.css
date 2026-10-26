@@ -1028,3 +1028,8 @@ input.colour__input:disabled {
   opacity: 0.45;
   cursor: not-allowed;
 }
+
+.sec__issues {
+  flex: none;
+  white-space: nowrap;
+}

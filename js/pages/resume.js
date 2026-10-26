@@ -5,6 +5,7 @@ import { closeSession, openSession, settleSaves } from "../state/resume-store.js
 import { createBlank, createSample } from "../models/resume.js";
 import { mountStudio } from "../editors/studio.js";
 import { toast } from "../components/toast.js";
+import { studioSkeleton, whenSlow } from "../components/skeleton.js";
 
 async function createAndOpen(doc) {
   try {
@@ -32,7 +33,9 @@ const savedLink = () => h("a", { class: "btn btn--primary", href: "#/saved", tex
 function editorPage(root, id) {
   let disposed = false;
   let cleanup = null;
+  let ready = false;
   root.replaceChildren(h("p", { class: "page-loading container", role: "status", text: "Opening your resume…" }));
+  const cancelSkeleton = whenSlow(root, studioSkeleton, () => ready || disposed);
 
   (async () => {
     try {
@@ -44,6 +47,7 @@ function editorPage(root, id) {
       }
       if (!session) return message(root, { title: "Resume not found", lead: "This resume does not exist on this device. It may have been deleted, or it was created in another browser.", actions: [savedLink()] });
       const repo = await getRepository();
+      ready = true;
       cleanup = mountStudio(root, session, { persistent: repo.persistent });
     } catch (err) {
       if (disposed) return;
@@ -60,6 +64,7 @@ function editorPage(root, id) {
 
   return () => {
     disposed = true;
+    cancelSkeleton();
     cleanup?.();
     closeSession();
   };

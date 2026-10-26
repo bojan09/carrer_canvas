@@ -36,7 +36,7 @@ export function sectionsList({ session, ctx, onNavigate }) {
     grip.innerHTML = icon("grip");
     const li = h(
       "li",
-      { class: `rail__item${section.visible ? "" : " is-hidden"}` },
+      { class: `rail__item${section.visible ? "" : " is-hidden"}`, "data-flip-key": `rail:${id}` },
       grip,
       link(id, label, SECTION_DEFS[section.type].icon),
       h(

@@ -8,6 +8,7 @@ import { icon } from "./utils/dom.js";
 import { APP_VERSION } from "./config.js";
 import { initPrintSupport } from "./export/print.js";
 import { activeSession } from "./state/resume-store.js";
+import { initShortcuts, openShortcuts } from "./components/shortcuts.js";
 
 applySettings();
 mountNav();
@@ -40,7 +41,7 @@ function paintNet(announce) {
   pill.hidden = !offline;
   if (announce) {
     toast({
-      message: offline ? "You're offline. CareerCanvas keeps working." : "Back online.",
+      message: offline ? "You're offline. CareerCanvas keeps working and your documents stay saved on this device." : "Back online.",
       tone: offline ? "warn" : "ok",
       duration: 3500,
     });
@@ -51,6 +52,8 @@ window.addEventListener("offline", () => paintNet(true));
 paintNet(false);
 
 initPrintSupport(() => activeSession()?.doc || null);
+initShortcuts();
+document.getElementById("open-shortcuts").addEventListener("click", () => openShortcuts());
 
 document.getElementById("footer-version").textContent = `Version ${APP_VERSION}`;
 
