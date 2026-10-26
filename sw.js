@@ -6,7 +6,7 @@
  *   they live in IndexedDB.
  * Keep CACHE_VERSION in sync with js/config.js APP_VERSION (tests enforce this).
  */
-const CACHE_VERSION = "0.2.0";
+const CACHE_VERSION = "0.3.0";
 const CACHE_PREFIX = "careercanvas-shell-";
 const CACHE_NAME = `${CACHE_PREFIX}${CACHE_VERSION}`;
 
@@ -28,6 +28,22 @@ const PRECACHE = [
   "css/pages/placeholder.css",
   "css/pages/editor.css",
   "css/pages/saved.css",
+  "css/templates/doc.css",
+  "css/templates/stage.css",
+  "css/templates/summit.css",
+  "css/templates/grid.css",
+  "css/templates/aurora.css",
+  "css/templates/velo.css",
+  "css/templates/slate.css",
+  "css/templates/bloom.css",
+  "css/templates/vertex.css",
+  "css/templates/nexus.css",
+  "js/editors/design-panel.js",
+  "js/editors/photo.js",
+  "js/preview/paper.js",
+  "js/preview/thumb.js",
+  "js/templates/registry.js",
+  "js/templates/design.js",
   "js/theme-boot.js",
   "js/main.js",
   "js/config.js",
@@ -40,7 +56,6 @@ const PRECACHE = [
   "js/components/install-card.js",
   "js/components/placeholder.js",
   "js/components/template-card.js",
-  "js/data/templates-meta.js",
   "js/pages/home.js",
   "js/pages/resume.js",
   "js/pages/cover-letter.js",

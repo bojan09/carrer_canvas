@@ -1,0 +1,55 @@
+/* Bloom: warm paper, serif headings and a restrained decorative motif (background art only). */
+.doc[data-template="bloom"] {
+  --paper-bg: #f6f0e2;
+  --ink: #3a3524;
+  --ink-2: #6a6350;
+  --rule: rgba(85, 115, 63, 0.4);
+}
+
+.doc[data-template="bloom"]::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 36%;
+  aspect-ratio: 1;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cg fill='%236b8a4e' fill-opacity='.38'%3E%3Cpath d='M200 0v90c-30-4-52-20-60-48-4-14-2-30 4-42z'/%3E%3Cpath d='M200 40v70c-24 2-44-8-52-26-6-14-4-30 4-44 14 2 34 0 48 0z' fill-opacity='.28'/%3E%3Cpath d='M170 0c-10 18-12 36-6 52 8 20 22 34 36 42V0z' fill-opacity='.22'/%3E%3Cpath d='M200 100c-14-2-28 4-36 16-8 12-8 28 0 40 10 14 24 22 36 22z' fill-opacity='.3'/%3E%3C/g%3E%3C/svg%3E") no-repeat right top / contain;
+  pointer-events: none;
+}
+
+.doc[data-template="bloom"] .doc__header {
+  position: relative;
+  padding-bottom: 0.9em;
+}
+
+.doc[data-template="bloom"] .doc__name {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.doc[data-template="bloom"] .doc__role {
+  color: var(--accent);
+  font-style: italic;
+}
+
+.doc[data-template="bloom"] .doc__heading {
+  font-size: 1.05em;
+  font-style: italic;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: none;
+}
+
+.doc[data-template="bloom"][data-photo] .doc__header:has(.doc__photo) {
+  display: flex;
+  align-items: center;
+  gap: 1.2em;
+}
+
+.doc[data-template="bloom"][data-align="center"] .doc__header:has(.doc__photo) {
+  flex-direction: column;
+}
+
+.doc[data-template="bloom"] .doc__photo {
+  box-shadow: 0 0 0 3px #f6f0e2, 0 0 0 4px var(--accent);
+}

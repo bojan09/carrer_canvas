@@ -40,12 +40,12 @@ const openSection = async (page, id) => {
   await page.getByRole("button", { name: "Start blank" }).click();
   await page.waitForSelector(".studio");
   check("blank resume opens the editor", /#\/resume\/.+/.test(page.url()));
-  check("empty preview prompts for content", (await page.textContent(".paper")).includes("Add content"));
+  check("empty preview prompts for content", (await page.textContent(".doc")).includes("Add content"));
 
   await page.getByLabel("Full name").fill("Jordan Tester");
   await page.getByLabel("Email").fill("jordan@example.org");
   await page.waitForTimeout(250);
-  check("preview updates live", (await page.textContent(".paper h1")) === "Jordan Tester");
+  check("preview updates live", (await page.textContent(".doc__name")) === "Jordan Tester");
 
   // email validation after blur
   await page.getByLabel("Email").fill("bad-email");
@@ -63,7 +63,7 @@ const openSection = async (page, id) => {
   await page.getByRole("button", { name: "Add another item" }).click();
   await page.getByLabel(/item 2 of 2/).fill("Fixed another thing");
   await page.waitForTimeout(250);
-  const pv = await page.textContent(".paper");
+  const pv = await page.textContent(".doc");
   check("experience + bullets appear in preview", pv.includes("Engineer") && pv.includes("Acme") && pv.includes("Built a thing"));
 
   // keyboard reorder of bullets: focus "move item 1 down" and press Enter
@@ -96,12 +96,12 @@ const openSection = async (page, id) => {
   await page.waitForTimeout(150);
   await page.getByRole("button", { name: "Undo" }).click();
   await page.waitForTimeout(150);
-  check("undo reverts the last edit", !(await page.locator(".paper").textContent()).includes("Third bullet"));
+  check("undo reverts the last edit", !(await page.locator(".doc").textContent()).includes("Third bullet"));
   while ((await page.getByRole("button", { name: "Undo" }).getAttribute("aria-disabled")) === "false") await page.getByRole("button", { name: "Undo" }).click();
-  check("undo to the start of the session keeps earlier saved content", (await page.textContent(".paper")).includes("Engineer") && !(await page.textContent(".paper")).includes("Third bullet"));
+  check("undo to the start of the session keeps earlier saved content", (await page.textContent(".doc")).includes("Engineer") && !(await page.textContent(".doc")).includes("Third bullet"));
   while ((await page.getByRole("button", { name: "Redo" }).getAttribute("aria-disabled")) === "false") await page.getByRole("button", { name: "Redo" }).click();
   await page.waitForTimeout(300);
-  check("redo restores the edit", (await page.textContent(".paper")).includes("Third bullet"));
+  check("redo restores the edit", (await page.textContent(".doc")).includes("Third bullet"));
 
   // quick edit then immediate navigation must not lose the edit
   await page.getByLabel("Full name").fill("Quick Edit Name");
@@ -118,8 +118,8 @@ const openSection = async (page, id) => {
   await page.waitForTimeout(300);
   const xss = await page.evaluate(() => window.__xss === 1);
   check("hostile markup is not executed", !xss);
-  check("hostile text shown literally", (await page.textContent(".paper h1")).includes("<img src=x"));
-  check("javascript: URL is not rendered as a link", (await page.locator('.paper a[href^="javascript"]').count()) === 0);
+  check("hostile text shown literally", (await page.textContent(".doc__name")).includes("<img src=x"));
+  check("javascript: URL is not rendered as a link", (await page.locator('.doc a[href^="javascript"]').count()) === 0);
 
   // section reorder + hide via rail buttons (wide layout)
   await page.getByRole("button", { name: "Move Education down" }).click();
@@ -163,7 +163,7 @@ const openSection = async (page, id) => {
   await page.getByRole("button", { name: "New fictional sample" }).click();
   await page.waitForSelector(".studio");
   check("sample warns it is fictional", (await page.textContent(".studio__banners")).includes("fictional sample content"));
-  check("sample preview renders", (await page.textContent(".paper h1")) === "Alex Sample");
+  check("sample preview renders", (await page.textContent(".doc__name")) === "Alex Sample");
   await page.getByRole("button", { name: /Writing checklist/ }).click();
   check("checklist dialog flags sample content", (await page.textContent("dialog")).includes("Sample content is still present"));
   await page.getByRole("button", { name: "Close", exact: true }).last().click();

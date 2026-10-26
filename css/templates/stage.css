@@ -1,0 +1,67 @@
+/* Preview stage, page guides and gallery thumbnails */
+
+.stage {
+  position: relative;
+  height: 100%;
+  min-height: 280px;
+  padding: 14px;
+  overflow: auto;
+  border-radius: var(--radius-md);
+  background: var(--surface-3);
+  overscroll-behavior: contain;
+}
+
+.stage__sizer {
+  position: relative;
+  margin-inline: auto;
+  box-shadow: 0 10px 40px rgba(2, 6, 18, 0.35);
+}
+
+.stage__sizer > .doc {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.stage__guide {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 0;
+  border-top: 2px dashed rgba(214, 59, 37, 0.75);
+  pointer-events: none;
+}
+
+.stage__guide span {
+  position: absolute;
+  right: 6px;
+  top: 2px;
+  padding: 1px 8px;
+  border-radius: 99px;
+  background: rgba(214, 59, 37, 0.92);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.thumb {
+  position: relative;
+  aspect-ratio: 210 / 297;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 0 0 1px rgba(16, 27, 54, 0.14), var(--shadow-sm);
+}
+
+.thumb__page {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 794px;
+  transform-origin: 0 0;
+  pointer-events: none;
+}
+
+.thumb__page .doc {
+  animation: none;
+}

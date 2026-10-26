@@ -1,6 +1,6 @@
 import { icon } from "../utils/dom.js";
-import { TEMPLATES } from "../data/templates-meta.js";
-import { templateCardHTML } from "../components/template-card.js";
+import { TEMPLATES } from "../templates/registry.js";
+import { createTemplateCard } from "../components/template-card.js";
 import { mountInstallCard } from "../components/install-card.js";
 
 const FEATURES = [
@@ -17,8 +17,6 @@ export default function home(root) {
       <span><span class="feature__title">${title}</span><span class="feature__sub">${sub}</span></span></li>`,
   ).join("");
 
-  const teaser = TEMPLATES.map((t) => templateCardHTML(t, { href: "#/templates" })).join("");
-
   root.innerHTML = `
   <section class="hero" aria-labelledby="hero-title">
     <div class="container hero__grid">
@@ -34,38 +32,38 @@ export default function home(root) {
       </div>
       <div class="hero__visual">
         <div class="hero__stage" aria-hidden="true">
-          <div class="doc doc--summit">
-            <div class="doc__name">Alex Johnson</div>
-            <div class="doc__bars"><i></i><i></i><i></i></div>
-            <div class="doc__h">Experience</div>
-            <div class="doc__bars"><i></i><i></i><i></i><i></i><i></i></div>
-            <div class="doc__h">Education</div>
-            <div class="doc__bars"><i></i><i></i><i></i></div>
+          <div class="mock mock--summit">
+            <div class="mock__name">Alex Johnson</div>
+            <div class="mock__bars"><i></i><i></i><i></i></div>
+            <div class="mock__h">Experience</div>
+            <div class="mock__bars"><i></i><i></i><i></i><i></i><i></i></div>
+            <div class="mock__h">Education</div>
+            <div class="mock__bars"><i></i><i></i><i></i></div>
           </div>
-          <div class="doc doc--bloom">
-            <div class="doc__name">Alex Johnson</div>
-            <div class="doc__bars"><i></i><i></i></div>
-            <div class="doc__h">Profile</div>
-            <div class="doc__bars"><i></i><i></i><i></i><i></i></div>
-            <div class="doc__h">Skills</div>
-            <div class="doc__bars"><i></i><i></i></div>
+          <div class="mock mock--bloom">
+            <div class="mock__name">Alex Johnson</div>
+            <div class="mock__bars"><i></i><i></i></div>
+            <div class="mock__h">Profile</div>
+            <div class="mock__bars"><i></i><i></i><i></i><i></i></div>
+            <div class="mock__h">Skills</div>
+            <div class="mock__bars"><i></i><i></i></div>
           </div>
-          <div class="doc doc--aurora">
-            <div class="doc__rail"><i></i><i></i><i></i><i></i><i></i></div>
-            <div class="doc__main">
-              <div class="doc__head">
-                <span class="doc__avatar">AJ</span>
-                <div><div class="doc__name">Alex Johnson</div><div class="doc__role">Product Designer</div></div>
+          <div class="mock mock--aurora">
+            <div class="mock__rail"><i></i><i></i><i></i><i></i><i></i></div>
+            <div class="mock__main">
+              <div class="mock__head">
+                <span class="mock__avatar">AJ</span>
+                <div><div class="mock__name">Alex Johnson</div><div class="mock__role">Product Designer</div></div>
               </div>
-              <div class="doc__h">About</div>
-              <div class="doc__bars"><i></i><i></i><i></i></div>
-              <div class="doc__chips"><span>Research</span><span>Prototyping</span><span>Systems</span></div>
-              <div class="doc__h">Experience</div>
-              <div class="doc__entry"><b>Role title</b><small>Company · 2022 – Present</small></div>
-              <div class="doc__bars"><i></i><i></i><i></i></div>
-              <div class="doc__entry"><b>Role title</b><small>Company · 2019 – 2022</small></div>
-              <div class="doc__bars"><i></i><i></i></div>
-              <span class="doc__sample-tag">Sample</span>
+              <div class="mock__h">About</div>
+              <div class="mock__bars"><i></i><i></i><i></i></div>
+              <div class="mock__chips"><span>Research</span><span>Prototyping</span><span>Systems</span></div>
+              <div class="mock__h">Experience</div>
+              <div class="mock__entry"><b>Role title</b><small>Company · 2022 – Present</small></div>
+              <div class="mock__bars"><i></i><i></i><i></i></div>
+              <div class="mock__entry"><b>Role title</b><small>Company · 2019 – 2022</small></div>
+              <div class="mock__bars"><i></i><i></i></div>
+              <span class="mock__sample-tag">Sample</span>
             </div>
           </div>
         </div>
@@ -81,7 +79,7 @@ export default function home(root) {
         <h2 class="section__title" id="templates-title">Eight templates, built to be different</h2>
         <p class="section__lead">From a plain, ATS-conscious single column to expressive creative layouts. Pick the one that fits the role, not just the colour.</p>
       </div>
-      <div class="teaser-strip" role="list">${TEMPLATES.map((t) => `<div role="listitem">${templateCardHTML(t, { href: "#/templates" })}</div>`).join("")}</div>
+      <div class="teaser-strip" id="home-teaser" role="list"></div>
     </div>
   </section>
 
@@ -145,5 +143,17 @@ export default function home(root) {
     el.removeAttribute("style-i");
   });
 
-  return mountInstallCard(root.querySelector("#home-install"));
+  const disposers = [];
+  const strip = root.querySelector("#home-teaser");
+  for (const t of TEMPLATES) {
+    const card = createTemplateCard(t, { mode: "link" });
+    disposers.push(card.destroy);
+    strip.append(Object.assign(document.createElement("div"), { role: "listitem" }));
+    strip.lastElementChild.append(card.el);
+  }
+  const stopInstall = mountInstallCard(root.querySelector("#home-install"));
+  return () => {
+    disposers.forEach((d) => d());
+    stopInstall?.();
+  };
 }

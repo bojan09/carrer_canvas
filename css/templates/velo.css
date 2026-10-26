@@ -1,0 +1,70 @@
+/* Velo: crisp technical resume. Two columns (main left, tinted details right) with a single-column fallback. */
+.doc[data-template="velo"] .doc__name {
+  font-weight: 800;
+}
+
+.doc[data-template="velo"] .doc__header .doc__id {
+  padding-left: 0.9em;
+  border-left: 5px solid var(--accent);
+}
+
+.doc[data-template="velo"] .doc__role {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.doc[data-template="velo"] .doc__heading {
+  font-size: 0.8em;
+}
+
+.doc[data-template="velo"] .doc__entry-title {
+  letter-spacing: -0.005em;
+}
+
+.doc[data-template="velo"][data-layout="sidebar-right"] {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 31%;
+  grid-template-rows: auto auto 1fr;
+  grid-template-areas:
+    "id photo"
+    "main contact"
+    "main side";
+  padding: 0;
+}
+
+.doc[data-template="velo"][data-layout="sidebar-right"] .doc__header,
+.doc[data-template="velo"][data-layout="sidebar-right"] .doc__body {
+  display: contents;
+}
+
+.doc[data-template="velo"][data-layout="sidebar-right"] .doc__id {
+  grid-area: id;
+  margin: var(--margin) 0 0 var(--margin);
+}
+
+.doc[data-template="velo"][data-layout="sidebar-right"] .doc__photo {
+  grid-area: photo;
+  justify-self: end;
+  margin: var(--margin) var(--margin) 0 0;
+}
+
+.doc[data-template="velo"][data-layout="sidebar-right"] .doc__main {
+  grid-area: main;
+  padding: var(--gap) calc(var(--margin) * 0.7) var(--margin) var(--margin);
+}
+
+.doc[data-template="velo"][data-layout="sidebar-right"] .doc__contact {
+  grid-area: contact;
+  flex-direction: column;
+  margin: var(--gap) 0 0;
+  padding: var(--gap) var(--margin) 0 calc(var(--margin) * 0.7);
+  background: color-mix(in srgb, var(--accent) 8%, #fff);
+  border-left: 3px solid var(--accent);
+}
+
+.doc[data-template="velo"][data-layout="sidebar-right"] .doc__side {
+  grid-area: side;
+  padding: var(--gap) var(--margin) var(--margin) calc(var(--margin) * 0.7);
+  background: color-mix(in srgb, var(--accent) 8%, #fff);
+  border-left: 3px solid var(--accent);
+}

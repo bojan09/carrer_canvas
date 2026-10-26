@@ -3,7 +3,11 @@ import { SECTION_DEFS } from "../models/section-defs.js";
 import { cleanText } from "../utils/sanitization.js";
 import { announce } from "../components/announcer.js";
 import { confirmDialog, openDialog } from "../components/dialog.js";
-import { renderResume } from "../preview/render.js";
+import { mountPaper, ZOOM_MODES } from "../preview/paper.js";
+import { getTemplate } from "../templates/registry.js";
+import { PAPER } from "../templates/design.js";
+import { getSettings, updateSettings } from "../state/settings.js";
+import { designPanel } from "./design-panel.js";
 import { analyze, openIssues, titleOf } from "./hints.js";
 import { checkboxField } from "./fields.js";
 import { contactBody, sectionBody } from "./section-forms.js";
@@ -62,14 +66,12 @@ export function mountStudio(root, session, { persistent }) {
   [
     ["edit", "Edit"],
     ["preview", "Preview"],
+    ["design", "Design"],
   ].forEach(([value, label], i) => {
     const input = h("input", { type: "radio", name: "studio-view", value });
     input.checked = i === 0;
-    input.addEventListener("change", () => {
-      studio.dataset.view = value;
-      window.scrollTo(0, 0);
-    });
-    seg.append(h("label", { class: "segmented__option" }, input, h("span", { class: "segmented__label", text: label })));
+    input.addEventListener("change", () => setView(value));
+    seg.append(h("label", { class: `segmented__option${value === "preview" ? " studio__opt-preview" : ""}` }, input, h("span", { class: "segmented__label", text: label })));
   });
   viewGroup.append(seg);
 
@@ -77,22 +79,54 @@ export function mountStudio(root, session, { persistent }) {
   const railHost = h("nav", { class: "studio__rail", "aria-label": "Sections" });
   const editor = h("div", { class: "studio__editor" });
   const previewScroll = h("div", { class: "studio__paperwrap" });
+  const zoomSelect = h("select", { class: "input input--select", id: "zoom-select", "aria-label": "Preview zoom" });
+  ZOOM_MODES.forEach(([v, label]) => zoomSelect.append(h("option", { value: v, text: label })));
+  zoomSelect.value = getSettings().previewZoom;
+  const pageInfo = h("span", { class: "studio__pageinfo", role: "status" });
+  const tplBadge = h("span", { class: "badge" });
   const preview = h(
     "section",
     { class: "studio__preview", "aria-label": "Preview" },
-    h("div", { class: "studio__previewhead" }, h("h2", { text: "Preview" }), h("span", { class: "badge badge--muted", text: "Basic preview" })),
+    h("div", { class: "studio__previewhead" }, h("h2", { text: "Preview" }), tplBadge, h("div", { class: "studio__zoom" }, zoomSelect)),
     previewScroll,
-    h("p", { class: "studio__previewnote", text: "Template styling, colours and PDF export arrive in later phases." }),
+    h("p", { class: "studio__previewnote" }, pageInfo, document.createTextNode(" Page-break guides are estimates. PDF export arrives in the next phase.")),
   );
+  const paper = mountPaper(previewScroll, {
+    zoom: getSettings().previewZoom,
+    onInfo: ({ pages, paper: size }) => {
+      pageInfo.textContent = `About ${pages} page${pages === 1 ? "" : "s"} · ${PAPER[size].label.split(" (")[0]}.`;
+    },
+  });
+  zoomSelect.addEventListener("change", () => {
+    paper.setZoom(zoomSelect.value);
+    updateSettings({ previewZoom: zoomSelect.value });
+  });
+  const designHost = h("div", { class: "studio__design" });
+  let designApi = null;
+  let designStale = true;
 
   const studio = h(
     "div",
     { class: "studio", "data-view": "edit" },
     bar,
     banners,
-    h("div", { class: "studio__grid" }, railHost, h("section", { class: "studio__editorwrap", "aria-label": "Resume content" }, editor), preview),
-    viewGroup,
+    h("div", { class: "studio__grid" }, railHost, h("section", { class: "studio__editorwrap", "aria-label": "Resume content" }, editor, designHost), preview),
   );
+  bar.append(viewGroup);
+
+  function setView(value) {
+    studio.dataset.view = value;
+    if (value === "design") ensureDesign();
+    window.scrollTo(0, 0);
+  }
+
+  function ensureDesign() {
+    if (!designStale) return;
+    designApi?.destroy();
+    designApi = designPanel({ session, ctx });
+    designHost.replaceChildren(designApi.el);
+    designStale = false;
+  }
   root.replaceChildren(studio);
 
   // ---- rendering ----
@@ -178,7 +212,7 @@ export function mountStudio(root, session, { persistent }) {
     host?.closest?.("dialog")?.close();
     expanded.add(id);
     renderEditor();
-    studio.dataset.view = "edit";
+    setView("edit");
     viewGroup.querySelector('input[value="edit"]').checked = true;
     const toggle = editor.querySelector(`[data-focus-key="sec:${id}"]`);
     requestAnimationFrame(() => {
@@ -263,7 +297,8 @@ export function mountStudio(root, session, { persistent }) {
 
   let previewTimer;
   function renderPreview() {
-    previewScroll.replaceChildren(renderResume(session.doc));
+    paper.update(session.doc);
+    tplBadge.textContent = `${getTemplate(session.doc.templateId).name}${session.doc.designSettings.simplified ? " · simplified" : ""}`;
     const n = openIssues(session.doc);
     checklistBadge.hidden = n === 0;
     checklistBadge.textContent = String(n);
@@ -301,6 +336,8 @@ export function mountStudio(root, session, { persistent }) {
       if (event.restored) title.value = session.doc.title;
       renderEditor();
       renderRails();
+      designStale = true;
+      if (studio.dataset.view === "design") ensureDesign();
       window.scrollTo(0, y);
       focusKey(event.focusKey);
     }
@@ -335,6 +372,8 @@ export function mountStudio(root, session, { persistent }) {
 
   return () => {
     clearTimeout(previewTimer);
+    paper.destroy();
+    designApi?.destroy();
     unsubscribe();
     document.removeEventListener("keydown", onKey);
   };

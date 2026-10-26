@@ -1,0 +1,234 @@
+/* Shared resume document styles. Templates (aurora.css … nexus.css) only restyle these classes.
+ * The document is sized in CSS pixels at 96dpi (A4 794x1123, Letter 816x1056) and scaled by the
+ * preview with transform, so what you see is the same structure that will be printed. */
+
+.doc {
+  --paper-bg: #ffffff;
+  --ink: #141a2e;
+  --ink-2: #4b5568;
+  --rule: color-mix(in srgb, var(--ink) 22%, transparent);
+  position: relative;
+  box-sizing: border-box;
+  width: var(--paper-w);
+  min-height: var(--paper-h);
+  padding: var(--margin);
+  background: var(--paper-bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: var(--fs);
+  line-height: var(--lh);
+  overflow-wrap: anywhere;
+  text-align: left;
+  text-size-adjust: none;
+  -webkit-text-size-adjust: none;
+}
+
+.doc *,
+.doc *::before,
+.doc *::after {
+  box-sizing: border-box;
+}
+
+.doc h1,
+.doc h2 {
+  margin: 0;
+  font-family: var(--font-head);
+  text-wrap: balance;
+}
+
+.doc p {
+  margin: 0;
+}
+
+.doc ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.doc a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, currentColor 45%, transparent);
+  text-underline-offset: 2px;
+}
+
+.doc__name {
+  font-size: calc(var(--fs) * 2.3 * var(--title-scale));
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+}
+
+.doc__role {
+  margin-top: 0.25em;
+  color: var(--ink-2);
+  font-size: 1.15em;
+}
+
+.doc__contact {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.15em 1.2em;
+  margin-top: 0.7em;
+  color: var(--ink-2);
+  font-size: 0.92em;
+}
+
+.doc[data-align="center"] .doc__header {
+  text-align: center;
+}
+
+.doc[data-align="center"] .doc__contact {
+  justify-content: center;
+}
+
+.doc__body {
+  margin-top: calc(var(--gap) * 1.1);
+}
+
+.doc__section {
+  margin-top: var(--gap);
+}
+
+.doc__main > .doc__section:first-child,
+.doc__side > .doc__section:first-child {
+  margin-top: 0;
+}
+
+.doc__heading {
+  margin-bottom: 0.7em;
+  padding-bottom: 0.35em;
+  color: var(--accent);
+  font-size: 0.82em;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.doc[data-divider="line"] .doc__heading {
+  border-bottom: 1px solid var(--rule);
+}
+
+.doc[data-divider="thick"] .doc__heading {
+  border-bottom: 3px solid var(--accent);
+}
+
+.doc[data-divider="dotted"] .doc__heading {
+  border-bottom: 2px dotted var(--accent);
+}
+
+.doc__entry {
+  margin-bottom: 0.95em;
+  break-inside: avoid;
+}
+
+.doc__entry:last-child {
+  margin-bottom: 0;
+}
+
+.doc__entry-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0 1em;
+}
+
+.doc__entry-title {
+  font-weight: 700;
+}
+
+.doc__dates {
+  color: var(--ink-2);
+  font-size: 0.9em;
+  white-space: nowrap;
+}
+
+.doc__entry-sub {
+  color: var(--ink-2);
+}
+
+.doc__bullets {
+  margin-top: 0.35em;
+  padding-left: 1.15em;
+  list-style: disc;
+}
+
+.doc__bullets li {
+  margin: 0.18em 0;
+}
+
+.doc__bullets li::marker {
+  color: var(--accent);
+}
+
+.doc__text {
+  white-space: pre-line;
+}
+
+.doc__skillgroup + .doc__skillgroup {
+  margin-top: 0.5em;
+}
+
+.doc__skilllabel {
+  display: block;
+  margin-bottom: 0.2em;
+  font-size: 0.92em;
+}
+
+.doc__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35em;
+}
+
+.doc__chips li {
+  padding: 0.12em 0.7em;
+  border: 1px solid color-mix(in srgb, var(--accent) 50%, transparent);
+  border-radius: 99px;
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  font-size: 0.9em;
+  line-height: 1.5;
+}
+
+.doc__lang {
+  margin-bottom: 0.2em;
+}
+
+.doc__photo {
+  width: 6.8em;
+  height: 6.8em;
+  object-fit: cover;
+}
+
+.doc[data-photo="circle"] .doc__photo {
+  border-radius: 50%;
+}
+
+.doc[data-photo="square"] .doc__photo {
+  border-radius: 0.45em;
+}
+
+.doc__empty {
+  color: var(--ink-2);
+}
+
+/* Uses the individual `scale` property so it composes with the preview's inline transform
+   (animating `transform` would override the zoom). */
+@keyframes doc-in {
+  from {
+    opacity: 0;
+    scale: 0.985;
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+  }
+}
+
+@media print {
+  .doc {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}

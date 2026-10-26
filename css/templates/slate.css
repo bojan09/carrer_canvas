@@ -1,0 +1,46 @@
+/* Slate: dark executive identity on screen; prints on white to save ink. */
+.doc[data-template="slate"] {
+  --paper-bg: #1b2130;
+  --ink: #e9ecf4;
+  --ink-2: #aab2c8;
+  --rule: rgba(201, 169, 106, 0.4);
+}
+
+.doc[data-template="slate"] .doc__header {
+  padding-bottom: 1em;
+  border-bottom: 1px solid var(--accent);
+}
+
+.doc[data-template="slate"] .doc__name {
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.doc[data-template="slate"] .doc__role {
+  color: var(--accent);
+  letter-spacing: 0.04em;
+}
+
+.doc[data-template="slate"] .doc__heading {
+  font-size: 0.78em;
+  letter-spacing: 0.2em;
+}
+
+.doc[data-template="slate"] .doc__entry-title {
+  color: #fff;
+}
+
+@media print {
+  .doc[data-template="slate"] {
+    --paper-bg: #fff;
+    --ink: #111;
+    --ink-2: #333;
+    --accent: #5b4a1f !important;
+    background: #fff;
+  }
+
+  .doc[data-template="slate"] .doc__entry-title {
+    color: #000;
+  }
+}

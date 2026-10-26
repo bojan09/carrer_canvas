@@ -1,8 +1,11 @@
 import { APP_VERSION } from "../config.js";
 import { cleanText } from "../utils/sanitization.js";
 import { BUILTIN_ORDER, CONTACT_FIELDS, SECTION_DEFS } from "./section-defs.js";
+import { DEFAULT_TEMPLATE_ID, TEMPLATE_IDS } from "../templates/registry.js";
+import { normalizeDesign } from "../templates/design.js";
 
-export const SCHEMA_VERSION = 1;
+export const SCHEMA_VERSION = 2;
+export const PHOTO_MAX_CHARS = 150_000; // data-URL length cap (~110 KB of image data)
 export const LIMITS = { entries: 50, bullets: 30, tags: 60, links: 10, customSections: 20 };
 export const PAGE_SIZES = ["A4", "Letter"];
 
@@ -55,7 +58,7 @@ export function createBlank(title = "Untitled resume") {
     title,
     createdAt: stamp,
     updatedAt: stamp,
-    templateId: "summit",
+    templateId: DEFAULT_TEMPLATE_ID,
     pageSize: "A4",
     designSettings: {},
     contact: Object.fromEntries(CONTACT_FIELDS.map((f) => [f.key, ""])),
@@ -157,6 +160,13 @@ function normItem(type, raw) {
   return item;
 }
 
+/** Photo is stored as a small JPEG data URL produced by our own canvas re-encode. */
+export function normalizePhoto(p) {
+  if (!isObj(p) || typeof p.data !== "string") return null;
+  if (!/^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(p.data) || p.data.length > PHOTO_MAX_CHARS) return null;
+  return { data: p.data, width: Math.min(2000, Math.max(1, Math.round(Number(p.width) || 320))), height: Math.min(2000, Math.max(1, Math.round(Number(p.height) || 320))) };
+}
+
 /** Validates and repairs a stored/imported record. Throws ResumeDataError when unusable. */
 export function normalizeResume(raw) {
   if (!isObj(raw) || typeof raw.id !== "string" || !raw.id) {
@@ -173,10 +183,10 @@ export function normalizeResume(raw) {
   doc.title = cleanText(raw.title, 120) || "Untitled resume";
   doc.createdAt = iso(raw.createdAt, stamp);
   doc.updatedAt = iso(raw.updatedAt, doc.createdAt);
-  doc.templateId = typeof raw.templateId === "string" ? cleanText(raw.templateId, 40) : "summit";
+  doc.templateId = TEMPLATE_IDS.includes(raw.templateId) ? raw.templateId : DEFAULT_TEMPLATE_ID;
   doc.pageSize = PAGE_SIZES.includes(raw.pageSize) ? raw.pageSize : "A4";
-  doc.designSettings = isObj(raw.designSettings) ? structuredClone(raw.designSettings) : {};
-  doc.photo = null; // photos arrive with the template phase
+  doc.designSettings = normalizeDesign(raw.designSettings);
+  doc.photo = normalizePhoto(raw.photo);
   doc.metadata = {
     isSample: raw.metadata?.isSample === true,
     createdWith: cleanText(raw.metadata?.createdWith, 20) || APP_VERSION,

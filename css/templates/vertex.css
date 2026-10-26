@@ -1,0 +1,85 @@
+/* Vertex: bold editorial. Large header block, headings in a left gutter. Header prints outlined. */
+.doc[data-template="vertex"] .doc__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5em 1.4em;
+  margin: calc(var(--margin) * -1) calc(var(--margin) * -1) 0;
+  padding: var(--margin);
+  background: #15151d;
+  border-bottom: 8px solid var(--accent);
+  color: #fff;
+}
+
+.doc[data-template="vertex"] .doc__photo {
+  order: 3;
+  margin-left: auto;
+  width: 7.2em;
+  height: 7.2em;
+}
+
+.doc[data-template="vertex"] .doc__id {
+  flex: 1 1 60%;
+}
+
+.doc[data-template="vertex"] .doc__name {
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+}
+
+.doc[data-template="vertex"] .doc__role {
+  color: color-mix(in srgb, var(--accent) 55%, #fff);
+  font-weight: 700;
+}
+
+.doc[data-template="vertex"] .doc__contact {
+  flex: 1 1 100%;
+  order: 4;
+  margin-top: 0.2em;
+  color: #cfd3e4;
+}
+
+.doc[data-template="vertex"] .doc__section {
+  display: grid;
+  grid-template-columns: 22% minmax(0, 1fr);
+  column-gap: 1.5em;
+}
+
+.doc[data-template="vertex"] .doc__section > :not(.doc__heading) {
+  grid-column: 2;
+}
+
+.doc[data-template="vertex"] .doc__heading {
+  grid-column: 1;
+  grid-row: 1 / span 20;
+  align-self: start;
+  margin: 0;
+  padding: 0.5em 0 0;
+  border-top: 4px solid var(--accent);
+  color: var(--ink);
+  font-size: 1.1em;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  text-transform: none;
+}
+
+.doc[data-template="vertex"] .doc__entry-title {
+  font-weight: 800;
+}
+
+@media print {
+  .doc[data-template="vertex"] .doc__header {
+    background: #fff;
+    border: 3px solid #15151d;
+    color: #111;
+  }
+
+  .doc[data-template="vertex"] .doc__contact {
+    color: #333;
+  }
+
+  .doc[data-template="vertex"] .doc__role {
+    color: #111;
+  }
+}

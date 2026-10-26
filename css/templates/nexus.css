@@ -1,0 +1,63 @@
+/* Nexus: modular cards on a tinted page. */
+.doc[data-template="nexus"] {
+  --paper-bg: #eef1f8;
+}
+
+.doc[data-template="nexus"] .doc__header,
+.doc[data-template="nexus"] .doc__section {
+  padding: 1em 1.2em;
+  border-radius: 0.8em;
+  background: #fff;
+  box-shadow: 0 0 0 1px rgba(20, 26, 46, 0.08);
+}
+
+.doc[data-template="nexus"] .doc__header {
+  border-top: 4px solid var(--accent);
+}
+
+.doc[data-template="nexus"] .doc__header:has(.doc__photo) {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.4em 1.2em;
+}
+
+.doc[data-template="nexus"] .doc__header:has(.doc__photo) .doc__contact {
+  flex: 1 1 100%;
+}
+
+.doc[data-template="nexus"] .doc__photo {
+  order: 2;
+  margin-left: auto;
+}
+
+.doc[data-template="nexus"] .doc__role {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.doc[data-template="nexus"] .doc__body {
+  margin-top: var(--gap);
+}
+
+.doc[data-template="nexus"] .doc__section {
+  border-top: 3px solid var(--accent);
+}
+
+.doc[data-template="nexus"] .doc__heading {
+  margin-bottom: 0.5em;
+  padding-bottom: 0;
+  letter-spacing: 0.1em;
+}
+
+@media print {
+  .doc[data-template="nexus"] .doc__header,
+  .doc[data-template="nexus"] .doc__section {
+    box-shadow: none;
+    border: 1px solid #ccd2e0;
+  }
+
+  .doc[data-template="nexus"] {
+    --paper-bg: #fff;
+  }
+}

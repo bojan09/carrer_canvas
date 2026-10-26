@@ -5,6 +5,9 @@ import { ResumeDataError, SCHEMA_VERSION, normalizeResume } from "../models/resu
 export const MIGRATIONS = {
   // Records without a version predate versioning; they already match the v1 shape.
   0: (doc) => ({ ...doc, schemaVersion: 1 }),
+  // v2 (Phase 3): validated template id, design overrides and optional photo. Records keep their content;
+  // an older app version refuses v2 records instead of silently dropping the photo.
+  1: (doc) => ({ ...doc, schemaVersion: 2 }),
 };
 
 /** Upgrades and validates a raw stored record. Throws ResumeDataError when it cannot be used

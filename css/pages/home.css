@@ -147,7 +147,7 @@
   color: #8e9bc4;
 }
 
-.doc {
+.mock {
   position: absolute;
   border-radius: 14px;
   box-shadow: 0 30px 70px rgba(2, 6, 18, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.06);
@@ -156,7 +156,7 @@
   line-height: 1.35;
 }
 
-.doc--summit {
+.mock--summit {
   --rot: -9deg;
   left: 3%;
   top: 10%;
@@ -169,7 +169,7 @@
   animation: float-a 9s ease-in-out infinite;
 }
 
-.doc--bloom {
+.mock--bloom {
   --rot: 7deg;
   right: 3%;
   top: 4%;
@@ -184,7 +184,7 @@
   animation: float-a 11s ease-in-out infinite reverse;
 }
 
-.doc--aurora {
+.mock--aurora {
   --rot: -2.5deg;
   left: 22%;
   top: 0;
@@ -201,7 +201,7 @@
   animation: float-a 8s ease-in-out infinite;
 }
 
-.doc__rail {
+.mock__rail {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -211,24 +211,24 @@
   border-right: 1px solid rgba(140, 158, 255, 0.18);
 }
 
-.doc__rail i {
+.mock__rail i {
   width: 1.2em;
   height: 1.2em;
   border-radius: 50%;
   border: 1.5px solid rgba(157, 176, 255, 0.7);
 }
 
-.doc__main {
+.mock__main {
   padding: 1.8em 1.6em;
 }
 
-.doc__head {
+.mock__head {
   display: flex;
   align-items: center;
   gap: 1em;
 }
 
-.doc__avatar {
+.mock__avatar {
   display: grid;
   place-items: center;
   flex: none;
@@ -242,20 +242,20 @@
   box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.25);
 }
 
-.doc__name {
+.mock__name {
   font-size: 2em;
   font-weight: 800;
   letter-spacing: -0.02em;
   line-height: 1.1;
 }
 
-.doc__role {
+.mock__role {
   font-size: 1.1em;
   color: #8fa4ff;
   font-weight: 600;
 }
 
-.doc__h {
+.mock__h {
   margin-top: 1.7em;
   font-size: 0.95em;
   font-weight: 800;
@@ -264,24 +264,24 @@
   color: #b8c4ff;
 }
 
-.doc--summit .doc__h,
-.doc--bloom .doc__h {
+.mock--summit .mock__h,
+.mock--bloom .mock__h {
   color: inherit;
   opacity: 0.8;
 }
 
-.doc--summit .doc__name,
-.doc--bloom .doc__name {
+.mock--summit .mock__name,
+.mock--bloom .mock__name {
   font-size: 1.7em;
 }
 
-.doc__bars {
+.mock__bars {
   display: grid;
   gap: 0.55em;
   margin-top: 0.7em;
 }
 
-.doc__bars i {
+.mock__bars i {
   display: block;
   height: 0.5em;
   border-radius: 99px;
@@ -289,24 +289,24 @@
   opacity: 0.2;
 }
 
-.doc__bars i:nth-child(3n + 1) {
+.mock__bars i:nth-child(3n + 1) {
   width: 96%;
 }
-.doc__bars i:nth-child(3n + 2) {
+.mock__bars i:nth-child(3n + 2) {
   width: 82%;
 }
-.doc__bars i:nth-child(3n) {
+.mock__bars i:nth-child(3n) {
   width: 64%;
 }
 
-.doc__chips {
+.mock__chips {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5em;
   margin-top: 0.8em;
 }
 
-.doc__chips span {
+.mock__chips span {
   padding: 0.3em 0.9em;
   border-radius: 99px;
   font-size: 0.9em;
@@ -315,24 +315,24 @@
   border: 1px solid rgba(140, 158, 255, 0.35);
 }
 
-.doc__entry {
+.mock__entry {
   margin-top: 0.9em;
   padding-left: 1.2em;
   border-left: 2px solid #536bff;
 }
 
-.doc__entry b {
+.mock__entry b {
   display: block;
   font-size: 1.1em;
 }
 
-.doc__entry small {
+.mock__entry small {
   display: block;
   font-size: 0.9em;
   opacity: 0.65;
 }
 
-.doc__sample-tag {
+.mock__sample-tag {
   position: absolute;
   right: 0.9em;
   bottom: 0.9em;

@@ -46,6 +46,10 @@ export default function settings(root) {
           <div class="setting-row__label"><strong id="motion-label">Motion</strong><span>Reduced removes animation and transitions.</span></div>
           <div role="group" aria-labelledby="motion-label">${radioGroup("motion", "Motion", [["system", "System"], ["reduced", "Reduced"]], s.motion)}</div>
         </div>
+        <div class="setting-row">
+          <div class="setting-row__label"><label for="zoom-default"><strong>Default preview zoom</strong></label><span>Used when you open the resume preview.</span></div>
+          <select id="zoom-default" class="input input--select">${[["fit-width", "Fit width"], ["fit-page", "Fit page"], ["75", "75%"], ["100", "100%"], ["125", "125%"]].map(([v, l]) => `<option value="${v}"${v === s.previewZoom ? " selected" : ""}>${l}</option>`).join("")}</select>
+        </div>
       </section>
 
       <section class="setting-card" aria-labelledby="s-install">
@@ -116,6 +120,8 @@ export default function settings(root) {
       i.checked = next[i.name] === i.value;
     });
   });
+
+  root.querySelector("#zoom-default").addEventListener("change", (e) => updateSettings({ previewZoom: e.target.value }));
 
   // Install
   const unsubInstall = mountInstallCard($("#install-mount"));

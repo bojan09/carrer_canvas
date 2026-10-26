@@ -1,6 +1,7 @@
 import { SETTINGS_KEY, THEME_COLORS } from "../config.js";
 
-const DEFAULTS = { theme: "dark", motion: "system", offlineToastShown: false };
+const DEFAULTS = { theme: "dark", motion: "system", previewZoom: "fit-width", offlineToastShown: false };
+const ZOOMS = ["fit-width", "fit-page", "75", "100", "125"];
 const THEMES = ["light", "dark", "system"];
 const MOTIONS = ["system", "reduced"];
 
@@ -13,6 +14,7 @@ function load() {
     return {
       theme: THEMES.includes(raw.theme) ? raw.theme : DEFAULTS.theme,
       motion: MOTIONS.includes(raw.motion) ? raw.motion : DEFAULTS.motion,
+      previewZoom: ZOOMS.includes(raw.previewZoom) ? raw.previewZoom : DEFAULTS.previewZoom,
       offlineToastShown: raw.offlineToastShown === true,
     };
   } catch {

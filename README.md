@@ -2,7 +2,7 @@
 
 Free, private, offline-capable resume and cover-letter builder. Vanilla HTML, CSS and JavaScript (ES modules). No framework, no build step, no backend, no accounts, no trackers.
 
-**Status:** Phase 2 of 7 done (app shell, PWA, resume editor with local autosave). Templates, export and cover letters are next. See [docs/PHASE_STATUS.md](docs/PHASE_STATUS.md).
+**Status:** Phase 3 of 7 done (PWA shell, resume editor with local autosave, eight templates with live paper preview and design controls). Print-to-PDF, backup and cover letters are next. See [docs/PHASE_STATUS.md](docs/PHASE_STATUS.md).
 
 ## Run locally
 
@@ -13,6 +13,7 @@ npm run serve        # http://localhost:4173 (zero-dependency static server)
 npm test             # unit/structure tests (Node 20+)
 NODE_PATH=<dir containing playwright> node e2e/phase1.mjs   # browser checks + screenshots (needs Playwright + Chromium)
 NODE_PATH=<dir containing playwright> node e2e/phase2.mjs   # editor, storage and persistence checks
+NODE_PATH=<dir containing playwright> node e2e/phase3.mjs   # templates, design controls, photo, zoom
 ```
 
 ## Structure
@@ -24,6 +25,7 @@ sw.js                 Service worker (must live at the root for full scope)
 offline.html          Fallback if the shell was never cached
 vercel.json           Static hosting headers (CSP, SW no-cache)
 css/                  tokens, base, layout, components, motion, print
+  templates/          doc.css (shared) + one stylesheet per template
   pages/              Per-page styles
 js/
   main.js             Bootstrap
@@ -35,7 +37,8 @@ js/
   models/             Resume schema, normaliser, section definitions
   storage/            IndexedDB + memory fallback, repository, migrations
   editors/            Studio, section forms, bullets, rail, checklist
-  preview/            Semantic resume renderer
+  templates/          Template registry + design settings (pure data/logic)
+  preview/            Resume renderer, paper preview (zoom), thumbnails
   pages/              One module per route
   pwa/                Service worker registration, install handling
   data/, utils/

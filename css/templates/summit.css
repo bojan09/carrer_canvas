@@ -1,0 +1,27 @@
+/* Summit: single-column editorial. ATS-conscious design goal: real text, standard headings,
+   no icons, nothing essential in pseudo-elements. */
+.doc[data-template="summit"] .doc__header {
+  padding-bottom: 0.9em;
+  border-bottom: 2px solid var(--accent);
+}
+
+.doc[data-template="summit"] .doc__name {
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
+
+.doc[data-template="summit"] .doc__role {
+  font-style: italic;
+  color: var(--ink-2);
+}
+
+.doc[data-template="summit"] .doc__heading {
+  font-size: 1.02em;
+  font-variant: small-caps;
+  letter-spacing: 0.08em;
+  text-transform: none;
+}
+
+.doc[data-template="summit"] .doc__entry-title {
+  font-family: var(--font-head);
+}

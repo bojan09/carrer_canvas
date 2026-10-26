@@ -1,6 +1,43 @@
 # Phase status
 
-Latest: **Phase 2 implemented** (below). Phase 1 section follows it.
+Latest: **Phase 3 implemented** (below). Earlier phases follow.
+
+## Phase 3: Templates, live paper preview, design customization — implemented (v0.3.0)
+
+### Scope finished
+- Eight genuinely different templates (Aurora, Summit, Velo, Slate, Bloom, Grid, Vertex, Nexus) from one canonical renderer + per-template CSS; registry holds layout, sidebar sections, photo support, layout warnings and defaults (`js/templates`, `css/templates`).
+- Gallery with real, locally rendered thumbnails, category filters, preview dialog (layout notes), and **Use template** that applies to the last-opened resume without touching content (or starts a new blank resume).
+- Editor Design tab: template picker, Simplified (ATS-conscious) layout, accent swatches + custom colour with contrast warning, four font pairings, name/text size, line spacing, section spacing, margins, divider style, header alignment (locked where a template fixes it, with an explanation), paper size, reset to template defaults. Every change is undoable and persists.
+- Paper preview at real A4/Letter size with Fit width / Fit page / 75–125% zoom (default stored in Settings), estimated page-break guides and page count, template-switch crossfade.
+- Optional photo: opt-in, centre-cropped and re-encoded to a small JPEG (EXIF dropped), stored locally, hidden until "Show photo" is on, never shown by ATS/executive layouts or Simplified layout, clear warning copy.
+- Schema v2 with migration; older app versions refuse v2 records instead of dropping photos.
+- Mobile: Edit / Preview / Design bottom tabs; Design panel and gallery verified at 390px.
+
+### Executed checks (results)
+- `npm test`: 43/43 pass (registry rules, design clamping, simplified/photo rules, applyTemplate, contrast, photo normalisation, v1→v2 migration, future-version refusal).
+- `e2e/phase3.mjs` (Chromium): all checks pass, including content preserved across all 8 templates, no overflow with very long/unbroken text on all 8, preview stays fitted after switching, design controls persist across reload, Summit/Grid structure (single column, no images, real headings, no pseudo-element content), photo opt-in flow, dark templates print on white, mobile tabs.
+- `e2e/phase1.mjs` and `e2e/phase2.mjs` still pass (selectors updated for the new preview).
+- Every template was reviewed by eye at natural size; the gallery at 1500 and 390 and the Design panel at 1500 and 390 were reviewed in screenshots.
+
+### Bugs found and fixed during this phase
+- Hero mock classes (`.doc*`) collided with the real document classes; renamed to `.mock*`.
+- Template-switch animation overrode the preview zoom (animated `transform`); now animates opacity and the individual `scale` property.
+
+### Not verified
+- Real print/PDF output (Phase 4), Safari/Firefox rendering of `color-mix`, `:has()` and `inert` (all need recent browsers: iOS 16.4+), real-device photo picking (camera, HEIC), screen reader pass, contrast of every template at every accent.
+
+### Known limitations / technical debt
+- Page-break guides are estimates; pagination is decided by the print engine (Phase 4).
+- Print rules for dark/ink-heavy templates exist but are only probed, not yet tested through a real print dialog.
+- Photos are embedded in the resume record (≤ ~110 KB) and in every undo snapshot.
+- System fonts only, so typography varies by OS.
+- Simplified layout borrows Summit's structure for every non-ATS template (by design, but it drops the template's identity).
+- Aurora/Velo move Skills, Languages, Certifications into the sidebar, so their DOM reading order differs from the section order shown in the editor.
+
+### Handoff
+Phase 4: print-to-PDF workflow (`@page` size/margins per paper size, break guards, preflight checklist, instructions), JSON backup/restore (photos only when selected), draft recovery warnings, cross-browser testing. Reuse `renderResume()` and the `.doc` tree for print; do not start until approved.
+
+---
 
 ## Phase 2: Resume schema, editor, local autosave — implemented (v0.2.0)
 

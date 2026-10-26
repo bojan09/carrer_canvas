@@ -1,0 +1,59 @@
+/* Grid: strict alignment, black and white. Dates in a fixed left column; the DOM order stays
+   title, dates, details so the reading order is logical. ATS-conscious design goal. */
+.doc[data-template="grid"] {
+  --ink: #0b0b0b;
+  --ink-2: #3d3d3d;
+}
+
+.doc[data-template="grid"] .doc__header {
+  padding-bottom: 0.8em;
+  border-bottom: 4px solid var(--accent);
+}
+
+.doc[data-template="grid"] .doc__name {
+  font-size: calc(var(--fs) * 2.1 * var(--title-scale));
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.doc[data-template="grid"] .doc__role {
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.doc[data-template="grid"] .doc__heading {
+  color: var(--accent);
+  font-size: 0.86em;
+  letter-spacing: 0.14em;
+}
+
+.doc[data-template="grid"] .doc__entry {
+  display: grid;
+  grid-template-columns: 9.8em minmax(0, 1fr);
+  column-gap: 1.1em;
+}
+
+.doc[data-template="grid"] .doc__entry-head {
+  display: contents;
+}
+
+.doc[data-template="grid"] .doc__dates {
+  grid-column: 1;
+  grid-row: 1;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.doc[data-template="grid"] .doc__entry-title {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.doc[data-template="grid"] .doc__entry > :not(.doc__entry-head) {
+  grid-column: 2;
+}
+
+.doc[data-template="grid"] .doc__bullets li::marker {
+  color: var(--ink);
+}
