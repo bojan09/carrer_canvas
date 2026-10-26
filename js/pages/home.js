@@ -79,7 +79,7 @@ export default function home(root) {
     <div class="container">
       <div class="section__head">
         <p class="eyebrow">Templates</p>
-        <h2 class="section__title" id="templates-title">Ten templates, built to be different</h2>
+        <h2 class="section__title" id="templates-title">Fifteen templates, built to be different</h2>
         <p class="section__lead">From a plain, ATS-conscious single column to expressive creative layouts. Pick the one that fits the role, not just the colour.</p>
       </div>
       <div class="teaser-strip" id="home-teaser" role="list"></div>
@@ -127,7 +127,7 @@ export default function home(root) {
 
   <section class="section" aria-label="Project status">
     <div class="container">
-      <div class="status-strip">${icon("info")}<p><strong>Early build.</strong> The offline app, resume editor, ten templates, design controls, print-to-PDF and backup are live. Cover letters are still being built.</p></div>
+      <div class="status-strip">${icon("info")}<p><strong>Early build.</strong> The offline app, resume editor, fifteen templates, design controls, print-to-PDF and backup are live. Cover letters are still being built.</p></div>
     </div>
   </section>
 

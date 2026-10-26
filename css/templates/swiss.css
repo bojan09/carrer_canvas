@@ -1,0 +1,115 @@
+/* Swiss: strict grid, white page, hairlines and a single accent. Left column holds the portrait,
+   contact and details; prints as one column (css/print.css). */
+.doc[data-template="swiss"] .doc__name {
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1;
+}
+
+.doc[data-template="swiss"] .doc__role {
+  color: var(--ink);
+  font-size: 1.1em;
+  font-weight: 500;
+}
+
+.doc[data-template="swiss"] .doc__heading {
+  border-bottom: 0;
+  padding-bottom: 0;
+  color: var(--ink);
+  font-size: 0.74em;
+  letter-spacing: 0.18em;
+}
+
+.doc[data-template="swiss"] .doc__heading::before {
+  content: "";
+  display: block;
+  width: 2.2em;
+  height: 4px;
+  margin-bottom: 0.6em;
+  background: var(--accent);
+}
+
+.doc[data-template="swiss"] .doc__entry-title {
+  font-weight: 700;
+}
+
+.doc[data-template="swiss"][data-layout="sidebar-left"] {
+  display: grid;
+  grid-template-columns: 30% minmax(0, 1fr);
+  grid-template-rows: auto auto 1fr;
+  grid-template-areas:
+    "photo id"
+    "contact main"
+    "side main";
+  padding: 0;
+}
+
+.doc[data-template="swiss"][data-layout="sidebar-left"]::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 30%;
+  width: 1px;
+  background: var(--rule);
+  pointer-events: none;
+}
+
+.doc[data-template="swiss"][data-layout="sidebar-left"] .doc__header,
+.doc[data-template="swiss"][data-layout="sidebar-left"] .doc__body {
+  display: contents;
+}
+
+.doc[data-template="swiss"][data-layout="sidebar-left"] .doc__photo {
+  grid-area: photo;
+  width: calc(100% - var(--margin) - 1.2em);
+  height: auto;
+  aspect-ratio: 1;
+  margin: var(--margin) 0 0 var(--margin);
+  border-radius: 0;
+}
+
+.doc[data-template="swiss"][data-layout="sidebar-left"][data-photo="circle"] .doc__photo {
+  border-radius: 50%;
+}
+
+.doc[data-template="swiss"][data-layout="sidebar-left"] .doc__id {
+  grid-area: id;
+  align-self: end;
+  padding: var(--margin) var(--margin) 0 1.6em;
+}
+
+.doc[data-template="swiss"][data-layout="sidebar-left"] .doc__contact {
+  grid-area: contact;
+  flex-direction: column;
+  margin: 0;
+  padding: var(--gap) 1.2em 0 var(--margin);
+  font-size: 0.86em;
+}
+
+.doc[data-template="swiss"][data-layout="sidebar-left"] .doc__main {
+  grid-area: main;
+  padding: var(--gap) var(--margin) var(--margin) 1.6em;
+}
+
+.doc[data-template="swiss"][data-layout="sidebar-left"] .doc__side {
+  grid-area: side;
+  padding: var(--gap) 1.2em var(--margin) var(--margin);
+}
+
+.doc[data-template="swiss"] .doc__side .doc__chips li {
+  border-radius: 0;
+  background: transparent;
+  border-color: var(--ink-2);
+}
+
+@media print {
+  .doc[data-template="swiss"][data-layout="sidebar-left"]::before {
+    display: none;
+  }
+}
+
+@media print {
+  .doc[data-template="swiss"][data-layout="sidebar-left"] .doc__photo {
+    width: 6.4em;
+    height: 6.4em;
+  }
+}

@@ -12,10 +12,10 @@ import { ResumeDataError } from "../js/models/resume.js";
 const root = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const exists = (f) => stat(join(root, f)).then(() => true, () => false);
 
-test("ten distinct templates with the required identities", () => {
-  assert.equal(TEMPLATES.length, 10);
-  assert.deepEqual([...TEMPLATE_IDS].sort(), ["aurora", "bloom", "grid", "nexus", "orbit", "prism", "slate", "summit", "velo", "vertex"]);
-  assert.equal(new Set(TEMPLATES.map((t) => t.id)).size, 10);
+test("fifteen distinct templates with the required identities", () => {
+  assert.equal(TEMPLATES.length, 15);
+  assert.deepEqual([...TEMPLATE_IDS].sort(), ["aurora", "bento", "bloom", "glass", "grid", "horizon", "mono", "nexus", "orbit", "prism", "slate", "summit", "swiss", "velo", "vertex"]);
+  assert.equal(new Set(TEMPLATES.map((t) => t.id)).size, 15);
 });
 
 test("Summit and Grid are single-column, ATS-conscious, plain skills; photos are opt-in and never part of the simplified layout", () => {

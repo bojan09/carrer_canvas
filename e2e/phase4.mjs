@@ -54,7 +54,7 @@ await page.addInitScript(() => {
 await page.goto(`${base}/#/`);
 await page.waitForSelector("h1");
 
-const IDS = ["summit", "grid", "aurora", "velo", "slate", "bloom", "vertex", "nexus", "prism", "orbit"];
+const IDS = ["summit", "grid", "aurora", "velo", "slate", "bloom", "vertex", "nexus", "prism", "orbit", "glass", "bento", "horizon", "swiss", "mono"];
 
 // A long resume so every template runs to 2+ pages
 const makeDoc = (templateId, extra = {}) =>
@@ -111,7 +111,7 @@ for (const id of IDS) {
   check(`${id}: text is real and selectable`, text.includes("alex printable") && text.includes("bullet 5 for role 6") && text.includes("sample certificate"));
   check(`${id}: no app chrome or preview guides in the PDF`, !/get started|settings|page 2 starts|skip to content/.test(text));
   // real margins on EVERY page (min distance of any word from every edge)
-  const tplMargins = { aurora: 14, summit: 18, velo: 14, slate: 16, bloom: 18, grid: 16, vertex: 14, nexus: 12, prism: 14, orbit: 14 }[id];
+  const tplMargins = { aurora: 14, summit: 18, velo: 14, slate: 16, bloom: 18, grid: 16, vertex: 14, nexus: 12, prism: 14, orbit: 14, glass: 12, bento: 12, horizon: 14, swiss: 14, mono: 16 }[id];
   const need = (tplMargins / 25.4) * 72 - 2; // vertical checks allow 8pt for font ascent in the reported glyph box
   const bad = pw.filter((p) => p.ws.some((w) => w.x0 < need || w.y0 < need * 0.9 - 8 || w.x1 > p.w - need || w.y1 > p.h - need * 0.9));
   check(`${id}: margins respected on every page`, bad.length === 0, `${pw.length} pages, ${bad.length} violating ${JSON.stringify(bad.map((p) => ({ w: p.w, h: p.h, need, v: p.ws.filter((w) => w.x0 < need || w.y0 < need * 0.9 - 8 || w.x1 > p.w - need || w.y1 > p.h - need * 0.9).slice(0, 2) })))}`);

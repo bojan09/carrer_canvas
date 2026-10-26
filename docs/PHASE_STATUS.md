@@ -132,9 +132,9 @@ See `docs/DESIGN_SYSTEM.md`.
 ### Handoff
 Phase 2: versioned resume schema, IndexedDB repositories + migrations, section editors, autosave, undo/redo, Saved dashboard. Use `onBeforeUpdateReload()` to flush pending saves. Do not start until approved.
 
-## Phase 3b: template refresh (v0.5.0)
+## Phase 3b: template refresh (v0.5.0, extended to 15 templates)
 **Done**
-- Ten templates. Two new: **Prism** (solid colour sidebar with portrait) and **Orbit** (timeline, soft header card, rounded labels). Aurora, Velo, Slate, Bloom, Vertex and Nexus were restyled (ring/arch/offset portraits, hero card, numbered sections, mono meta). Summit stays the plain ATS-conscious default; Grid stays plain and now allows an optional small photo.
+- Fifteen templates. Five more were added after review using the ui-ux-pro-max style guidance: **Glass** (dark frosted cards), **Bento** (card grid), **Horizon** (gradient banner with overlapping portrait), **Swiss** (strict grid, square portrait column), **Mono** (oversized name, black/white). Earlier ten: two new: **Prism** (solid colour sidebar with portrait) and **Orbit** (timeline, soft header card, rounded labels). Aurora, Velo, Slate, Bloom, Vertex and Nexus were restyled (ring/arch/offset portraits, hero card, numbered sections, mono meta). Summit stays the plain ATS-conscious default; Grid stays plain and now allows an optional small photo.
 - Every fictional sample (gallery thumbnails, Home teaser, "Open sample", design panel) has a profile photo: an original illustrated avatar (`assets/sample/avatar.svg` rendered to `js/models/sample-photo.js` by `scripts/generate-sample-photo.mjs`). No stock photography, no real person. Home hero mock-ups use it too.
 - Blank resumes still start with no photo; photos stay opt-in.
 - Each new/changed template has a print fallback; all ten produce real PDFs in `e2e/phase4.mjs` (3 pages, A4, margins held, selectable text, dark/colour blocks print on white).
@@ -142,3 +142,6 @@ Phase 2: versioned resume schema, IndexedDB repositories + migrations, section e
 **Verified (Chromium only):** 57 unit tests; e2e phases 1-4 pass (phase 4: 115 checks).
 **Not verified:** Safari, Firefox, iOS, Android rendering and printing; very long names or unusual photo aspect in every template.
 **Notes:** Slate's name letter-spacing was reduced because wide tracking made PDF text extraction split letters. Prism, Aurora, Orbit and Nexus are not ATS-conscious by design; Summit and Grid are.
+
+**Fixes after user review:** the editor preview pane no longer outgrows short windows (paper bottom was unreachable; the stage now scrolls inside the pane). Adding a photo now shows it immediately instead of requiring a separate "Show photo" tick.
+**Verified (Chromium only):** 57 unit tests; e2e phases 1-4 pass, phase 4 = 150 checks incl. real PDFs for all 15 templates.

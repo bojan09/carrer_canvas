@@ -46,7 +46,7 @@ await page.waitForSelector("h1");
 check("offline reload renders app shell", (await page.textContent("h1")).includes("makes your work stand out"));
 await page.goto(base + "/#/templates");
 await page.waitForSelector(".template-card");
-check("offline route /templates renders 10 cards", (await page.locator(".template-card").count()) === 10);
+check("offline route /templates renders 15 cards", (await page.locator(".template-card").count()) === 15);
 check("offline pill visible", await page.locator("#net-status").isVisible());
 await page.goto(base + "/#/settings");
 await page.waitForSelector("#kv-offline");
@@ -63,7 +63,7 @@ await page.check('input[name="theme"][value="dark"]');
 // Template filtering
 await page.goto(base + "/#/templates");
 await page.click('[data-cat="Tech"]');
-check("Tech filter shows 2 templates", (await page.locator(".template-card").count()) === 2);
+check("Tech filter shows 3 templates", (await page.locator(".template-card").count()) === 3);
 
 // Manifest sanity
 const manifest = await page.evaluate(() => fetch("manifest.webmanifest").then((r) => r.json()));

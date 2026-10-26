@@ -1,0 +1,108 @@
+/* Bento: soft modular cards in a two-column grid on a tinted page. Prints on white, cards outlined. */
+.doc[data-template="bento"] {
+  --paper-bg: #f3f4f8;
+  --card-line: rgba(20, 26, 46, 0.09);
+}
+
+.doc[data-template="bento"] .doc__header,
+.doc[data-template="bento"] .doc__section {
+  padding: 1.05em 1.2em;
+  border: 1px solid var(--card-line);
+  border-radius: 1.1em;
+  background: #fff;
+}
+
+.doc[data-template="bento"] .doc__header {
+  padding: 1.3em 1.5em;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 12%, #fff), #fff 70%);
+}
+
+.doc[data-template="bento"] .doc__header:has(.doc__photo) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas: "id photo" "contact photo";
+  align-items: center;
+  column-gap: 1.4em;
+}
+
+.doc[data-template="bento"] .doc__header:has(.doc__photo) .doc__id {
+  grid-area: id;
+  align-self: end;
+}
+
+.doc[data-template="bento"] .doc__header:has(.doc__photo) .doc__contact {
+  grid-area: contact;
+  align-self: start;
+}
+
+.doc[data-template="bento"] .doc__header:has(.doc__photo) .doc__photo {
+  grid-area: photo;
+  width: 7.8em;
+  height: 7.8em;
+  border-radius: 1.2em;
+  box-shadow: 0 0 0 4px #fff, 0 8px 22px rgba(20, 26, 46, 0.18);
+}
+
+.doc[data-template="bento"][data-photo="circle"] .doc__photo {
+  border-radius: 50%;
+}
+
+.doc[data-template="bento"] .doc__role {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.doc[data-template="bento"] .doc__body {
+  margin-top: calc(var(--gap) * 0.6);
+}
+
+.doc[data-template="bento"] .doc__main {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: calc(var(--gap) * 0.6);
+}
+
+.doc[data-template="bento"] .doc__main > .doc__section {
+  margin-top: 0;
+}
+
+.doc[data-template="bento"] .doc__main > .doc__section:is([data-type="summary"], [data-type="experience"], [data-type="projects"], [data-type="custom"]),
+.doc[data-template="bento"] .doc__main > .doc__empty {
+  grid-column: 1 / -1;
+}
+
+.doc[data-template="bento"] .doc__heading {
+  display: flex;
+  align-items: center;
+  gap: 0.55em;
+  border-bottom: 0;
+  padding-bottom: 0;
+  font-size: 0.78em;
+}
+
+.doc[data-template="bento"] .doc__heading::before {
+  content: "";
+  width: 0.7em;
+  height: 0.7em;
+  border-radius: 0.25em;
+  background: var(--accent);
+}
+
+.doc[data-template="bento"] .doc__entry-title {
+  font-weight: 800;
+}
+
+.doc[data-template="bento"] .doc__chips li {
+  background: color-mix(in srgb, var(--accent) 9%, #fff);
+}
+
+@media print {
+  .doc[data-template="bento"] {
+    --paper-bg: #fff;
+    background: #fff;
+  }
+
+  .doc[data-template="bento"] .doc__header {
+    background: #fff;
+  }
+}

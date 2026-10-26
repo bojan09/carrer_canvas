@@ -1,7 +1,7 @@
 import { h } from "../utils/dom.js";
 import { announce } from "../components/announcer.js";
 import { toast } from "../components/toast.js";
-import { renderTemplateOf, resolveDesign } from "../templates/design.js";
+import { photoVisible, renderTemplateOf, resolveDesign } from "../templates/design.js";
 import { compressPhoto, PHOTO_ERRORS, PHOTO_TYPES } from "./photo.js";
 
 let uid = 0;
@@ -27,8 +27,15 @@ export function photoControls({ doc, ctx, headingId = "photo-h", level = "h3" })
     if (!file) return;
     try {
       const result = await compressPhoto(file);
-      ctx.change(() => (doc.photo = result), { structural: true, focusKey: "design:photo-show" });
-      toast({ message: "Photo added. Turn on “Show photo” to include it.", tone: "ok" });
+      ctx.change(
+        () => {
+          doc.photo = result;
+          if (doc.designSettings.showPhoto === undefined) doc.designSettings.showPhoto = true; // adding a photo means you want to see it
+        },
+        { structural: true, focusKey: "design:photo-show" },
+      );
+      const shown = photoVisible(doc);
+      toast({ message: shown ? "Photo added and shown on the resume." : `Photo added. ${renderTemplateOf(doc).name} does not show photos, so choose another template to see it.`, tone: shown ? "ok" : "warn" });
     } catch (err) {
       toast({ message: PHOTO_ERRORS[err.message] || "Could not use that photo.", tone: "warn", duration: 7000 });
     }

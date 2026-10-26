@@ -14,7 +14,7 @@ const check = (name, ok, detail = "") => {
   console.log(`${ok ? "PASS" : "FAIL"}  ${name}${detail ? "  " + detail : ""}`);
 };
 
-const IDS = ["summit", "grid", "aurora", "velo", "slate", "bloom", "vertex", "nexus", "prism", "orbit"];
+const IDS = ["summit", "grid", "aurora", "velo", "slate", "bloom", "vertex", "nexus", "prism", "orbit", "glass", "bento", "horizon", "swiss", "mono"];
 // Valid 16x16 red PNG generated at runtime (proper CRCs), so createImageBitmap can decode it
 import { deflateSync } from "node:zlib";
 function makePng(w, h) {
@@ -51,11 +51,11 @@ const edit = () => page.check('input[name="studio-view"][value="edit"]');
 // ---------- gallery ----------
 await page.goto(`${base}/#/templates`);
 await page.waitForSelector(".template-card .thumb .doc");
-check("gallery shows 10 real rendered thumbnails", (await page.locator(".template-card .thumb .doc").count()) === 10);
+check("gallery shows 15 real rendered thumbnails", (await page.locator(".template-card .thumb .doc").count()) === 15);
 const rendered = await page.locator(".template-card .thumb .doc").evaluateAll((els) => els.map((e) => e.dataset.template));
 check("each gallery card renders its own template", IDS.every((id) => rendered.includes(id)));
 await page.click('[data-cat="Tech"]');
-check("category filter works (Tech = 2)", (await page.locator(".template-card").count()) === 2);
+check("category filter works (Tech = 3)", (await page.locator(".template-card").count()) === 3);
 await page.click('[data-cat="All"]');
 
 await page.getByRole("button", { name: "Preview Velo" }).click();
@@ -202,7 +202,8 @@ await page.getByLabel(/Simplified layout/).uncheck();
 await page.locator(`[data-focus-key="tpl:velo"]`).click();
 await page.setInputFiles('.design input[type="file"]', { name: "me.png", mimeType: "image/png", buffer: PNG });
 await page.waitForSelector(".design .design__photo");
-check("photo uploads but is NOT shown until enabled", (await page.locator(".stage__sizer .doc__photo").count()) === 0);
+await page.waitForTimeout(400);
+check("a newly added photo is shown straight away", (await page.locator(".stage__sizer .doc__photo").count()) === 1);
 const stored = await page.evaluate(() => document.querySelector(".design .design__photo").src);
 check("photo is stored as a small re-encoded JPEG data URL", stored.startsWith("data:image/jpeg;base64,") && stored.length < 150000, `${stored.length} chars`);
 await page.locator(".design").getByLabel("Show photo on resume").check();

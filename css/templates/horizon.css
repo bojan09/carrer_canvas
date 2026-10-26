@@ -1,0 +1,93 @@
+/* Horizon: full-width gradient banner with the portrait overlapping its lower edge.
+   Prints without the banner fill (outlined) to save ink. */
+.doc[data-template="horizon"] .doc__header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  margin: calc(var(--margin) * -1) calc(var(--margin) * -1) 0;
+  padding: calc(var(--margin) * 1.1) var(--margin) 1.4em;
+  background: linear-gradient(120deg, color-mix(in srgb, var(--accent) 88%, #000), var(--accent) 55%, color-mix(in srgb, var(--accent) 55%, #ff8a3d));
+  color: #fff;
+}
+
+.doc[data-template="horizon"] .doc__header:has(.doc__photo) {
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-areas: "photo id" "photo contact";
+  column-gap: 1.5em;
+  align-items: end;
+  padding-bottom: 1.6em;
+}
+
+.doc[data-template="horizon"] .doc__header:has(.doc__photo) .doc__photo {
+  grid-area: photo;
+  position: relative;
+  align-self: end;
+  width: 8.6em;
+  height: 8.6em;
+  margin-bottom: -4.2em;
+  box-shadow: 0 0 0 5px #fff, 0 12px 28px rgba(0, 0, 0, 0.25);
+}
+
+.doc[data-template="horizon"] .doc__header:has(.doc__photo) .doc__id {
+  grid-area: id;
+}
+
+.doc[data-template="horizon"] .doc__header:has(.doc__photo) .doc__contact {
+  grid-area: contact;
+}
+
+.doc[data-template="horizon"] .doc__header:has(.doc__photo) + .doc__body {
+  margin-top: calc(var(--gap) + 4.2em);
+}
+
+.doc[data-template="horizon"] .doc__role {
+  color: rgba(255, 255, 255, 0.92);
+  font-weight: 600;
+}
+
+.doc[data-template="horizon"] .doc__contact {
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.doc[data-template="horizon"] .doc__heading {
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  border-bottom: 0;
+  padding-bottom: 0;
+  font-size: 0.82em;
+}
+
+.doc[data-template="horizon"] .doc__heading::before {
+  content: "";
+  width: 0.55em;
+  height: 0.55em;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 0.25em color-mix(in srgb, var(--accent) 20%, transparent);
+}
+
+.doc[data-template="horizon"] .doc__entry-title {
+  font-weight: 800;
+}
+
+@media print {
+  .doc[data-template="horizon"] .doc__header {
+    background: #fff;
+    border-bottom: 6px solid var(--accent);
+    color: #111;
+  }
+
+  .doc[data-template="horizon"] .doc__role,
+  .doc[data-template="horizon"] .doc__contact {
+    color: #333;
+  }
+
+  .doc[data-template="horizon"] .doc__header:has(.doc__photo) .doc__photo {
+    margin-bottom: 0;
+    box-shadow: none;
+  }
+
+  .doc[data-template="horizon"] .doc__header:has(.doc__photo) + .doc__body {
+    margin-top: var(--gap);
+  }
+}

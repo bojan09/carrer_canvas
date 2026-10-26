@@ -1,0 +1,112 @@
+/* Glass: dark mesh-gradient page with frosted cards (glassmorphism). Prints on white, cards outlined. */
+.doc[data-template="glass"] {
+  --paper-bg: #0b1026;
+  --ink: #eef1ff;
+  --ink-2: #b4bde6;
+  --rule: rgba(255, 255, 255, 0.18);
+  --card: rgba(255, 255, 255, 0.07);
+  --card-line: rgba(255, 255, 255, 0.17);
+  background:
+    radial-gradient(60% 22% at 90% 2%, color-mix(in srgb, var(--accent) 55%, transparent), transparent 70%),
+    radial-gradient(55% 26% at 0% 55%, rgba(34, 211, 238, 0.22), transparent 70%),
+    radial-gradient(60% 24% at 100% 100%, rgba(176, 108, 242, 0.3), transparent 70%),
+    #0b1026;
+}
+
+.doc[data-template="glass"] .doc__header,
+.doc[data-template="glass"] .doc__section {
+  padding: 1em 1.2em;
+  border: 1px solid var(--card-line);
+  border-radius: 1em;
+  background: var(--card);
+}
+
+.doc[data-template="glass"] .doc__header {
+  padding: 1.3em 1.5em;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.13), rgba(255, 255, 255, 0.04));
+}
+
+.doc[data-template="glass"] .doc__header:has(.doc__photo) {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-areas: "photo id" "contact contact";
+  align-items: center;
+  column-gap: 1.4em;
+}
+
+.doc[data-template="glass"] .doc__header:has(.doc__photo) .doc__photo {
+  grid-area: photo;
+  width: 7.6em;
+  height: 7.6em;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.55), 0 0 28px color-mix(in srgb, var(--accent) 60%, transparent);
+}
+
+.doc[data-template="glass"] .doc__header:has(.doc__photo) .doc__id {
+  grid-area: id;
+}
+
+.doc[data-template="glass"] .doc__header:has(.doc__photo) .doc__contact {
+  grid-area: contact;
+}
+
+.doc[data-template="glass"] .doc__role {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.doc[data-template="glass"] .doc__body {
+  margin-top: var(--gap);
+}
+
+.doc[data-template="glass"] .doc__main {
+  display: grid;
+  gap: calc(var(--gap) * 0.6);
+}
+
+.doc[data-template="glass"] .doc__main > .doc__section,
+.doc[data-template="glass"] .doc__side > .doc__section {
+  margin-top: 0;
+}
+
+.doc[data-template="glass"] .doc__heading {
+  border-bottom: 0;
+  padding-bottom: 0;
+  font-size: 0.78em;
+  letter-spacing: 0.16em;
+}
+
+.doc[data-template="glass"] .doc__entry-title {
+  color: #fff;
+}
+
+.doc[data-template="glass"] .doc__chips li {
+  border-color: rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--ink);
+}
+
+@media print {
+  .doc[data-template="glass"] {
+    --paper-bg: #fff;
+    --ink: #111;
+    --ink-2: #333;
+    --card: #fff;
+    --card-line: #ccd2e0;
+    --accent: #2b3a8f !important;
+    background: #fff;
+  }
+
+  .doc[data-template="glass"] .doc__header {
+    background: #fff;
+  }
+
+  .doc[data-template="glass"] .doc__entry-title {
+    color: #000;
+  }
+
+  .doc[data-template="glass"] .doc__chips li {
+    border-color: #99a3c4;
+    background: #f1f3fa;
+    color: #111;
+  }
+}

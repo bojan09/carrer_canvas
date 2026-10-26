@@ -437,6 +437,14 @@ textarea.input {
   }
 
   .studio__paperwrap {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    min-height: 0;
+  }
+
+  .studio__paperwrap > .stage {
+    flex: 1;
     height: auto;
     min-height: 0;
   }
